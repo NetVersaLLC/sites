@@ -1,0 +1,20 @@
+seed = rand(10000).to_s()
+data = {}
+data['first_name'] 		= business.contact_first_name
+data['last_name'] 		= business.contact_last_name
+data['email'] 			= business.bings.first.email
+data['password'] 		= Yahoo.make_password
+data['country'] = 'United States'
+data['postalcode'] = business.zip
+data['status'] = 'employed'
+#data['status'] = 'looking'
+#data['status'] = 'student'
+data['jobtitle'] = business.category1 + ' ' + business.category2 + ' ' + business.category3
+data['company'] = business.business_name
+data['industry'] = 'Accounting'
+data['self_employed'] = false
+data['startYear'] = business.year_founded
+data['endYear'] = 'Present'
+#data['endYear'] = 1999
+data['university'] = 'My Personal'
+data

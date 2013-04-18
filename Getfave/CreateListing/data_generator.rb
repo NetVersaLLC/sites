@@ -1,0 +1,23 @@
+data = {}
+data[ 'phone' ] 		= business.local_phone
+data[ 'email' ] 		= business.getfavs.first.email
+data[ 'address' ]  	    	= business.address + ' ' + business.address2 + ', ' + business.city + ',  ' + business.state + ', ' + business.zip
+data[ 'password' ] 		= business.getfavs.first.password
+data[ 'name' ] 			= business.contact_first_name + ' ' + business.contact_last_name
+data[ 'business' ] 		= business.business_name
+data[ 'city' ] 			= business.city
+data[ 'state' ] 		= business.state
+data[ 'location' ] 		= data[ 'city' ] +', '+data[ 'state' ]
+data[ 'zip' ] 			= business.zip
+data[ 'category' ] 		= business.category1
+data[ 'company_details' ] 	= business.business_description
+data[ 'keywords' ] 		= business.category1 + ' ' + business.category2 + ' ' + business.category3 + ' ' + business.category4 + ' ' + business.category5
+data[ 'year' ]  		= business.year_founded
+data[ 'business_email' ]  	= business.bings.first.email
+data[ 'business_hours' ]  	= Getfav.consolidate_hours( business )
+data[ 'tagline' ]  		= business.category1 + ' ' + business.category2
+data[ 'user_type' ]  		= 'new'
+data[ 'discription' ] 		= business.business_description
+data[ 'url' ] 			= business.company_website
+data[ 'bus_name_fixed'] 	= business.business_name.gsub(" ", "+")
+data

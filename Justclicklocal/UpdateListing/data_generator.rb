@@ -1,0 +1,22 @@
+data = {}
+data['email']			= business.justclicklocals.first.username
+data['password']		= business.justclicklocals.first.password
+data[ 'business' ]		= business.business_name
+data['address']			= business.address
+data['address2']		= business.address2
+data['city']			= business.city
+data[ 'phone' ]			= business.local_phone
+data[ 'state' ]			= business.state
+data['zip']			= business.zip
+data['url']			= business.company_website
+data['fax']			= business.fax_number
+data['description']		= business.business_description
+data['products']		= ""
+data['services']		= ""
+data['brands']			= ""
+data['num_locations']		= ""
+data['num_employees']		= ""
+data['year_established']	= business.year_founded
+data[ '24hours' ]		= business.open_24_hours
+data[ 'hours' ]			= Localndex.get_hours( business )
+data

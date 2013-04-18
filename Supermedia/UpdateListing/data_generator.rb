@@ -1,0 +1,19 @@
+data = {}
+data['email']			= business.supermedia.first.username
+data['password']		= business.supermedia.first.password
+data[ 'phone' ]			= business.local_phone
+data[ 'business' ]		= business.business_name
+data[ 'addressComb' ]	= business.address + " " + business.address2
+data[ 'city' ]			= business.city
+data[ 'state' ]			= business.state
+data[ 'zip' ]			= business.zip
+data[ 'url' ]		= business.company_website
+data[ 'category1' ]		= business.category1
+data[ 'fname' ]			= business.contact_first_name
+data[ 'lname' ]			= business.contact_last_name
+data[ 'tollfree' ]		= business.toll_free_phone
+data[ 'desc' ]			= business.business_description
+data[ 'founded' ]		= business.year_founded
+data[ 'fax' ]			= business.fax_number
+data['categories']		= [business.category1,business.category2,business.category3,business.category4,business.category5]
+data

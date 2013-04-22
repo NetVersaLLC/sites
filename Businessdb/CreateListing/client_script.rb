@@ -14,7 +14,8 @@ def add_listing(data)
   @browser.text_field(:id => 'company_phone').set data[ 'phone' ]
   @browser.text_field(:id => 'company_fax').set data[ 'fax' ]
   @browser.select_list(:name => 'city_id').select data[ 'city' ]
-  @browser.select_list(:name => 'category_id').select data[ 'category' ]
+  @browser.select_list(:name => 'category_id').select data[ 'business_category' ]
+  @browser.select_list(:name => 'category_id_1').select data[ 'business_category2' ]
   @browser.link(:text=> 'Finish').click
 
   @confirmation_msg = 'Our premium service is launching soon!'
@@ -22,6 +23,7 @@ def add_listing(data)
   if @browser.text.include?(@confirmation_msg)
     puts "Initial registration Successful"
     RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data[ 'username' ], 'account[password]' => data['password'], 'model' => 'Businessdb'
+    true
   else
     throw "Initial registration not successful"
   end

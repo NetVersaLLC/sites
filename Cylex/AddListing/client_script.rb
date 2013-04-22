@@ -117,4 +117,5 @@ if search_company(data)
   claim_business(data)
 else
   add_new_business(data)
+  true
 end

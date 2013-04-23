@@ -10,3 +10,14 @@ def find_site(data)
 
 	return @browser.div(:class => "nearby_patches").links.first.attribute_value('href')
 end
+
+
+def sign_in(data)
+	url = find_site(data)
+	@browser.goto(url + "signin")
+	@browser.text_field(:id => 'user_email').set data['email']
+	@browser.text_field(:id => 'user_password').set data['password']
+	@browser.button(:id => 'user_submit').click
+	Watir::Wait.until { @browser.link(:href => /users/i).exists? }
+	return url
+end

@@ -35,14 +35,15 @@ enter_captcha
 @browser.button(:id => 'submitButton').click
 
 sleep(5) #adding sleeps as it timesout after 30 seconds more often than usual. Just giving it some buffer time
+RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'account[secret_answer]' => data['secret_answer'], 'model' => 'Adsolutionsyp'
 Watir::Wait.until {@browser.text.include? "Your listing will not be displayed on YP.com until you have completed verification."}
 
+=begin
 @browser.link(:id => 'verifyLaterPhoneLink').click
 
 sleep(5)
 Watir::Wait.until {@browser.text.include? "Your Free Listing Details"}
-
-RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'account[secret_answer]' => data['secret_answer'], 'model' => 'Adsolutionsyp'
+=end
 
 if @chained
 	self.start("Adsolutionsyp/Verify")

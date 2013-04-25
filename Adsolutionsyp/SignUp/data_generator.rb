@@ -14,7 +14,6 @@ data['city']				= business.city
 data['state']				= business.state
 data['zip']					= business.zip
 data['founded']				= business.year_founded
-data['category']			= "Food Delivery Service"
 data['payments']			= Adsolutionsyp.payment_methods(business)
 data['password']			= Yahoo.make_password
 data['secret_answer']		= Yahoo.make_secret_answer1

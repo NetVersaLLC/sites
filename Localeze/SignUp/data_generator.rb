@@ -1,7 +1,7 @@
 data = {}
 
 catty                       = Localeze.where(:business_id => business.id).first
-data[ 'category' ]          = catty.localeze_category.parent.name.gsub("\n", "")
+data[ 'category' ]          = catty.localeze_category.name.gsub("\n", "")
 
 data[ 'phone' ]     	    = business.local_phone
 data[ 'phone_area' ]        = business.local_phone.split("-")[1]

@@ -21,7 +21,7 @@ enter_captcha( data )
 
   # If no return URl then 'Thank You for Registering with Express Update. An activation email sent!'
 
-RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['personal_email'], 'account[password]' => data['password'], 'model' => 'Expressupdateusa'
+RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['personal_email'], 'account[personal_password]' => data['password'], 'model' => 'Expressupdateusa'
 
 
 if @chained

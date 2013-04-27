@@ -1,11 +1,14 @@
 #Search Business
 @url = 'https://www.getfave.com/login'
-@browser = Watir::Browser.new
 @browser.goto(@url)
 @browser.text_field( :id => 'session_email' ).set data[ 'email' ]
 @browser.text_field( :id => 'session_password' ).set data[ 'password' ]
-@browser.button(:value,'Log In').click
-@browser.link(:id,'change-location').flash
+sleep(1)
+@browser.button(:xpath => '//*[@id="signin-container"]/form/input[3]').click
+
+
+sleep(100000)
+@browser.link(:id,'change-location').when_present.flash
 @browser.link(:id,'change-location').when_present.click
 @browser.text_field(:id, 'g-text-field').set data[ 'city' ] + ", " + data[ 'state' ]
 @browser.button(:value,'Pin').click

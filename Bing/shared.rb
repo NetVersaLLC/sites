@@ -116,9 +116,49 @@ def enter_captcha
 	count = 1
 	until capSolved or count > 5 do
 		captcha_code = solve_captcha2	
-		@browser.text_field( :class => 'spHipNoClear hipInputText' ).set captcha_code
-		@browser.button( :title => /I accept/i ).click
-		sleep(2)
+
+
+    @browser.execute_script("
+      function getRealId(partialid){
+        var re= new RegExp(partialid,'g')
+        var el = document.getElementsByTagName('*');
+        for(var i=0;i<el.length;i++){
+          if(el[i].id.match(re)){
+            return el[i].id;
+            break;
+          }
+        }
+      }
+      
+      _d.getElementById(getRealId('wlspispSolutionElement')).value = '#{captcha_code}';
+
+    ")
+
+sleep(10)
+@browser.execute_script('
+  jQuery("#SignUpForm").submit()
+  ')
+
+begin
+  @browser.execute_script('
+var result = document.evaluate("//*[@id=\'createbuttons\']/input", document, null, 0, null),item;
+
+while (item = result.iterateNext()) {
+    jQuery(item).trigger("onclick")
+}
+
+  ')
+rescue
+  
+end
+
+
+
+		#capfield = @browser.text_field( :class => 'spHipNoClear hipInputText',:index => 1 )
+    #capfield.focus
+    #capfield.set captcha_code
+		#@browser.button( :xpath => '//*[@id="createbuttons"]/input' ).click
+		
 		if not @browser.text.include? "The characters didn't match the picture. Please try again."
 			capSolved = true
 		end

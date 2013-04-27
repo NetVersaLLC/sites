@@ -97,6 +97,7 @@ def add_new_listing( data )
   }
 =end
   @browser.button( :id, 'SubmitListingButton' ).click
+  
   true
 
 end

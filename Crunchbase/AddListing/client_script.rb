@@ -9,7 +9,7 @@ process_crunchbase_signin(data)
 @browser.text_field(:id => 'company_homepage_url').set data['url']
 @browser.select_list(:id => 'company_founded_year').select data['yearfounded']
 
-@browser.file_field(:id => 'company_image_attributes_uploaded_data').set data['logo']
+#@browser.file_field(:id => 'company_image_attributes_uploaded_data').set data['logo']
 @browser.text_field(:id => 'company_overview').set data['description']
 puts("Finished entering info")
 enter_captcha_addbusiness

@@ -2,7 +2,7 @@ data = {}
 catty = Gomylocal.where(:business_id => business.id).first
 data[ 'category1' ]		= catty.gomylocal_category.name
 data[ 'username' ]		= business.bings.first.email.split("@")[0]
-data[ 'password' ]		= Yahoo.make_password(0 .. 7) #z5U8O36s
+data[ 'password' ]		= Yahoo.make_password[0 .. 7] #z5U8O36s
 data[ 'fname' ]			= business.contact_first_name
 data[ 'lname' ]			= business.contact_last_name
 data[ 'addressComb' ]		= business.address + "  " + business.address2

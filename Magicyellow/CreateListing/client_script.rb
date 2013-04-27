@@ -42,6 +42,7 @@ def add_new_business(data)
   # Add payment_options
   payments = data['payment_option']
   payments.each do |payment|
+    next if card_type(payment).to_s == ""
     @browser.checkbox(:value => card_type(payment).to_s).click
   end
   @browser.button(:value => 'Submit').click

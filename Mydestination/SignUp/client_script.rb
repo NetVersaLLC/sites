@@ -1,5 +1,5 @@
 def add_business(data)
-  @browser.div(:id => 'footer').link(:text => 'Add Your Business').click
+  @browser.div(:id => 'footer').when_present.link(:text => 'Add Your Business').click
   @browser.text_field(:name => 'contactName').set data[ 'full_name' ]	
   @browser.text_field(:name => 'companyName').set data[ 'business' ]
   @browser.text_field(:name => 'telephone').set data[ 'phone' ]

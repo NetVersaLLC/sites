@@ -23,9 +23,9 @@ data = {}
     data[ 'business_keywords' ] = business.category1 + ', ' + business.category2 + ', ' + business.category3 + ', ' + business.category4 + ', ' + business.category5
     data[ 'business_employeesize' ] = '12'
 
-    data[ 'business_logourl' ] = data[ 'business_url' ] + '/logo.gif'
-    data[ 'business_alternateurl' ] = data[ 'business_url' ]
-    data[ 'business_couponurl' ] = data[ 'business_url' ] + '/coupons'
+    data[ 'business_logourl' ] = data[ 'business_url' ] + '/logo.gif'.gsub( "www.", "").gsub("http://","")
+    data[ 'business_alternateurl' ] = data[ 'business_url' ].gsub( "www.", "").gsub("http://","")
+    data[ 'business_couponurl' ] = data[ 'business_url' ] + '/coupons'.gsub( "www.", "").gsub("http://","")
     data[ 'business_mondayopen' ] = business.monday_open
     data[ 'business_mondayclose' ] = business.monday_close
     # TODO: specify rest of the days and closed state
@@ -42,7 +42,7 @@ data = {}
     data[ 'personal_password' ]  = business.bings.first.password
     data[ 'personal_firstname' ] = business.contact_first_name
     data[ 'personal_lastname' ] = business.contact_last_name
-    data[ 'personal_url' ]  = business.company_website
+    data[ 'personal_url' ]  = business.company_website.gsub( "www.", "").gsub("http://","")
     data[ 'personal_title' ]  = 'Owner'
     data[ 'personal_phone' ] = business.local_phone
 

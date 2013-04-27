@@ -11,15 +11,15 @@ def add_listing(data)
 	@browser.text_field(:name => 'ListStatement').set data[ 'business_description' ]
 
 	#Enter Decrypted captcha string here
-	enter_captcha( data )
-
+	enter_captcha
 	@browser.link(:href => 'thankyou.php').click
 
 	@confirmation_msg = 'Your submission was successful and has now been sent to our review department.'
 
 	if @browser.text.include?(@confirmation_msg)
 		puts "Initial registration Successful"
-		RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data[ 'username' ],'model' => 'Discoverourtown'
+		RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data[ 'email' ],'model' => 'Discoverourtown'
+		true
 		else
 		throw "Initial registration not successful"
 	end
@@ -30,9 +30,4 @@ end
 # Launch url
 url = 'http://www.discoverourtown.com/add/'
 @browser.goto(url)
-
-if search_business(data)
   add_listing(data)
-else
-  puts "Business Already Exist"
-end

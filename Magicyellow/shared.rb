@@ -30,6 +30,7 @@ def search_by_phone(data)
   @business_found = false
   @browser.text_field(:name => 'phone').set data[ 'phone' ]
   @browser.button(:value=> 'Search').click
+  sleep(10)
   if not @browser.html.include?("<i>No matches found for <b>")
     @business_found = true
   end

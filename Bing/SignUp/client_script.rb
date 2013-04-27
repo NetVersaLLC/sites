@@ -1,42 +1,85 @@
-def get_email_name( business )
-  business[ 'name' ].downcase.delete( ' ' ).strip + (rand( 10000 )+200).to_s
-end
+@browser.goto('https://signup.live.com/signup.aspx?')
 
-def sign_up( business )
-  @browser.text_field(  :id, 'iFirstName' ).set     business[ "first_name" ]
-  @browser.text_field(  :id, 'iLastName' ).set      business[ "last_name" ]
-  @browser.select_list( :id, 'iBirthMonth' ).select business[ 'birth_month' ]
-  @browser.select_list( :id, 'iBirthDay' ).select   business[ 'birth_day' ]
-  @browser.select_list( :id, 'iBirthYear' ).select  business[ 'birth_year' ]
-  @browser.select_list( :id, 'iGender' ).select     business[ 'gender' ]
+
+  @browser.execute_script("
+
+      _d.getElementById('iFirstName').value = '#{data[ "first_name" ]}';
+      _d.getElementById('iLastName').value = '#{data[ "last_name" ]}';
+      _d.getElementById('iBirthMonth').value = '#{data[ "birth_month" ]}';
+      _d.getElementById('iBirthDay').value = '#{data[ "birth_day" ]}';
+      _d.getElementById('iBirthYear').value = '#{data[ "birth_year" ]}';
+      _d.getElementById('iGender').value = 'u';
+
+
+    ")
+
+puts(data['password'])
+puts(data['secret_answer'])
+sleep(3)
+=begin
+  @browser.text_field(  :id, 'iFirstName' ).set     data[ "first_name" ]
+  @browser.text_field(  :id, 'iLastName' ).set      data[ "last_name" ]
+  @browser.select_list( :id, 'iBirthMonth' ).select data[ 'birth_month' ]
+  @browser.select_list( :id, 'iBirthDay' ).select   data[ 'birth_day' ]
+  @browser.select_list( :id, 'iBirthYear' ).select  data[ 'birth_year' ]
+  @browser.select_list( :id, 'iGender' ).select     data[ 'gender' ]
+=end  
   # click <get a new email address> to open alt email field
+  
+@browser.execute_script("
+jQuery('#iliveswitch').trigger('click')
+")
+sleep(4)
+
+@browser.execute_script("
+jQuery('#iqsaswitch').trigger('click')
+")
+sleep(4)
+
+@browser.execute_script("
+  _d.getElementById('iSQ').value = 'Name of first pet'
+_d.getElementById('iAltEmail').value = '#{data[ "alt_email" ]}';
+_d.getElementById('iSA').value = '#{data[ "secret_answer" ]}';
+_d.getElementById('iCountry').value = '#{data[ "country" ]}';
+_d.getElementById('iZipCode').value = '#{data["zip"]}';
+_d.getElementById('iOptinEmail').checked = false;
+
+_d.getElementById('iPwd').value = '#{data[ "password" ]}';
+_d.getElementById('iRetypePwd').value = '#{data[ "password" ]}';
+")
+  
+email_name = data[ 'name' ].downcase.delete( ' ' ).strip + (rand( 10000 )+200).to_s #get_email_name( data )
+
+@browser.execute_script("
+ _d.getElementById('imembernamelive').value = '#{email_name}';
+")
+
+  data[ 'hotmail' ] = email_name + '@outlook.com'
+  puts(data['hotmail'])
+=begin
   @browser.link( :id, 'iliveswitch' ).click
   sleep 4 # or wait until id => imembernamelive exists
   # Choose a security question
   @browser.link( :id, 'iqsaswitch' ).click
   sleep 4 # or wait until id => iSA exists
   @browser.select_list( :id, 'iSQ' ).select      'Name of first pet'
-  @browser.text_field( :id, 'iAltEmail' ).set    business[ 'alt_email' ]
-  @browser.text_field( :id, 'iSA' ).set          business[ 'secret_answer' ]
-  @browser.select_list( :id, 'iCountry' ).select business[ 'country' ]
-  @browser.text_field( :id, 'iZipCode' ).set     business[ 'zip' ]
+  @browser.text_field( :id, 'iAltEmail' ).set    data[ 'alt_email' ]
+  @browser.text_field( :id, 'iSA' ).set          data[ 'secret_answer' ]
+  @browser.select_list( :id, 'iCountry' ).select data[ 'country' ]
+  @browser.text_field( :id, 'iZipCode' ).set     data[ 'zip' ]
   @browser.checkbox( :id, 'iOptinEmail' ).clear
  
-  @browser.text_field( :name, 'iPwd' ).set       business[ 'password' ]
-  @browser.text_field( :name, 'iRetypePwd' ).set business[ 'password' ]
-  email_name = get_email_name( business )
+  @browser.text_field( :name, 'iPwd' ).set       data[ 'password' ]
+  @browser.text_field( :name, 'iRetypePwd' ).set data[ 'password' ]
+  email_name = data[ 'name' ].downcase.delete( ' ' ).strip + (rand( 10000 )+200).to_s #get_email_name( data )
   @browser.text_field( :id, 'imembernamelive' ).set email_name
-  business[ 'hotmail' ] = email_name + '@hotmail.com'
+  data[ 'hotmail' ] = email_name + '@hotmail.com'
+  puts(data['hotmail'])
+=end
+
   enter_captcha
  
-	RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => business['hotmail'], 'account[password]' => business['password'], 'account[secret_answer]' => business['secret_answer'], 'model' => 'Bing'
-
- end
-puts("before goto")	 
-
-@browser.goto('https://signup.live.com/')
-sign_up( data )
-
+	RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['hotmail'], 'account[password]' => data['password'], 'account[secret_answer]' => data['secret_answer'], 'model' => 'Bing'
 if @chained
 		self.start("Bing/CreateRule")
 end

@@ -36,12 +36,12 @@ end
 
 puts(data['password'])
 
-if @browser.text.include? 'Thank you for Registering USBDN.com.'
+sleep 2
+Watir::Wait.until { @browser.text.include? 'Thank you for Registering USBDN.com.' }
 RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['fakeurl'], 'account[password]' => data['password'], 'model' => 'Usbdn'
-#	if @chained
-#		self.start("Usbdn/Verify")
-#	end
-	true
-end
+	if @chained
+		self.start("Usbdn/Verify")
+	end
+true
 
 

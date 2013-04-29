@@ -9,12 +9,13 @@
 @browser.text_field( :id => 'confirm_password').set data[ 'password' ]
 
 enter_captcha( data )
-
-if @browser.text.include? "Thank you for registering. An activation email has just been sent to your email address. Use the link in that email to activate your account."
+sleep 2
+Watir::Wait.until { @browser.text.include? "Thank you for registering. An activation email has just been sent to your email address. Use the link in that email to activate your account." }
+	
 	RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['email'], 'account[password]' => data['password'], 'model' => 'Yellowise'
 	if @chained
 		self.start("Yellowise/Verify")
 	end
 true
 
-end
+

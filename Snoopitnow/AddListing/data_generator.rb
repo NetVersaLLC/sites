@@ -1,6 +1,6 @@
 data = {}
 catty                       = Snoopitnow.where(:business_id => business.id).first
-data[ 'category1' ]          = catty.snoopitnow_category.parent.name.gsub("\n", "")
+data[ 'category1' ]          = catty.snoopitnow_category.name.gsub("\n", "")
 
 data[ 'username' ]		= business.bings.first.email[0..14]
 data[ 'password' ]		= Yahoo.make_password

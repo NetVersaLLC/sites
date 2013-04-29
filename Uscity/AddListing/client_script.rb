@@ -19,6 +19,7 @@
   enter_captcha(data)
 
   @confirmation_msg = 'Verification link has been sent to your email.'
+  sleep(3)
   Watir::Wait.until{ @browser.text.include? @confirmation_msg }
 
   if @browser.text.include?(@confirmation_msg)

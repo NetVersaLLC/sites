@@ -11,8 +11,8 @@ def add_business( data )
 	@browser.text_field( :id, 'listingForm:zip').set data[ 'zip' ]
 	@browser.text_field( :id, 'listingForm:web').set data[ 'website' ]
 	@browser.text_field( :id, 'listingForm:email').set data[ 'business_email' ]
-	@browser.text_field( :xpath, '/html/body[2]/form/table/tbody/tr[2]/td/table/tbody/tr[2]/td/div[3]/div/div/table/tbody/tr/td[2]/input').set data[ 'first_name' ] + ' ' + data[ 'last_name' ] 
-	@browser.text_field( :xpath, '/html/body[2]/form/table/tbody/tr[2]/td/table/tbody/tr[2]/td/div[3]/div/div/table/tbody/tr[2]/td[2]/input').set data[ 'email' ]
+	@browser.text_field( :id, 'listingForm:_id154').set data[ 'first_name' ] + ' ' + data[ 'last_name' ] 
+	@browser.text_field( :id, 'listingForm:_id159').set data[ 'email' ]
 	@browser.radio( :value, 'O').set
 
 	#Now to add categories. At least 1 category is required.

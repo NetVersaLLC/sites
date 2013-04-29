@@ -41,12 +41,10 @@ hours.each_with_index do |hour,day|
 		if theday == "thu"
 			theday = "thur"
 		end
-		puts("fails here")
 		if not @browser.checkbox( :id => "ctl00_MainContent_customBusinessHours_#{theday}CheckBox").set?
 			@browser.checkbox( :id => "ctl00_MainContent_customBusinessHours_#{theday}CheckBox").click
 			sleep(3)
 		end
-		puts("fails here")
 		if theday == "thur"
 			theday = "thurs"
 		end
@@ -98,11 +96,12 @@ hours.each_with_index do |hour,day|
 		if theday == "thu"
 			theday = "thur"
 		end
-			puts("or here")
+		if theday == "tue"
+			theday = "tues"
+		end
 			@browser.checkbox( :id => "ctl00_MainContent_customBusinessHours_#{theday}CheckBox").click
 			puts("clicked the checkbox")
 			sleep(3)		
-			puts("or here")
 	end
 
 end

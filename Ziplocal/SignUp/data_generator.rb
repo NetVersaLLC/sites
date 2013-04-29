@@ -15,5 +15,6 @@ data[ 'countryAbrv' ] = 'US'
 data[ 'citystate' ] = data[ 'city' ] + ', ' + data[ 'stateabreviation' ]
 data[ 'password' ] = Yahoo.make_password
 data[ 'website' ] = business.company_website
-data[ 'categoryKeyword' ] = 'Restaurant'#business.category1 #'computer'
+catty 			= Ziplocal.where(:business_id => business.id).first
+data[ 'categoryKeyword' ] = catty.ziplocal_category.name
 data

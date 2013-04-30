@@ -40,17 +40,11 @@ data[ 'payment_methods' ].each{ | method |
 
 @browser.button( :value => /Submit Business/).click
 
-if @browser.text.include? "Congratulations"
-#phone verification
-	@browser.button( :value => /Claim Now/i).click
-	@browser.button( :value => /Click to Call Your Phone & Receive Code/i).click
-	code = PhoneVerify.ask_for_code	
-	@browser.text_field( :name => 'verification_code').set code
-	@browser.button( :value => /Submit/).click
-	if @browser.text.include? "Congratulations! Your phone number has been verified."
-		puts( "Listing submitted" )
-		true
-	end
+sleep 2
+Watir::Wait.until { @browser.text.include? "Congratulations" }
+
+if @chained
+	self.start("Ibegin/Verify")
 end
 
-
+true

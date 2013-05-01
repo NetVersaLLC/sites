@@ -18,12 +18,20 @@ def add_listing(data)
 
 #Enter Decrypted captcha string here
 enter_captcha
-
-  @confirmation_msg = 'An email with further instructions on how to complete your registration has been sent to the email address you provided.'
+@confirmation_msg = 'An email with further instructions on how to complete your registration has been sent to the email address you provided.'
+sleep 2
+Watir::Wait.until { @browser.text.include? @confirmation_msg }
+  
 
   if @browser.text.include?(@confirmation_msg)
     puts "Initial registration Successful"
     RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data[ 'email' ], 'account[password]' => data['password'], 'model' => 'Spotbusiness'
+
+    if @chained 
+      self.start('Spotbusiness/Verify')
+    end
+    true
+
   else
     throw "Initial registration not successful"
   end

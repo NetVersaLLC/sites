@@ -24,6 +24,7 @@ end
 
 @browser.button(:id => 'btnSubmit').click
 
+sleep 2
 Watir::Wait.until{@browser.text.include? "Your request to create a listing has been submitted."}
 
 true

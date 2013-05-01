@@ -7,8 +7,12 @@
 
 @browser.button(:value => 'Submit').click
 
+sleep 2
 RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data[ 'username' ], 'account[password]' => data['password'], 'model' => 'Usyellowpages'
 
 Watir::Wait.until {@browser.text.include? "Browse by State in the US Yellow Pages"}
 
+if @chained
+	self.start("Usyellowpages/AddListing")
+end
 true

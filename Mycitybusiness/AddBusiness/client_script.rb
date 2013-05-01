@@ -19,12 +19,13 @@
 @browser.text_field( :name => 'contactemail').set data['email']
 
 @browser.button( :value => 'Submit').click
-
-if @browser.text.include? "Thank you for adding your business to mycityBusiness.net"
+sleep 2
+Watir::Wait.until { @browser.text.include? "Thank you for adding your business to mycityBusiness.net" }
+	
 	if @chained
 		self.start("Mycitybusiness/Verify")
 	end
 	true
 
-end
+
 

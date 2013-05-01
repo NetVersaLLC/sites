@@ -19,7 +19,7 @@ retries = 5
        		sleep 5
        		retry
    		else
-       		puts "After 5 retries the payload could not sign in run. Data available:"
+       		puts "After 5 retries the payload could not sign in. Data available:"
        		puts data
        		puts "Data required:"
        		puts "email,password"

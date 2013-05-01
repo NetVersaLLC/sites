@@ -134,23 +134,21 @@ def enter_captcha
 
     ")
 
-sleep(10)
-@browser.execute_script('
-  jQuery("#SignUpForm").submit()
-  ')
+sleep(5)
+#@browser.execute_script('
+#  jQuery("#SignUpForm").submit()
+#  ')
 
 begin
-  @browser.execute_script('
-var result = document.evaluate("//*[@id=\'createbuttons\']/input", document, null, 0, null),item;
-
-while (item = result.iterateNext()) {
-    jQuery(item).trigger("onclick")
-}
-
-  ')
-rescue
+      @browser.execute_script('
+        var result = document.evaluate("//*[@id=\'createbuttons\']/input", document, null, 0, null),item;
+        while (item = result.iterateNext()) {
+          jQuery(item).trigger("onclick")
+        }
+      ')
+    rescue
   
-end
+    end
 
 
 
@@ -158,7 +156,7 @@ end
     #capfield.focus
     #capfield.set captcha_code
 		#@browser.button( :xpath => '//*[@id="createbuttons"]/input' ).click
-		
+		sleep 5
 		if not @browser.text.include? "The characters didn't match the picture. Please try again."
 			capSolved = true
 		end
@@ -205,5 +203,7 @@ def enter_captcha3
 		throw("Captcha was not solved")
 	end
 end
+
+
 
 

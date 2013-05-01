@@ -6,7 +6,7 @@ sign_in( data )
 sleep(1)
 @browser.select_list( :id, 'region').select data['state_name']
 sleep(1)
-@browser.select_list( :id, 'city').select data['city']
+@browser.select_list( :id, 'city').options(:text => /#{data['city']}/i).click
 @browser.text_field( :name, 'address').set data['address']
 @browser.text_field( :name, 'zip').set data['zip']
 @browser.text_field( :name, 'phone').set data['phone']

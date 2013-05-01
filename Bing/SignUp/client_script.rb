@@ -119,50 +119,36 @@ end
 
 
 sleep(3)
-begin
-  enter_captcha
-rescue
 
-end
-
-
-
-begin 
-
-  sleep 2
-  Watir::Wait.until { @browser.text.include? "Account summary" }
-  RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['hotmail'], 'account[password]' => data['password'], 'account[secret_answer]' => data['secret_answer'], 'model' => 'Bing'
-  if @chained
-		self.start("Bing/CreateRule")
-  end
-
-  true
-
-
-rescue Watir::Wait::TimeoutError
-  puts "Timeout while waiting for inbox to load. Checking current location."
-
-  if @browser.url =~ /account.live.com\/summarypage.aspx/i
-    puts "Currently in the inbox, saving new account information."
+enter_captcha
+  begin 
+    sleep 2
+    Watir::Wait.until { @browser.text.include? "Account summary" }
     RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['hotmail'], 'account[password]' => data['password'], 'account[secret_answer]' => data['secret_answer'], 'model' => 'Bing'
-    return true
-  else
-    throw "Not in the inbox, account creation may have failed. Account that was attempted: #{data['hotmail']} - #{data['password']}"
+    if @chained
+  		self.start("Bing/CreateRule")
+    end
+    true
 
+  rescue Watir::Wait::TimeoutError
+    puts "Timeout while waiting for inbox to load. Checking current location."
+    if @browser.url =~ /account.live.com\/summarypage.aspx/i
+      puts "Currently in the inbox, saving new account information."
+      RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['hotmail'], 'account[password]' => data['password'], 'account[secret_answer]' => data['secret_answer'], 'model' => 'Bing'
+      return true
+    else
+      throw "Not in the inbox, account creation may have failed. Account that was attempted: #{data['hotmail']} - #{data['password']}"
+    end
+  rescue Exception => e
+    puts(e.inspect)
+    if retries > 0
+      puts("Retrying... #{retries} remaining.")
+      retries -= 1
+      retry
+    else
+      throw("Failed due to #{e.inspect}")
+      false
+    end
   end
 
-rescue Interrupt
-
-  throw "Job was interrupted manually."
-
-rescue Exception => e
-  puts(e.inspect)
-  if retries > 0
-    puts("Retrying... #{retries} remaining.")
-    retries -= 1
-    retry
-  else
-    throw("Failed due to #{e.inspect}")
-    false
-  end
-end
+true

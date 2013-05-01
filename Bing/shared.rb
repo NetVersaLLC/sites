@@ -101,23 +101,23 @@ end
 
 
 def solve_captcha2
+  begin
   image = "#{ENV['USERPROFILE']}\\citation\\bing1_captcha.png"
   obj = @browser.img( :xpath, '//div/table/tbody/tr/td/img[1]' )
   puts "CAPTCHA source: #{obj.src}"
   puts "CAPTCHA width: #{obj.width}"
   obj.save image
 
-  CAPTCHA.solve image, :manual
+    return CAPTCHA.solve image, :manual
+  rescue Exception => e
+    puts(e.inspect)
+  end
 end
 
 def enter_captcha
-
-	capSolved = false
-	count = 1
-	until capSolved or count > 5 do
-		captcha_code = solve_captcha2	
-
-
+  captcharetries = 5
+  begin
+	  captcha_code = solve_captcha2	
     @browser.execute_script("
       function getRealId(partialid){
         var re= new RegExp(partialid,'g')
@@ -133,40 +133,43 @@ def enter_captcha
       _d.getElementById(getRealId('wlspispSolutionElement')).value = '#{captcha_code}';
 
     ")
-
-sleep(5)
+    sleep(5)
 #@browser.execute_script('
 #  jQuery("#SignUpForm").submit()
 #  ')
 
-begin
-      @browser.execute_script('
-        var result = document.evaluate("//*[@id=\'createbuttons\']/input", document, null, 0, null),item;
-        while (item = result.iterateNext()) {
-          jQuery(item).trigger("onclick")
-        }
-      ')
-    rescue
+#    @browser.execute_script('
+#      jQuery("input").find("[value=\'I accept\']").trigger("onclick")
+#    ')
+@browser.execute_script('
+  jQuery("#SignUpForm").submit()
+  ')
+
+#    @browser.execute_script('
+#      var result = document.evaluate("//*[@id=\'createbuttons\']/input", document, null, 0, null),item;
+#      while (item = result.iterateNext()) {
+#      jQuery(item).trigger("onclick")
+#      }
+#    ')
+    sleep(25) #An ugly sleep.. however waiting for elements is failing on this page.
+    if @browser.url =~ /account.live.com\/summarypage.aspx/i
+      
+      else
+        throw "Captcha code was incorrect."
+      end
+    
   
+  rescue Exception => e
+    puts(e.inspect)
+    if captcharetries > 0      
+      puts "Retrying in 3 seconds..."
+      captcharetries -= 1
+      retry
+    else
+      throw "Job failed after trying to enter captcha 5 times."
     end
-
-
-
-		#capfield = @browser.text_field( :class => 'spHipNoClear hipInputText',:index => 1 )
-    #capfield.focus
-    #capfield.set captcha_code
-		#@browser.button( :xpath => '//*[@id="createbuttons"]/input' ).click
-		sleep 5
-		if not @browser.text.include? "The characters didn't match the picture. Please try again."
-			capSolved = true
-		end
-	count+=1
-	end
-	if capSolved == true
-		true
-	else
-		throw("Captcha was not solved")
-	end
+  end
+return true
 end
 
 

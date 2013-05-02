@@ -30,9 +30,25 @@ end
 
 
 def sign_in(data)
-	@browser.goto("https://adsolutions.yp.com/SSO/Login")
-	@browser.text_field(:id => 'Email').set data['email']
-	@browser.text_field(:id => 'Password').set data['password']
-	@browser.button(:src => 'https://si.yellowpages.com/D49_ascp-button-signup-blue_V1.png').click
-	sleep 2
+	
+retries = 3
+	begin
+		@browser.goto("https://adsolutions.yp.com/SSO/Login")
+		@browser.text_field(:id => 'Email').set data['email']
+		@browser.text_field(:id => 'Password').set data['password']
+		@browser.button(:src => 'https://si.yellowpages.com/D49_ascp-button-signup-blue_V1.png').click
+		sleep 3
+		Watir::Wait.until { @browser.text.include? "Welcome to Your Online Account Services" }
+	rescue Watir::Wait::TimeoutError
+		if retries > 0			
+			retries -= 1
+			retry
+		else
+			throw "Cound not sign in using email: #{data['email']} password: #{data['password']}"
+		end
+
+	rescue Exception => e
+		puts(e.inspect)
+	end
+
 end

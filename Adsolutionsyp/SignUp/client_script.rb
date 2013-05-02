@@ -16,14 +16,33 @@ sleep 1
 @browser.select_list(:id => 'BusinessAddress_State').select data['state']
 @browser.text_field(:id => 'BusinessAddress_Zipcode').set data['zip']
 @browser.text_field(:id => 'BusinessYear').set data['founded']
-@browser.image(:alt => 'continue').click
-sleep 3
 
+
+
+@browser.image(:alt => 'continue').click
+
+begin
+	sleep 2
+	Watir::Wait.until(15) { @browser.text_field(:id => /BusinessWebsites/i).exists? }
+rescue Watir::Wait::TimeoutError	
+	if @browser.link(:id => 'selectLink').exists?
+		@browser.link(:id => 'selectLink').click
+		retry
+	else
+		throw "Payload failed. Never found @browser.text_field(:id => /BusinessWebsites/i) or @browser.link(:id => 'selectLink')."
+	end
+rescue Exception => e
+	puts(e.inspect)
+end
+
+sleep 3
 @browser.text_field(:id => /BusinessWebsites/i).when_present.set data['website']
 data['payments'].each do |pay|
+	@browser.checkbox(:id => pay).clear
 	@browser.checkbox(:id => pay).click
 end
 enter_captcha
+sleep 2
 @browser.text_field(:id => 'RepeatEmail').when_present.set data['email']
 @browser.text_field(:id => 'Password').set data['password']
 @browser.text_field(:id => 'RepeatPassword').set data['password']

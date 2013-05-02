@@ -1,9 +1,9 @@
 data = {}
-
 catty                       = AngiesList.where(:business_id => business.id).first
 
 data[ 'email' ]             = business.bings.first.email 
-data[ 'password' ]          = Yahoo.make_password
+data[ 'password' ]          = AngiesList.make_password
+data[ 'password2' ]         = AngiesList.make_password
 data[ 'first_name' ]        = business.contact_first_name
 data[ 'last_name' ]         = business.contact_last_name
 data[ 'gender' ]            = business.contact_gender

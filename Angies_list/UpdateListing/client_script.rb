@@ -40,9 +40,13 @@
 		sleep(3)
 		@browser.select_list(:id, /ctl01_SetCloseDropDownList/).when_present.select clean_time( data['weekend_closing_hours'] )
 		@browser.button(:id,'ctl00_ContentPlaceHolderMainContent_CocoFunnelSection_CoCoFunnelWizard_BusinessDetailEditControl_BusinessDetailSaveButton').when_present.click
+		sleep 2
 		Watir::Wait.until { @browser.text.include? 'License Details' }
+		sleep 2
 		@browser.select_list(:id, /LicenseSignature/).when_present.select data['license_signature'] 
+		sleep 2
 		@browser.button(:title,'Save').when_present.click
+		sleep 2
 		Watir::Wait.until { @browser.text.include? 'Thank you! 100% complete profile helps members find and contact you.' }
 		@thankyou_block = @browser.div(:id,/ThankYouKenticoBlock/)
 		if @browser.wait_until {@thankyou_block.exist?}

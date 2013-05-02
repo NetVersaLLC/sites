@@ -1,22 +1,26 @@
 data = {}
 catty                       = Zippro.where(:business_id => business.id).first
-data[ 'category1' ]         = ZipproCategory.where(:id => catty.zippro_category_id).first.name.gsub("\r","").gsub("\n","")
-#data[ 'category2' ]         = ZipproCategory.where(:id => catty.zippro_category2_id).first.name
-data['parent1']    = ZipproCategory.where(:id => catty.zippro_category_id).first.parent.name.gsub("\r","").gsub("\n","")
-#data['parent2']    = ZipproCategory.where(:id => catty.zippro_category2_id).first.parent.name
+data[ 'category1' ]			= catty.zippro_category.name
+data['parent1']				= catty.zippro_category.parent.name
 
-paren1  = ZipproCategory.where(:id => catty.zippro_category_id).first.parent
-paren2  = ZipproCategory.where(:id => catty.zippro_category2_id).first.parent
-data['root1']    = paren1.parent.name.gsub("\r","").gsub("\n","")
-#data['root2']    = paren2.parent.name
+begin 
+	data['root1']				= catty.zippro_category.parent.parent.name
+rescue
+	data['root1']				= ""
+end
 
+begin 
+	data['root21']				= catty.zippro_category.parent.parent.parent.name
+rescue
+	data['root21']				= ""
+end
 
-paren21  = paren1.parent.parent
-paren22  = paren2.parent.parent
-data['root21']    = paren21.name.gsub("\r","").gsub("\n","")
-#data['root22']    = paren22.name
-
-
+data['categorytree']		= {
+	0 => data[ 'root21' ],
+	1 => data[ 'root1' ],
+	2 => data[ 'parent1' ],
+	3 => data[ 'category1' ]	
+}
 
 
 

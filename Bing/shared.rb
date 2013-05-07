@@ -65,24 +65,103 @@ def sign_in( business )
 
 end
 
+def sign_in_business( business )
+
+retries = 3
+begin
+    @browser.goto( 'https://www.bingplaces.com/' )
+
+    @browser.button(:id => 'loginButton').click
+
+    sleep 2
+    @browser.link(:text => 'Login').when_present.click
+
+    email_parts = {}
+    email_parts = business[ 'hotmail' ].split( '.' )
+    sleep 2
+    Watir::Wait.until { @browser.input( :name, 'login' ).exists? }
+
+    @browser.input( :name, 'login' ).send_keys email_parts[ 0 ]
+    @browser.input( :name, 'login' ).send_keys :decimal
+    @browser.input( :name, 'login' ).send_keys email_parts[ 1 ]
+    # TODO: check that email entered correctly since other characters may play a trick
+    @browser.text_field( :name, 'passwd' ).set business[ 'password' ]
+    # @browser.checkbox( :name, 'KMSI' ).set
+    @browser.button( :name, 'SI' ).click
+
+    sleep 2
+    Watir::Wait.until {@browser.button(:id => 'loginButton').exists?}
+
+    if @browser.button(:id => 'loginButton').text =~ /Sign in/i
+      throw "Sign-in failed"
+    end
+
+
+  rescue Exception => e
+    if retries > 0
+      puts e.inspect
+      retries -= 1
+      retry
+    else
+      throw "Sign in was not able to complete. "
+    end
+  end
+
+
+
+end
+
+
 def search_for_business( business )
+  retries = 3
+  begin
+  @browser.goto( 'http://www.bing.com/businessportal/' ) 
+  sleep 2
+  @browser.button( :value , 'Get Started' ).when_present.click
+  sleep 2
+  @browser.link(:title => 'Add Your Business').when_present.click
 
-  @browser.goto( 'http://www.bing.com/businessportal/' )
-  puts 'Search for the ' + business[ 'name' ] + ' business at ' + business[ 'city' ] + ' city'
-  @browser.link( :text , 'Get Started Now!' ).click
+  @businessfound = false
 
-  #sleep 4 # seems that div's are not loaded quickly simetimes
-  watir_must do @browser.div( :class , 'LiveUI_Area_Find___Business' ).text_field( :class, 'LiveUI_Field_Input' ).click end
-  @browser.div( :class , 'LiveUI_Area_Find___Business' ).text_field( :class, 'LiveUI_Field_Input' ).flash
-  @browser.div( :class , 'LiveUI_Area_Find___Business' ).text_field( :class, 'LiveUI_Field_Input' ).focus
-  @browser.div( :class , 'LiveUI_Area_Find___Business' ).text_field( :class, 'LiveUI_Field_Input' ).set business[ 'name' ]
-  @browser.div( :class , 'LiveUI_Area_Find___City' ).text_field( :class, 'LiveUI_Field_Input' ).click
-  @browser.div( :class , 'LiveUI_Area_Find___City' ).text_field( :class, 'LiveUI_Field_Input' ).set business[ 'city' ]
-  @browser.div( :class , 'LiveUI_Area_Find___State' ).text_field( :class, 'LiveUI_Field_Input' ).click
-  @browser.div( :class , 'LiveUI_Area_Find___State' ).text_field( :class, 'LiveUI_Field_Input' ).set business[ 'state_short' ]
-  @browser.div( :class , 'LiveUI_Area_Search_Button LiveUI_Short_Button_Medium' ).click
-  #sleep 4
+
+    
+    sleep 2
+    @browser.execute_script("hidePopUp()")
+    @browser.text_field(:name => 'PhoneNumber').when_present.set business['local_phone']
+    @browser.execute_script("hidePopUp()")
+    @browser.button(:value => 'Search').click
+    @browser.execute_script("hidePopUp()")
+
+    sleep 2
+    Watir::Wait.until(10) { @browser.text.include? "Search Results" or @browser.text.include? "We found no businesses with the given information"}
+   
+    if @browser.text.include? "Search Results"
+      @browser.link(:href => /http:\/\/www.bing.com\/local\/details.aspx/i).each do |item|
+        if item.text =~ /#{business['business']}/i
+          @businessfound = true
+        end
+      end 
+
+    else
+      @businessfound = false
+    end
   
+
+  rescue Watir::Wait::TimeoutError
+      
+    if retries > 0
+      @browser.execute_script("hidePopUp()") #If the Script Error popup comes up this closes it.
+      puts("Something went wrong, refreshing the page and trying again.")
+      @browser.refresh
+      retries -= 1
+      retry
+    end
+  rescue Exception => e
+    puts(e.inspect)
+  end
+
+
+  return @businessfound
 end
 
 def goto_listing( business )

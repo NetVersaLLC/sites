@@ -98,7 +98,7 @@ sleep(5)
 end
 
 def main(business)
-  sign_in(business)
+  sign_in_business(business)
   goto_listing(business)
   enter_business_portal_details( business )
   enter_business_portal_more_details( business )

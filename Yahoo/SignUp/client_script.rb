@@ -1,3 +1,104 @@
+@browser.goto( 'http://listings.local.yahoo.com/' )
+@browser.link( :text => 'Sign Up' ).click
+
+@browser.link(:id => 'signUpBtn').click
+sleep 2
+@browser.text_field(  :id => 'firstname' ).when_present.set   data[ 'first_name' ]
+@browser.text_field(  :id => 'secondname' ).set  data[ 'last_name' ]
+
+retries = 3
+begin
+  nameFound = false
+  subtries = 3
+  while subtries > 0
+    seed = rand(10).to_s
+    @browser.text_field(:id => 'yahooid').set data['username'] + seed
+    sleep 2
+    @browser.text_field(:id => 'yahooid').send_keys :tab
+    @browser.text_field(:id => 'password').focus
+  
+    sleep(8 - retries)
+
+    if @browser.text.include? "This ID is not available"
+      subtries -= 1
+      next
+    else
+      data['username'] = data['username'] + seed + "@yahoo.com"
+      data['business_email'] = data['username']
+      nameFound = true
+    end
+    if nameFound == true
+      break
+    end
+    
+  end
+
+  sleep 4
+  Watir::Wait.until(8) { @browser.span( :id => 'choosenyid' ).text ==  data['business_email']}
+
+rescue Watir::Wait::TimeoutError
+  if retries > 0
+    puts("Something went wrong while choosing the username. Changing approach and trying again.")
+    case retries
+    when 3
+      data['username'] = data['first_name']+data['last_name']
+    when 2
+      data['username'] = data['last_name']+data['first_name']
+    when 1
+      data['username'] = data['last_name']+seed+data['first_name']
+    end
+    retries -= 1
+    retry
+  else
+
+  end
+
+end
+
+puts("Made it out of the username generator! with this username: "+data['username'])
+
+@browser.text_field( :id => 'password' ).set data[ 'password' ]
+@browser.text_field( :id => 'passwordconfirm' ).set data[ 'password' ]
+@browser.select_list( :id => 'mm' ).select data[ 'month' ]
+@browser.text_field(  :id => 'dd' ).set data[ 'day' ]
+@browser.text_field(  :id => 'yyyy' ).set data[ 'year' ]
+@browser.text_field(  :id => 'mobileNumber' ).set data[ 'phone' ]
+@browser.select_list( :id => 'gender' ).select   data[ 'gender' ]
+@browser.select_list( :id => 'country' ).select  data[ 'country' ]
+@browser.select_list( :id => 'language' ).select data[ 'language' ]
+#@browser.select_list( :id => 'mobileCountryCode' ).select "#{business[ 'country_code' ]}"
+@browser.text_field(:id => 'altemail').set data['alt_mail']
+@browser.text_field(:id => 'postalcode').set data['zip']
+
+@browser.button(:id => 'IAgreeBtn').click
+  
+sleep 2
+Watir::Wait.until{ @browser.button( :id => 'VerifyCollectBtn' ).exist? }
+
+@browser.select_list( :id, 'secquestion' ).select 'Where did you meet your spouse?'
+@browser.text_field( :id, 'secquestionanswer' ).set data[ 'secret_answer_1' ]
+@browser.select_list( :id, 'secquestion2' ).select 'Where did you spend your childhood summers?'
+@browser.text_field( :id, 'secquestionanswer2' ).set data[ 'secret_answer_2' ]
+
+sleep 10
+retry_captcha(data)
+
+sleep 2
+Watir::Wait.until { @browser.button( :id => 'ContinueBtn' ).exists? }
+
+@browser.button( :id => 'ContinueBtn' ).click
+
+RestClient.post "#{@host}/yahoo/save_email.json?auth_token=#{@key}&business_id=#{@bid}", :email => data['business_email'], :password => data['password'], :secret1 => data['secret_answer_1'], :secret2 => data['secret_answer_2']
+
+sleep 10
+if @chained
+  self.start("Yahoo/CreateListing")
+end
+
+true
+
+=begin
+
 def sign_up_personal( business )
   puts 'Business is not found - Sign up for new account'
   @browser.goto( 'http://listings.local.yahoo.com/' )
@@ -121,3 +222,4 @@ if @chained
 end
 
 true
+=end

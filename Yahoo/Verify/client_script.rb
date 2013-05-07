@@ -29,19 +29,39 @@ end
 def verify_phone(data)
 
   sign_in(data)
-  @browser.goto("http://smallbusiness.yahoo.com/dashboard/mybusinesses?brand=local")
+  sleep 2
+
   @browser.link(:text => "Verify").when_present.click
   sleep(2)
   @browser.radio(:id => 'opt-phone').when_present.click
   sleep(2)
+
+  
+
+retries = 3
+begin
   @browser.button(:id => 'btn-phone').when_present.click
-
-  sleep(3)
-
+    sleep(3)
   code = PhoneVerify.ask_for_code 
   @browser.text_field(:id => 'txtCaptcha').set code
 
   @browser.button(:id => 'btnverifychannel').click
+  sleep 5
+
+  if @browser.text.include? "The verification code you submitted was incorrect. Please enter the new verification code."
+    throw "Invalid code."
+  end
+rescue
+  if retries > 0
+    puts("Invalid code. Trying again in 3 seconds...")
+    sleep 3
+    retries -= 1
+    retry
+  else
+    throw "Could not verify the account"
+  end
+end
+
 
   true
 

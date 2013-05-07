@@ -1,14 +1,45 @@
 require 'cgi'
 
-def goto_sign_up
-  puts 'Business is not found - Sign up for new account'
+
+
+def goto_sign_up(data)
   @browser.goto( 'http://listings.local.yahoo.com/' )
   @browser.link( :text => 'Sign Up' ).click
+  sleep 2
+  @browser.text_field(:id, 'username').when_present.set data['email']
+  @browser.text_field(:id, 'passwd').set data['password']
+  sleep 4
+  @browser.button(:id, '.save').click
+
+end
+
+
+def preview_and_submit( business )
+  puts 'Preview and close'
+  @browser.button( :id => 'preview-bottom-btn' ).click
+  sleep 10
+  Watir::Wait::until do @browser.button( :id => 'prcloser' ).exists? end
+  @browser.button( :id => 'prcloser' ).click
+
+  # require "deathbycaptcha"
+  puts 'Submit the business'
+sleep(2)
+retry_captcha2(business)
+sleep(2)
+
+Watir::Wait.until { @browser.text.include? 'Congratulations' }
+
+  if @browser.text.include? 'Congratulations' # 'Pending Verification', 'Get a Verification Code'
+    puts 'Congratulations, Yahoo! Local Listing Id: ' + @browser.label( :id => 'lc-listIdLabel' ).text
+  else
+    raise StandardError.new( "Problem to submit the business info!" )
+  end
 end
 
 def provide_business_info( business )
   # Provide Your Business Information
-  @browser.text_field( :id => 'cfirstname' ).set business[ 'first_name' ]
+  sleep 2
+  @browser.text_field( :id => 'cfirstname' ).when_present.set business[ 'first_name' ]
   @browser.text_field( :id => 'clastname' ).set business[ 'last_name' ]
   @browser.text_field( :id => 'email' ).set business[ 'email' ]
   @browser.text_field( :id => 'phone' ).set business[ 'phone' ]
@@ -38,12 +69,14 @@ def provide_business_info( business )
 
     @browser.button( :id => 'submitbtn' ).click
 
-    puts("before wait")
     sleep(3)
     Watir::Wait::until do @browser.text.include? 'Optional Business Information' end
-      puts("after wait")
 
 
+preview_and_submit(business)
+
+end
+=begin
   # Optional Business Information
   @browser.h3( :id => 'operationhours-collapsed' ).click
   sleep(2)
@@ -92,36 +125,19 @@ sleep(2)
   end
 end
 
-def preview_and_submit( business )
-  puts 'Preview and close'
-  @browser.button( :id => 'preview-bottom-btn' ).click
-  sleep 10
-  Watir::Wait::until do @browser.button( :id => 'prcloser' ).exists? end
-  @browser.button( :id => 'prcloser' ).click
-
-  # require "deathbycaptcha"
-  puts 'Submit the business'
-sleep(2)
-retry_captcha2(business)
-sleep(2)
-
-Watir::Wait.until { @browser.text.include? 'Congratulations' }
-
-  if @browser.text.include? 'Congratulations' # 'Pending Verification', 'Get a Verification Code'
-    puts 'Congratulations, Yahoo! Local Listing Id: ' + @browser.label( :id => 'lc-listIdLabel' ).text
-  else
-    raise StandardError.new( "Problem to submit the business info!" )
-  end
-end
+=end
 
 def main( business )
-  sign_in(business)
+  #sign_in(business)
 
-  goto_sign_up
+  goto_sign_up(business)
   provide_business_info( business )
-  preview_and_submit( business )
 end
 
 main(data)
+
+if @chained
+  self.start("Yahoo/Verify")
+end
 
 true

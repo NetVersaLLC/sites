@@ -68,5 +68,6 @@ end
 end
 
 verify_phone(data)
-
+sleep 10 #Just waiting for the code to verify. Hard to find an element to wait for. 
+true
 #main( data )

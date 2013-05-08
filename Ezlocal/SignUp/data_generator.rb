@@ -1,4 +1,6 @@
 data = {}
+seed = rand(1000).to_s
+
 catty                   = Ezlocal.where(:business_id => business.id).first
 data[ 'ezlocal_category1' ]          = catty.ezlocal_category.name.gsub("\n", "").gsub("\r","")
 

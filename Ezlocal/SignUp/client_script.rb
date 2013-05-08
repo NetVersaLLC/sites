@@ -1,5 +1,4 @@
 @browser.goto("https://secure.ezlocal.com/newbusiness/default.aspx")
-puts("HALP")
 #@browser.text_field(:id =>"tPhone1").set data['phone_area_code']
 #@browser.text_field(:id => "tPhone2").set data['phone_prefix']
 #@browser.text_field(:id => "tPhone3").set data['phone_number']
@@ -31,8 +30,14 @@ puts("HALP")
 @browser.text_field(:id => "tDescription").set data['description']
 @browser.text_field(:id => "tWebsite").set data['website']
 @browser.button(:id => "btnContinue").click
-@browser.button(:id => "bFinish").click
-@browser.a(:text => "finish and submit your profile.").click
+
+#@browser.button(:id => "bFinish").click
+
+#@browser.a(:text => "finish and submit your profile.").click
+sleep 2
+
+Watir::Wait.until { @browser.text.include? 'Check your email' }
+
 if @browser.text.include? 'Check your email'
 	puts( 'Account signup and business registration successful!' )	
 

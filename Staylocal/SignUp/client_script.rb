@@ -28,7 +28,7 @@
   
 enter_captcha
 
-
+sleep 2
 Watir::Wait.until{ @browser.div(:class => 'messages error').exists? or @browser.text.include? "A validation e-mail has been sent to your e-mail address"}
  
   

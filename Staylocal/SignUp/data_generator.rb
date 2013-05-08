@@ -15,7 +15,7 @@ data[ 'role' ] = 				'owner'
 data[ 'first_name' ] =		 	business.contact_first_name
 data[ 'last_name' ] =			business.contact_last_name
 data[ 'full_name' ] =			data[ 'first_name' ] + " " + data[ 'last_name' ]
-data[ 'password' ] =			Yahoo.make_password
+data[ 'password' ] =			Yahoo.make_password+"$"
 data[ 'keywords' ] = 			business.category1 + ', ' + business.category2 + ', ' + business.category3 + ', ' + business.category4 + ', ' + business.category5
 data[ 'parish' ] =			 	'Orleans Parish'
 data

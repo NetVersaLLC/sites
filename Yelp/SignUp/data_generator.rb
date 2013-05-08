@@ -10,6 +10,18 @@ data[ 'phone' ]			= business.local_phone
 data[ 'website' ]		= business.company_website
 data[ 'email' ]			= business.bings.first.email
 
-data[ 'cat1' ] = catty.yelp_category.parent.name.gsub("\n", "")
-data[ 'cat2' ] = catty.yelp_category.name.gsub("\n", "")
+data['category'] 		= catty.yelp_category.name
+
+begin 
+data['parent']			= catty.yelp_category.parent.name
+rescue
+	data['parent']			= ""
+end
+
+begin
+	data['rootcat'] 		= catty.yelp_category.parent.parent.name
+rescue
+	data['rootcat'] 		= ""
+end
+
 data

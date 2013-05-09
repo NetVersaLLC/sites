@@ -9,7 +9,7 @@ sign_in( data )
 @opt_frame.button( :value, /Save/).click
 
 if @chained
-		self.start("Bing/CheckListing")
+		self.start("Bing/CreateListing")
 end
 
 true

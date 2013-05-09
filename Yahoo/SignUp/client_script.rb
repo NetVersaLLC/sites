@@ -83,12 +83,14 @@ Watir::Wait.until{ @browser.button( :id => 'VerifyCollectBtn' ).exist? }
 sleep 10
 retry_captcha(data)
 
-sleep 2
-Watir::Wait.until { @browser.button( :id => 'ContinueBtn' ).exists? }
-
-@browser.button( :id => 'ContinueBtn' ).click
+sleep 10
 
 RestClient.post "#{@host}/yahoo/save_email.json?auth_token=#{@key}&business_id=#{@bid}", :email => data['business_email'], :password => data['password'], :secret1 => data['secret_answer_1'], :secret2 => data['secret_answer_2']
+#Watir::Wait.until { @browser.button( :id => 'ContinueBtn' ).exists? }
+
+#@browser.button( :id => 'ContinueBtn' ).click
+
+
 
 sleep 10
 if @chained

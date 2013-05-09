@@ -23,7 +23,7 @@ retries = 5
        		puts data
        		puts "Data required:"
        		puts "email,password"
-       		throw("Job failed.")
+       		throw("Job failed during login. Verify the credintials are valid")
    		end
 	end
 end

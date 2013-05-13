@@ -1,6 +1,6 @@
 def add_listing(data)
-	@browser.text_field(:name => 'ListContact').set data[ 'full_name' ]
-	@browser.text_field(:name => 'ReqEmail').set data[ 'email' ]
+	@browser.text_field(:name => 'ListContact').when_present.set data[ 'full_name' ]
+	@browser.text_field(:name => 'ReqEmail').when_present.set data[ 'email' ]
 	@browser.text_field(:name => 'ListOrgName').set data[ 'business' ]
 	@browser.text_field(:name => 'ListAddr1').set data[ 'address' ]
 	@browser.text_field(:name => 'ListCity').set data[ 'city' ]
@@ -12,10 +12,11 @@ def add_listing(data)
 
 	#Enter Decrypted captcha string here
 	enter_captcha
-	@browser.link(:href => 'thankyou.php').click
 
+	@browser.link(:href => 'thankyou.php').when_present.click
+        @browser.wait()
 	@confirmation_msg = 'Your submission was successful and has now been sent to our review department.'
-
+        
 	if @browser.text.include?(@confirmation_msg)
 		puts "Initial registration Successful"
 		RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data[ 'email' ],'model' => 'Discoverourtown'
@@ -30,4 +31,5 @@ end
 # Launch url
 url = 'http://www.discoverourtown.com/add/'
 @browser.goto(url)
-  add_listing(data)
+#Add listing
+add_listing(data)

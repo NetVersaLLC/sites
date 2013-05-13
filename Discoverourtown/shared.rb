@@ -15,7 +15,7 @@ def enter_captcha
   until capSolved or count > 5 do
   captcha_code = solve_captcha
   @browser.text_field( :id, 'recaptcha_response_field').set captcha_code
-  @browser.button(:value => 'Submit').click
+  @browser.button(:value => 'Submit').when_present.click
 
     if not @browser.html.include?('Add Your Listing')
       capSolved = true

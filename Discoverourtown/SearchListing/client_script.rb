@@ -9,7 +9,8 @@ def search_business(data)
 			$matching_result = true
 			puts "Business is already Listed"
 		end
-	end		
+	end
+       return $matching_result		
 end
 
 #Main Steps

@@ -15,7 +15,7 @@ def enter_captcha( data )
   until capSolved or count > 5 do
   captcha_code = solve_captcha	
   @browser.text_field( :name, 'get_sign_crypt').set captcha_code
-  @browser.image(:src => /final-design2.png/).click
+  @browser.button(:src => /final-design2.png/).click
   sleep(4)
   if not @browser.text.include? "Enter the Right Word on The Access Code Below"
     capSolved = true

@@ -6,9 +6,30 @@
 
 @browser.select_list( :id => 'ctl00_ContentPlaceHolder1_cboCountry').select data['country']
 sleep(2)
+
+# Below the script will try to imeplement City/State data. If it fails, it'll try 3 more times
+# before resorting to capitlizing the first letters of each word in the data.
+
+retries = 3
+begin
 @browser.select_list( :id => 'ctl00_ContentPlaceHolder1_cboState').select data['state']
 sleep(2)
 @browser.select_list( :id => 'ctl00_ContentPlaceHolder1_cboCity').select data['city']
+
+	rescue
+	if retries > 0
+		puts("State/City not found, retrying in 2 seconds, #{retries} remain.")
+		sleep(2)
+		retries -= 1
+		retry
+	else
+		puts("Retry failed. Attempting to Capitalize State/City")
+
+		@browser.select_list( :id => 'ctl00_ContentPlaceHolder1_cboState').select data['state'].split(" ").each {|s| s.capitalize!}.join(" ")
+		@browser.select_list( :id => 'ctl00_ContentPlaceHolder1_cboCity').select data['city'].split(" ").each {|c| c.capitalize!}.join(" ")
+	
+	end
+end
 
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtZip').set data['zip']
 

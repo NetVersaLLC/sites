@@ -6,6 +6,7 @@ sleep(3)
 @browser.text_field(:name => 'txtBusinessName').when_present.set data['business']
 @browser.text_field(:name => 'txtAddress').set data['address']
 @browser.text_field(:name => 'txtZip').set data['zip']
+Watir::Wait.until{@browser.select_list(:name => 'txtCity').value != nil}
 @browser.select_list(:name => 'txtCity').focus
 
 @browser.text_field(:id => 'FilterHeadings').set data['category']

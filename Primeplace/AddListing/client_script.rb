@@ -14,6 +14,7 @@ sleep(2)
 @browser.select_list( :id => 'province').select data['state_name']
 @browser.text_field( :id => 'postalCode').set data['zip']
 @browser.text_field( :id => 'city').set data['city']
+sleep(1)
 
 puts(data['category1'])
 puts(data['category2'])
@@ -22,11 +23,18 @@ sleep(1)
 @browser.select_list( :id => 'level3Category').select data['category2']
 
 @browser.button( :id => 'add_place').click
+sleep(5)
+#if @browser.link( :class => 'button big').exists?
+#	@browser.link( :class => 'button big').click
+#end
 
-if @browser.link( :text => /Accept/i).exists?
-	@browser.link( :text => /Accept/i).click
-end
+#Wait for Verification Page
+Watir::Wait.until { @browser.text.include? "Choose a verification method" }
 
-@browser.button( :id => 'verifyPostcard').when_present.click
-
+#Begin Postcard Verify
+@browser.span(:id => 'methodPostcardTab').click
+sleep(2)
+@browser.text_field( :id => 'postcardFirstName').set data['fname']
+@browser.text_field( :id => 'postcardLastName').set data['lname']
+@browser.button( :id => 'verifyPostcard').click
 true

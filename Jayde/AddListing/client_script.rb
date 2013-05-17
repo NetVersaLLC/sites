@@ -1,6 +1,6 @@
 @browser.goto( 'http://www.jayde.com/submit-site.html' )
 
-@browser.text_field( :xpath => '//*[@id="submisstion-email-url"]/input').when_present.set data['website']
+@browser.text_field( :xpath => '//*[@id="submisstion-email-url"]/input').set data['website']
 @browser.text_field( :xpath => '//*[@id="submisstion-email-input"]/input').set data['email']
 @browser.text_field( :xpath => '//*[@id="id5_18_NAME_text"]/td[2]/input').set data['fullname']
 @browser.text_field( :xpath => '//*[@id="id5_18_BUSINESS_NAME_text"]/td[2]/input').set data['business']

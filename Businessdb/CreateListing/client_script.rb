@@ -1,3 +1,16 @@
+#If Business is already registered then add city name
+def create_business_name(data)
+  new_business_name = ''
+  if @browser.text.include?('The Company name field must contain a unique value')
+    new_business_name= data[ 'business'] + ' of ' + data['city']
+    @browser.text_field(:id => 'company_name').set new_business_name
+    @browser.text_field(:name => 'password_again').set data[ 'password' ]
+    @browser.text_field(:name => 'password').set data[ 'password' ]
+    sleep(3)
+    @browser.link(:text=> 'Sign Up FREE').click
+  end
+end
+
 def add_listing(data)
   @browser.goto('http://www.businessdb.com/sign-up')
   @browser.text_field(:name => 'password_again').set data[ 'password' ]
@@ -7,7 +20,8 @@ def add_listing(data)
   @browser.text_field(:name => 'email').set data[ 'email' ]
   @browser.checkbox(:name=> 'agreement').set
   @browser.link(:text=>'Sign Up FREE').click
-  @browser.text_field(:name => 'name_surname').set data[ 'full_name' ]
+  create_business_name(data)
+  @browser.text_field(:name => 'name_surname').when_present.set data[ 'full_name' ]
   @browser.text_field(:name => 'www').set data[ 'website' ]
   @browser.text_field(:name => 'about').set data[ 'business_description' ]
   @browser.text_field(:name => 'address').set data[ 'address' ]

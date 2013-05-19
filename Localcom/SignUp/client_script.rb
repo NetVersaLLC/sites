@@ -25,11 +25,18 @@ sleep(5)
 @cat_frame.text_field( :name => 'ctl00$ContentPlaceHolder1$Category1').click
 @cat_frame.text_field( :name => 'ctl00$ContentPlaceHolder1$Category1').when_present.set data['category1']
 @cat_frame.div(:id => 'list1').div(:index => 0).when_present.click
+#kill the pop up if encountered
+pop_up()
+
 @cat_frame.button( :name =>'ctl00$ContentPlaceHolder1$Button1').when_present.click
 @browser.div( :class => 'uList point').when_present.click
 sleep(5)
 @desc_frame = @browser.frame(:src => "/create/dialogs/info.aspx?focus=Description")
 @desc_frame.text_field( :name => 'ctl00$ContentPlaceHolder1$Description').set data['description']
+
+# Kill pop up if exist(It doesn't accept more than 155 chareecters)
+pop_up()
+
 @desc_frame.text_field( :name => 'ctl00$ContentPlaceHolder1$Services').set data['services']
 
 # Select operation hours

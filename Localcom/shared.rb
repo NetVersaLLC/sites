@@ -1,3 +1,12 @@
+def pop_up()
+	 sleep(3)
+	if @browser.alert.exists?
+		puts @browser.alert.text
+		@browser.alert.ok until @browser.alert.exists? == false
+		sleep(1)
+	end
+end
+
 def goto_signup_page fb=false
 	puts 'Loading Signup Page for Local.com'
 	@browser.goto('http://www.local.com/sitemap.aspx')

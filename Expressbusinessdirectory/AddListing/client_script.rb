@@ -7,8 +7,8 @@
 @browser.select_list( :id => 'ctl00_ContentPlaceHolder1_cboCountry').select data['country']
 sleep(2)
 
-# Below the script will try to imeplement City/State data. If it fails, it'll try 3 more times
-# before resorting to capitlizing the first letters of each word in the data.
+# Below the script will try to implement State/City data. If it fails, it'll try 3 more times
+# before resorting to capitalizing the first letter of each word in the data.
 
 retries = 3
 begin

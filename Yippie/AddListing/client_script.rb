@@ -13,10 +13,36 @@ puts(data['category1'])
 @browser.text_field( :name => 'website').set data['website']
 @browser.text_field( :name => 'email').set data['email']
 @browser.select_list( :name => 'categories').click
-@browser.select_list( :name => 'categories').option( :text => /#{data['category1']}/i).click
+
+
+begin
+	@browser.select_list( :name => 'categories').option( :text => data['category1']).click
+	puts('category clicked')
+
+
+	rescue
+	puts("Selection failed. Trying alternative method in 3 seconds.")
+	sleep(3)	
+
+	@browser.select_list(:name => 'categories').option do |check|
+		if check =~ /:/ then
+				aftercolon = data['category1'].split(':').last
+				if aftercolon =~ check.text.split(':').last then
+				check.value.click
+				else
+					puts("Category Selection failed")
+		end			
+		else
+			puts('No colon here, moving on...')
+			end
+		end
+	end
 
 @browser.button( :value => 'Submit').click
 
 if @browser.text.include? "Thank you for submitting your FREE business listing to YiPpIe!"
 	true
 end
+#else
+	#throw("Payload Failure")
+#end

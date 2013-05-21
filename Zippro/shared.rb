@@ -13,8 +13,8 @@ def enter_captcha( data )
 	count = 1
 	until capSolved or count > 5 do
 		captcha_code = solve_captcha	
-		@browser.text_field( :id, 'captcha').set captcha_code
-		@browser.button( :title => 'Finish').click	
+		@browser.text_field( :id, 'captcha').when_present.set captcha_code
+		@browser.button( :title => 'Finish').when_present.click	
 		sleep(4)
 		if not @browser.text.include? "Invalid verification code"
 			capSolved = true
@@ -33,9 +33,9 @@ def enter_captcha2( data )
 	count = 1
 	until capSolved or count > 5 do
 		captcha_code = solve_captcha	
-		@browser.text_field( :id, 'captcha').set captcha_code
+		@browser.text_field( :id, 'captcha').when_present.set captcha_code
 		@browser.checkbox( :id => 'agree').set
-		@browser.button( :class => 'signup').click	
+		@browser.button( :class => 'signup').when_present.click	
 		sleep(4)
 		if not @browser.text.include? "Incorrect Verification code."
 			capSolved = true

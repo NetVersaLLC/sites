@@ -10,3 +10,4 @@ data[ 'country' ] = 'United States'
 data[ 'continent' ] = 'North America'
 data[ 'city' ] = business.city
 data[ 'category' ] = business.category1
+data

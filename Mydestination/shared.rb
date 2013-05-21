@@ -13,8 +13,8 @@ def enter_captcha(data)
   count = 1
   until capSolved or count > 5 do
     captcha_text = solve_captcha	
-    @browser.text_field( :id, 'captcha').set captcha_code
-    @browser.div(:class => 'ctrlHolder buttonholder').button(:type => 'submit').click
+    @browser.text_field( :id, 'captcha').set captcha_text
+    @browser.div(:class => 'ctrlHolder buttonholder').button(:type => 'submit').when_present.click
     sleep(5)
     if not @browser.text.include? "please enter the correct captcha code"
       capSolved = true

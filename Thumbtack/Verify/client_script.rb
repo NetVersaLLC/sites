@@ -5,5 +5,5 @@ if @chained
   self.start("Thumbtack/CreateListing")
 end
     
-
+true
 

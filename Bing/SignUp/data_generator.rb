@@ -1,3 +1,6 @@
+require 'faker'
+
+seed = rand(10000).to_s
 data = {}
 data[ 'name' ]              = business.business_name.strip.gsub(/[^A-Za-z0-9_ ]/, '')
 data[ 'country' ]           = 'United States'
@@ -10,5 +13,5 @@ data[ 'birth_day' ]         = business.birthday.day
 data[ 'birth_year' ]        = business.birthday.year
 data[ 'gender' ]            = business.contact_gender
 data[ 'zip' ]               = business.zip
-data[ 'alt_email' ]         = 'james.douglas@netversa.com'
+data[ 'alt_email' ]         = Faker::Name.name.gsub(" ", "") + seed +"@gmail.com"
 data

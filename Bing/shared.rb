@@ -195,7 +195,8 @@ end
 
 def enter_captcha
   captcharetries = 5
-  begin
+  capSolved = false
+ until capSolved == true
 	  captcha_code = solve_captcha2	
     @browser.execute_script("
       function getRealId(partialid){
@@ -211,44 +212,33 @@ def enter_captcha
       
       _d.getElementById(getRealId('wlspispSolutionElement')).value = '#{captcha_code}';
 
-    ")
-    sleep(5)
-#@browser.execute_script('
-#  jQuery("#SignUpForm").submit()
-#  ')
+      ")
+      sleep(5)
 
-#    @browser.execute_script('
-#      jQuery("input").find("[value=\'I accept\']").trigger("onclick")
-#    ')
-@browser.execute_script('
-  jQuery("#SignUpForm").submit()
-  ')
+      @browser.execute_script('
+        jQuery("#SignUpForm").submit()
+      ')
 
-#    @browser.execute_script('
-#      var result = document.evaluate("//*[@id=\'createbuttons\']/input", document, null, 0, null),item;
-#      while (item = result.iterateNext()) {
-#      jQuery(item).trigger("onclick")
-#      }
-#    ')
-    sleep(25) #An ugly sleep.. however waiting for elements is failing on this page.
-    if @browser.url =~ /account.live.com\/summarypage.aspx/i
-      
-      else
-        throw "Captcha code was incorrect."
-      end
-    
-  
-  rescue Exception => e
-    puts(e.inspect)
-    if captcharetries > 0      
-      puts "Retrying in 3 seconds..."
-      captcharetries -= 1
-      retry
+      sleep 15
+
+    if @browser.url =~ /https:\/\/account.live.com\/summarypage.aspx/i
+      capSolved = true
     else
-      throw "Job failed after trying to enter captcha 5 times."
+      captcharetries -= 1
     end
+    if capSolved == true
+      break
+    end
+
   end
-return true
+
+  if capSolved == true
+    return true
+  else
+    throw "Captcha could not be solved"
+  end
+   
+
 end
 
 

@@ -1,53 +1,27 @@
 #Search Business
-@url = 'https://www.getfave.com/login'
-@browser.goto(@url)
-@browser.text_field( :id => 'session_email' ).set data[ 'email' ]
-@browser.text_field( :id => 'session_password' ).set data[ 'password' ]
-sleep(1)
-@browser.button(:xpath => '//*[@id="signin-container"]/form/input[3]').click
+url = 'https://www.getfave.com/login'
+@browser.goto url
+
+sign_in data
 
 sleep 10
 
-@browser.link(:id,'change-location').when_present.click
-@browser.text_field(:id, 'g-text-field').set data[ 'city' ] + ", " + data[ 'state' ]
-sleep 3
+change_location data
 
-@browser.text_field(:id, 'g-text-field').send_keys :enter
-@browser.send_keys :enter
-#@browser.button(:value,'Pin').click
-#@browser.button(:value,'Pin').click
 sleep 10
-queryurl = "https://www.getfave.com/search?utf8=%E2%9C%93&q=" + data[ 'bus_name_fixed' ]
-puts(queryurl)
-@browser.goto(queryurl)
 
-Watir::Wait.until { @browser.div(:id,'results').exists? }
+queryurl = "https://www.getfave.com/search?utf8=%E2%9C%93&q=#{data['bus_name_fixed']}"
+@browser.goto queryurl
 
-@results = @browser.div(:id,'results') 
-@result_msg = "We couldn't find any matches."
-@matching_result = @browser.div(:id,'business-results').span(:text,"#{data[ 'business' ] }")
+Watir::Wait.until { @browser.div(:id => 'results').exists? }
 
-if @results.exists? && @results.text.include?(@result_msg) || @matching_result.exist? == false
-#Add business
+if @browser.text.include? "We couldn't find any matches."
+  #Add business
+  @browser.link(:href => 'https://www.getfave.com/businesses/new').click
+  fill_business data
 
-	@browser.span(:text,'Add your business to Fave').click
-	@browser.text_field( :id => 'business_name' ).set data[ 'business' ]
-	@browser.text_field( :id => 'business_location' ).set data[ 'address' ]
-	@browser.text_field( :id => 'business_phone_number' ).set data[ 'phone' ]
-	@browser.text_field( :id => 'business_tags' ).set data[ 'keywords' ]
-	@browser.link(:text,'Manage More Attributes').click
-	@browser.text_field( :id => 'business_established' ).set data[ 'year' ]
-	@browser.text_field( :id => 'business_tags' ).set data[ 'keywords' ]
-	@browser.text_field( :id => 'business_tagline' ).set data[ 'tagline' ]
-	@browser.text_field( :id => 'business_description' ).set data[ 'discription' ]
-	@browser.text_field( :id => 'business_url' ).set data[ 'url' ]
-	@browser.text_field( :id => 'business_email' ).set data[ 'business_email' ]
-	@browser.text_field( :id => 'business_hours' ).set data[ 'business_hours' ]
-	@browser.button(:value,'Publish Changes').click
-
-true
-
-else
-	puts("Business is already listed.")
-	true
+  true
+elsif @browser.div(:id => 'business-results').span(:text => "#{data['business']}").exist?
+  puts "Business is already listed."
+  true
 end

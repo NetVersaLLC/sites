@@ -33,9 +33,13 @@ sleep(3)
 	@browser.link( :text => /#{data[ 'category1' ]}/i).click
 end
 
+data[ 'payment_methods' ].each{ | method |
+    @browser.checkbox( :id => /#{method}/ ).clear
+  }
+sleep(1)
 
 data[ 'payment_methods' ].each{ | method |
-    @browser.checkbox( :id => /#{method}/ ).click
+    @browser.checkbox( :id => /#{method}/ ).set
   }
 
  @browser.text_field( :name, 'url').set data['url']
@@ -47,6 +51,10 @@ data[ 'payment_methods' ].each{ | method |
 @browser.text_field( :name, 'services').set data['services']
 
 @browser.button( :value => /Update Business/).click
+sleep(1)
+if @browser.div( :class => 'fButtonInputRow').exists? then
+@browser.div( :class => 'fButtonInputRow').input( :value => /Update My Business/).click
+end
 
 Watir::Wait.until { @browser.text.include? "Congratulations." }
 true

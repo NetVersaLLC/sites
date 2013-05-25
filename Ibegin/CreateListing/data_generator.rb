@@ -15,8 +15,8 @@ data[ 'url' ]			= business.company_website
 data[ 'facebook' ]		= ""#business.facebooks.first.email
 data[ 'twitter_name' ]		= ""#business.twitters.first.username
 data[ 'desc' ]			= business.business_description[0 .. 245]
-data[ 'brands' ]		= ""#
-data[ 'products' ]		= ""#
+data[ 'brands' ]		= business.get_brands
+data[ 'products' ]		= ""#business.get_products
 data[ 'services' ]		= business.category1 + ', ' +business.category2 + ', ' +business.category3 + ', ' +business.category4 + ', ' +business.category5
 data[ 'payment_methods' ]	= Ibegin.payment_methods( business )
 data

@@ -1,6 +1,7 @@
 sign_in( data )
 
 @browser.goto('http://www.ibegin.com/business-center/submit/')
+sleep(3)
 @browser.text_field( :name, 'name').set data['business_name']
 @browser.select_list( :id, 'country').select data['country']
 sleep(1)

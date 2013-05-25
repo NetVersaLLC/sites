@@ -24,4 +24,11 @@ sleep(4)
 
 @browser.button(:src => '../images/update_button.jpg').click
 
-true
+msg = @browser.span(:class => 'orange_12pt')
+if msg.exist?
+  if msg.text.include? 'Successfully Updated your Listing'
+    true
+  else
+    raise Exception, "Page filled with error - #{msg.text}" 
+  end
+end

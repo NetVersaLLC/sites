@@ -1,131 +1,120 @@
-def enter_business_portal_details( business )
-puts("before the wait in enter_business_portal_details")
-  
-    sleep(5)
-	#Watir::Wait::until { @browser.div( :text, 'YOUR BUSINESS INFORMATION' ).exists? }
-  
-  puts("after the wait in enter_business_portal_details")
+def update_business_portal_details( business )
 
-  # .. Select business category
-  @browser.div( :class, 'LiveUI_Area_Category' ).input().click
-  # Can't find the way to click on a first search result, so click on 1st category without searching
-  # @browser.div( :class, 'LiveUI_Area_Browse_and_Search' ).text_field().set business[ 'category' ]
-  # @browser.send_keys :enter
-  #Watir::Wait::until do
-   # @browser.div( :class, /Hierarchy_Item/ ).exists?
-   puts("Sleeping until all the Divs and Javascript Load")
-   sleep(10)
-  #end
-  @browser.div( :title, /#{business[ 'category' ]}/i ).click #fire_event( 'onMouseDown' )
-  @browser.div( :title => 'Close').click
-
-  @browser.div( :class, 'LiveUI_Area_Business_address_line_1' ).text_field().click
-  @browser.div( :class, 'LiveUI_Area_Business_address_city' ).text_field().click
-  @browser.div( :class, 'LiveUI_Area_Business_address_state' ).text_field().click
-  @browser.div( :class, 'LiveUI_Area_Business_address_zip_code' ).text_field().click
+   puts("Debug: Waiting for page to load")
+   sleep(5)
   
-  @browser.div( :class, 'LiveUI_Area_Toll_free_number' ).text_field().click
-  @browser.div( :class, 'LiveUI_Area_Fax_number' ).text_field().click
-  @browser.div( :class, 'LiveUI_Area_Email_Address' ).text_field().click
-  @browser.div( :class, 'LiveUI_Area_URL' ).text_field().click
-  @browser.div( :class, 'LiveUI_Area_Facebook_URL' ).text_field().click
-  @browser.div( :class, 'LiveUI_Area_Twitter_URL' ).text_field().click
-  
-  @browser.div( :class, 'LiveUI_Area_Toll_free_number' ).text_field().set business[ 'toll_free_number' ]
-  @browser.div( :class, 'LiveUI_Area_Fax_number' ).text_field().set business[ 'fax_number' ]
-  @browser.div( :class, 'LiveUI_Area_Email_Address' ).text_field().set business[ 'email' ]
-  @browser.div( :class, 'LiveUI_Area_URL' ).text_field().set business[ 'website' ]
-  @browser.div( :class, 'LiveUI_Area_Facebook_URL' ).text_field().set business[ 'facebook' ]
-  @browser.div( :class, 'LiveUI_Area_Twitter_URL' ).text_field().set business[ 'twitter' ]
+  @browser.div( :class, 'businessCategory').a.click
+  puts("Debug: Category Removed")
 
-  @browser.div( :text, 'Next' ).click
-  @browser.div( :text, 'Next' ).click # it is not redirected from 1st click, so click twice
+  @browser.h4( :text, 'Additional Business Details').click
+  sleep(1)
+  @browser.h4( :text, 'Online Presence').click
+  sleep(1)
+  @browser.h4( :text, 'Images and Videos').click
+  sleep(1)
+  @browser.h4( :text, 'Other Contact Information').click
+  sleep(1)
+  @browser.h4( :text, 'General Information').click
+  puts("Debug: All Dropdown pages opened")
+  sleep(1)
+
+  @browser.checkboxes.each do |at|
+    at.clear
+  end
+  puts("Debug: All checkboxes cleared")
+
+  @browser.text_field( :title, 'Business Name' ).set business[ 'businessname' ]
+  @browser.text_field( :title, 'Address Line 1' ).set business[ 'address_uno' ]
+  @browser.text_field( :title, 'Address Line 2' ).set business[ 'address_dos' ]
+  @browser.text_field( :title, 'City' ).set business[ 'city' ]
+  @browser.text_field( :title, 'State' ).set business[ 'state_full' ]
+  @browser.text_field( :title, 'Zip Code' ).set business[ 'zip' ]
+  @browser.text_field( :title, 'Primary Phone Number' ).set business[ 'phone' ]
+  @browser.text_field( :title, 'Email Address' ).set business[ 'hotmail' ]
+  @browser.text_field( :title, 'Website' ).set business[ 'website' ]
+  puts("Debug: Basic Data Updated Successfully")
+
+  @browser.text_field( :title, 'Business Category' ).set business[ 'category' ]
+  sleep(1)
+  @browser.send_keys( :enter)
+  @browser.button( :id, 'categoryAddButton').click
+  puts("Debug: Category Updated Successfully")
 end
 
-def enter_business_portal_more_details( business )
-  #Watir::Wait::until do
-    #@browser.div( :class, 'LiveUI_Area_More_Details_Title' ).exists?
-  #end
-sleep(7)
-  @browser.div( :class, 'LiveUI_Area_Established_Date' ).text_field().set business[ 'year_established' ]
-  puts("year stablished")
-  @browser.div( :class, 'LiveUI_Area_Description' ).text_field( :index => 0).set business[ 'description' ]
-puts("scription")
-  @browser.div( :class, 'LiveUI_Area_Languages_spoken' ).text_field().focus
-  sleep 4
-  #Watir::Wait::until do @browser.div( :text, 'Select' ).exists? end
-  #business[ 'languages' ].each{ | language |
-    #@browser.div( :text, /#{language}/ ).fire_event( 'onMouseUp' )
-  #}
-  @browser.div( :class => 'LiveUI_Field_Flag_Option', :index => 8 ).fire_event( 'onMouseUp' )
-  @browser.div( :text , 'OK' ).click
-
-  @browser.div( :class, 'LiveUI_Area_Forms_of_payment_accepted' ).text_field().focus
-  sleep 4
-  #Watir::Wait::until do @browser.div( :class , 'LiveUI_Field_Flag_Option' ).visible? end
-  #business[ 'payments' ].each{ | payment |
-   # @browser.div( :text, payment ).click
-  #}
-  @browser.div( :class => 'LiveUI_Field_Flag_Option', :index => 1 ).fire_event( 'onMouseUp' )
-  @browser.div( :text , 'OK' ).click
-
-  #@browser.div( :class, 'LiveUI_Area_Business_Hours' ).div( :class, 'LiveUI_Field_Flag' ).click
-  #Watir::Wait::until do @browser.div( :text , 'Set Hours' ).visible? end
-  #@browser.div( :text , 'Set Hours' ).click
-
-  #if business['open_24_hours'] == true
-  #  @browser.div( :id, 'Popup_1||Hours_of Operation||Open24Hours||Open24HoursField' ).click
-  #else
-  #  @browser.div( :class, 'LiveUI_Area_HoursEntry' ).text_field( :index, 0 ).set business[ 'hours_monday_from' ]
-  #  @browser.div( :class, 'LiveUI_Area_HoursEntry' ).text_field( :index, 1 ).set business[ 'hours_monday_to' ]
-  #end
-
-  # @browser.div( :text, 'Ok' ).click
-
-  @browser.div( :text, 'Next' ).click
-  
+def update_business_portal_additional_details( business )
+  @browser.radio( :name => 'AdditionalBusinessInfo.OpHourDetail.OpHourType').set
+  @browser.text_field( :name, 'AdditionalBusinessInfo.OpHourDetail.AdditionalInformation').set business[ 'hours' ]
+  puts("Debug: Hours Set")
+  @browser.text_field( :name, 'AdditionalBusinessInfo.Description').set business[ 'description' ]
+  @browser.text_field( :name, 'AdditionalBusinessInfo.YearEstablished').set business[ 'year_established' ]
+  @browser.text_field( :name, 'AdditionalBusinessInfo.OpHourDetail.AdditionalInformation').set business[ 'brands ']
+  puts("Debug: Additional Data Updated Successfully")
 end
 
-def enter_business_portal_mobile()
+def update_business_portal_online_presence( business )
+  @browser.text_field(:name, 'AdditionalBusinessInfo.FacebookWebsite').set business[ 'facebook' ]
+  @browser.text_field(:name,'AdditionalBusinessInfo.TwitterWebsite').set business[ 'twitter' ]
+  puts("Debug: Online Presence Updated Successfully")
+end
+
+def update_business_portal_images_and_videos ( business )
+  @browser.file_field(:name, 'fileToUpload').set business[ 'logo' ]
+  puts("Debug: Logo Path Set (Uncomment Later)")
+  @browser.button(:id, 'uploadPhoto1').click
+end
+
+def update_business_portal_other_contact_information( business )
+  @browser.text_field(:name, 'AdditionalBusinessInfo.MobilePhoneNumber').set business[ 'mobile' ]
+  @browser.text_field(:name, 'AdditionalBusinessInfo.TollFreeNumber').set business[ 'toll_free_number' ]
+  @browser.text_field(:name, 'AdditionalBusinessInfo.FaxNumber').set business[ 'fax_number' ]
+  puts("Debug: Other Contact Information Updated Successfully")
+end
+
+def update_business_portal_general_information( business )
+  business[ 'payments' ].each do |pay|
+  @browser.checkbox(:id, pay).set
+  end
+  @browser.text_field(:name, 'AdditionalBusinessInfo.LanguageSpoken').set business[ 'languages' ]
+end
+
+#def enter_business_portal_mobile()
   #Watir::Wait::until do
   #  @browser.div( :text, 'MOBILE SITE' ).exists?
   #end
-sleep(5)
-  @browser.div( :class, 'LiveUI_Area_FreeMobileSite' ).div( :class, 'LiveUI_Field_Flag' ).click
-  @browser.div( :class, 'LiveUI_Area_CreateQRCode' ).div( :class, 'LiveUI_Field_Flag' ).click
+#sleep(5)
+  #@browser.div( :class, 'LiveUI_Area_FreeMobileSite' ).div( :class, 'LiveUI_Field_Flag' ).click
+  #@browser.div( :class, 'LiveUI_Area_CreateQRCode' ).div( :class, 'LiveUI_Field_Flag' ).click
+#
+ # @browser.div( :text, 'Next' ).click
+#end
 
-  @browser.div( :text, 'Next' ).click
+def editmode()
+  @browser.div( :id, 'businessList1').a( :text, 'Edit').click
 end
 
-def main(business)
-  sign_in_business(business)
-  goto_listing(business)
-  enter_business_portal_details( business )
-  enter_business_portal_more_details( business )
 
-  #Watir::Wait::until do
-  #  @browser.div( :class, 'LiveUI_Area_Profile_Title' ).exists?
-  #end
-  sleep(5)
-  @browser.div( :text, 'Next' ).click # skip profile tab
-  enter_business_portal_mobile()
-  sleep(5)
-  #Watir::Wait::until do
-   # @browser.div( :text, 'PHOTOS' ).exists?
-  #end
-  @browser.div( :text, 'Next' ).click # skip photos tab
-  sleep(5)
-  #Watir::Wait::until do
-  #  @browser.div( :class, 'LiveUI_Area_Publish_Title' ).exists?
-  #end
-  
-  @browser.div( :text, 'Next' ).click # skip preview tab
-  puts("Trying to verify")
-  sleep(5)
-  @browser.div( :class, 'LiveUI_Area_Verfiy_Mail_Button LiveUI_Button_Medium' ).click
-  puts("verified mailer sent!")
+def update( business )
+  sign_in_business( business )
+  puts("Debug: Signed in")
+  editmode()
+  puts("Debug: Edit Mode Activated")
+  update_business_portal_details( business )
+  puts("Debug: Details update method complete")
+  update_business_portal_additional_details( business )
+  puts("Debug: Additional details update method complete")
+  update_business_portal_online_presence( business )
+  puts("Debug: Online presence details update method complete")
+  update_business_portal_images_and_videos ( business )
+  puts("Debug: Images and videos update method complete")
+  update_business_portal_other_contact_information( business )
+  puts("Debug: Other contact information update method complete")
+  update_business_portal_general_information( business )
+  puts("Debug: General information update method complete")
+  @browser.button(:id, 'submitBusiness').click
+  puts("Debug: Overall Update Successful!")
 end
 
-main(data)
+update( data )
 
+puts("Debug: Mission Accomplished")
 true

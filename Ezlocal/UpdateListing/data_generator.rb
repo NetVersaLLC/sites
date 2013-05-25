@@ -1,4 +1,6 @@
 data = {}
+catty                   = Ezlocal.where(:business_id => business.id).first
+data[ 'ezlocal_category1' ]          = catty.ezlocal_category.name.gsub("\n", "").gsub("\r","")
 data['email']			= business.ezlocals.first.email
 data['password']		= business.ezlocals.first.password
 data['local_phone']		= business.local_phone.gsub("-","")

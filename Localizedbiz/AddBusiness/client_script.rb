@@ -5,7 +5,7 @@ sign_in(data)
 
 @browser.text_field( :id => 'location_name').set data['business']
 @browser.text_field( :name => 'address1').set data['address']
-@browser.text_field( :name => 'city').set data['business']
+@browser.text_field( :name => 'city').set data['city']
 @browser.select_list( :name => 'state').select data['state']
 @browser.text_field( :name => 'zip1').set data['zip']
 @browser.text_field( :name => 'areacode').set data['areacode']

@@ -43,7 +43,7 @@ def add_listing(data)
 
     if @browser.text.include?(@confirmation_msg)
       puts "Initial registration Successful"
-      RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data[ 'username' ], 'account[password]' => data['password'], 'model' => 'Businessdb'
+      RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data[ 'email' ], 'account[password]' => data['password'], 'model' => 'Businessdb'
       true
     else
       throw "Initial registration not successful"

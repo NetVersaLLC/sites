@@ -20,7 +20,7 @@ sign_in(data)
 @browser.text_field( :name => 'tagline').set data['tagline']
 @browser.text_field( :name => 'description').set data['description']
 
-#@browser.file_field( :name => 'new_image').set data['image']
+@browser.file_field( :name => 'new_image').set data['image'] unless data['image'].nil?
 
 @browser.button( :name => 'submit').click
 

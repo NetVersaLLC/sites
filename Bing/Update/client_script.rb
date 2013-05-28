@@ -58,9 +58,9 @@ def update_business_portal_online_presence( business )
 end
 
 def update_business_portal_images_and_videos ( business )
-  #@browser.file_field(:name, 'fileToUpload').set business[ 'logo' ]
+  @browser.file_field(:name, 'fileToUpload').set business[ 'logo' ]
   puts("Debug: Logo Path Set (Uncomment Later)")
-  #@browser.button(:id, 'uploadPhoto1').click
+  @browser.button(:id, 'uploadPhoto1').click
 end
 
 def update_business_portal_other_contact_information( business )

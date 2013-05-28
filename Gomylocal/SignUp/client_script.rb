@@ -1,5 +1,7 @@
 @browser.goto( 'https://www.gomylocal.com/add_listings.php?action=register&option=4' )
-puts(data['category1'])
+puts data['category1']
+
+puts data['username']
 @browser.text_field( :name => 'user_name').set data['username']
 @browser.text_field( :name => 'password').set data['password']
 @browser.text_field( :name => 'confirm_password').set data['password']
@@ -39,5 +41,3 @@ if @browser.text.include? "Congratulations your listing is now activate."
 true	
 
 end
-
-

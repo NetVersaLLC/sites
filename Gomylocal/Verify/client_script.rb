@@ -1,3 +1,3 @@
-@browser.goto(data['url'])
+@browser.goto data['url']
 
 true

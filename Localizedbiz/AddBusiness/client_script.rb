@@ -23,5 +23,5 @@ sign_in(data)
 #@browser.file_field( :name => 'new_image').set data['image']
 
 @browser.button( :name => 'submit').click
-true
 
+true if @browser.text.include? 'Listing Successfully Added'

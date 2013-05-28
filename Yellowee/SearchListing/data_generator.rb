@@ -60,9 +60,9 @@ state_abbr = {
 }
 
 data = {}
-data[ 'business' ]          = business['business']
-data[ 'businessfixed' ]          = business['business'].gsub(" ", "+")
+data[ 'business' ]    = business['business_name']
+data[ 'businessfixed' ]          = data[ 'business' ].gsub(" ", "+")
 data[ 'city' ]              = business['city']
-data[ 'state' ]			= state_abbr.[](business['state_short'])
-data[ 'citystate' ] = data[ 'city' ] + ", " + data[ 'state_short' ]
+data[ 'state' ]			= state_abbr.[](business['state'])
+data[ 'citystate' ] = data[ 'city' ] + ", " + data[ 'state' ]
 data

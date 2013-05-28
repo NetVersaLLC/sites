@@ -72,7 +72,6 @@ end
 
 def update_business_portal_general_information( business )
   business[ 'payments' ].each do |pay|
-  @browser.checkbox(:id, pay).clear
   @browser.checkbox(:id, pay).set
   end
   @browser.text_field(:name, 'AdditionalBusinessInfo.LanguageSpoken').set business[ 'languages' ]

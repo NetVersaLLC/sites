@@ -22,4 +22,5 @@ rescue Timeout::Error
   businessFound = [:unlisted]
 end
 
+#puts(businessFound)
 [true, businessFound]

@@ -42,14 +42,83 @@ data['hours'].each do |day|
 
 end
 
-
 data['payments'].each do |pay|
-	@browser.checkbox(:id => /#{pay}/).click
+	puts(pay)
+	if @browser.checkbox(:id => /#{pay}/).exists? then
+		@browser.checkbox(:id => /#{pay}/).clear
+	end
+		if pay == "Personal Checks" then
+			@browser.checkbox(:id => 'chkPersonalChecks').clear
+		end
+		if pay == "Credit Terms" then
+			@browser.checkbox(:id => 'chkCreditTerms').clear
+		end
+		if pay == "Financing" then
+			@browser.checkbox(:id => 'chkFinancing').clear
+		end
+		if pay == "Money Orders" then
+			@browser.checkbox(:id => 'chkMoneyOrders').clear
+		end
+		if pay == "Paypal" then
+			@browser.checkbox(:id => 'chkPaypal').clear
+		end
+		if pay == "Travelers Checks" then
+			@browser.checkbox(:id => 'chkTranvelersChecks').clear
+		end
+end
+sleep(2)
+data['payments'].each do |pay|
+	if @browser.checkbox(:id => /#{pay}/).exists? then
+		@browser.checkbox(:id => /#{pay}/).set\
+	end
+		if pay == "Personal Checks" then
+			@browser.checkbox(:id => 'chkPersonalChecks').set
+		end
+		if pay == "Credit Terms" then
+			@browser.checkbox(:id => 'chkCreditTerms').set
+		end
+		if pay == "Financing" then
+			@browser.checkbox(:id => 'chkFinancing').set
+		end
+		if pay == "Money Orders" then
+			@browser.checkbox(:id => 'chkMoneyOrders').set
+		end
+		if pay == "Paypal" then
+			@browser.checkbox(:id => 'chkPaypal').set
+		end
+		if pay == "Travelers Checks" then
+			@browser.checkbox(:id => 'chkTranvelersChecks').set
+		end
 end
 
+@browser.select_list(:id => "ddCategory").select data['ezlocal_category1']
+puts("Inserted Alias Category")
 
+if @browser.div(:class => "tags").a(:text => "x").exists? then
+@browser.div(:class => "tags").a(:text => "x").click
+sleep(2)
+@browser.div(:id => "main").input(:id => "btnYes").click
+puts("Category Removed")
+end
 
-@browser.button(:id => 'bContinue').click
+if @browser.div(:class => "tags").a(:text => "x").exists? then
+@browser.div(:class => "tags").a(:text => "x").click
+sleep(2)
+@browser.div(:id => "main").input(:id => "btnYes").click
+puts("Category Removed")
+end
+
+if @browser.div(:class => "tags").a(:text => "x").exists? then
+@browser.div(:class => "tags").a(:text => "x").click
+sleep(2)
+@browser.div(:id => "main").input(:id => "btnYes").click
+puts("Category Removed")
+end
+
+@browser.select_list(:id => "ddCategory").select data['ezlocal_category1']
+puts("Category re-selected")
+
+@browser.button(:id => "bContinue").click
 
 Watir::Wait.until{ @browser.text.include? "Your changes have been saved."}
 

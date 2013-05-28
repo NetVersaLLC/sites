@@ -59,7 +59,7 @@ end
 @browser.goto("https://twitter.com/")
 
 sleep 2
-Watir::Wait.until{@browser.text.include? "Confirm your email address to access all of Twitter's features." }
+Watir::Wait.until{@browser.text.include? "Here are some people you might enjoy following." }
 
 RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['username'], 'account[password]' => data['password'], 'model' => 'Twitter'
 

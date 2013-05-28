@@ -1,3 +1,5 @@
+puts data
+
 @browser.goto('https://signup.live.com/signup.aspx?')
 
 
@@ -51,9 +53,9 @@ begin
     
 
   else
-    @browser.text_field(  :id, 'iFirstName' ).set     data[ "first_name" ]
-    @browser.text_field(  :id, 'iLastName' ).set      data[ "last_name" ]
-    @browser.select_list( :id, 'iBirthMonth' ).select data[ 'birth_month' ]
+    @browser.text_field(  :id, 'iFirstName' ).set data[ "first_name" ]
+    @browser.text_field(  :id, 'iLastName' ).set data[ "last_name" ]
+    @browser.select_list( :id, 'iBirthMonth' ).when_present.select_value data[ 'birth_month' ]
     @browser.select_list( :id, 'iBirthDay' ).select   data[ 'birth_day' ]
     @browser.select_list( :id, 'iBirthYear' ).select  data[ 'birth_year' ]
     @browser.select_list( :id, 'iGender' ).select     data[ 'gender' ]

@@ -80,10 +80,9 @@ Watir::Wait.until{ @browser.button( :id => 'VerifyCollectBtn' ).exist? }
 @browser.select_list( :id, 'secquestion2' ).select 'Where did you spend your childhood summers?'
 @browser.text_field( :id, 'secquestionanswer2' ).set data[ 'secret_answer_2' ]
 
-sleep 10
+sleep 5
 retry_captcha(data)
-
-sleep 10
+sleep 5
 
 RestClient.post "#{@host}/yahoo/save_email.json?auth_token=#{@key}&business_id=#{@bid}", :email => data['business_email'], :password => data['password'], :secret1 => data['secret_answer_1'], :secret2 => data['secret_answer_2']
 #Watir::Wait.until { @browser.button( :id => 'ContinueBtn' ).exists? }

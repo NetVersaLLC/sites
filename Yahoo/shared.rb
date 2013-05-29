@@ -21,10 +21,11 @@ def retry_captcha(data)
     @browser.text_field( :id => 'captchaV5Answer' ).set captcha_text
     @browser.button( :id => 'VerifyCollectBtn' ).click  # if @browser.button( :id => 'IAgreeBtn' ).exist?
     #@browser.button( :id => 'VerifyCollectBtn' ).click if @browser.button( :id => 'VerifyCollectBtn' ).exist?
-
-     sleep(5)
-    if not @browser.text.include? "Please try this code instead"
+     sleep(3)
+     Watir::Wait.until { @browser.div(:id => 'details').exists? or @browser.text.include? "Please try this code instead"}
+    if @browser.div(:id => 'details').exists?
       capSolved = true
+      break
     end
     count+=1
    end

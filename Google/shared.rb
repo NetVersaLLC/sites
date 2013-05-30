@@ -30,31 +30,28 @@ end
 
 def search_for_business( data )
 
-	puts 'Search for the ' + data[ 'business' ] + ' business at ' + data[ 'zip' ] +  data['city']
+  puts 'Search for the ' + data[ 'business' ] + ' business at ' + data[ 'zip' ] +  data['city']
 	
-	#Close pop up if exist
-	if @browser.div(:class => 'U-L-Y U-L-Y-tm').exist? and @browser.div(:class => 'U-L-Y U-L-Y-tm').visible?
-           if @browser.button(:name => 'continue').exist?
-	     @browser.button(:name => 'continue').click
-	   end 
-	end
+  #Close pop up if exist
+  if @browser.div(:class => 'U-L-Y U-L-Y-tm').button(:name => 'continue').exist? and @browser.div(:class => 'U-L-Y U-L-Y-tm').button(:name => 'continue').visible?
+    @browser.div(:class => 'U-L-Y U-L-Y-tm').button(:name => 'continue').click
+  end
 
-        #Upgrade the account
-        if @browser.div(:class => /BSa TVa/).exist?
-          @browser.div(:class => /BSa TVa/).click
-          @browser.div(:class=> 'a-f-e c-b c-b-M YY Tma').click
-          @browser.button(:name => 'continue').click
-          @browser.div(:class=> /a-f-e c-b c-b-M/).click
-          @browser.button(:name => 'continue').click
-        end
-	
-	# 'https://plus.google.com/local' ) # Must be logged in to search
-	@browser.goto('https://plus.google.com/local')
-	@browser.text_field(:name, "qc").set data['business']
-	@browser.text_field(:name, "qb").set data['city']
-	@browser.button(:id,'gbqfb').click
-	@browser.wait
-	sleep(5)
+  #Upgrade the account
+  if @browser.div(:class => /BSa TVa/).exist? && @browser.div(:class => /BSa TVa/).visible?
+     @browser.div(:class => /BSa TVa/).click
+     @browser.div(:class=> 'a-f-e c-b c-b-M YY Tma').click
+     @browser.button(:name => 'continue').click
+     @browser.div(:class=> /a-f-e c-b c-b-M/).click
+     @browser.button(:name => 'continue').click
+  end
+
+  # 'https://plus.google.com/local' ) # Must be logged in to search
+  @browser.goto('https://plus.google.com/local')
+  @browser.text_field(:name, "qc").set data['business']
+  @browser.text_field(:name, "qb").set data['city']
+  @browser.button(:id,'gbqfb').click
+  @browser.wait_until { @browser.text.include?('Loading...') == false}
 end
 
 def parse_results( data )

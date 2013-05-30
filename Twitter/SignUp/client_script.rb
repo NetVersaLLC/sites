@@ -1,10 +1,13 @@
 @browser.goto("https://twitter.com/signup")
-
+puts("1")
 retries = 5
 begin 
+	puts("2")
 	@browser.text_field(:name => 'user[name]').set data['fullname']
+	puts("3")
 	@browser.text_field(:name => 'user[email]').set data['email']
 	@browser.text_field(:name => 'user[user_password]').set data['password']
+	puts("4")
 
 	while 1
 		seed = rand(1000).to_s
@@ -22,6 +25,8 @@ begin
 	@browser.checkbox(:name => 'user[remember_me_on_signup]').clear
 	@browser.checkbox(:name => 'user[use_cookie_personalization]').clear
 
+	sleep 10 # allow all the javascript validation to finish.. otherwise this button doesn't
+			 # do anything
 	@browser.button(:value => 'Create my account').click
 
 

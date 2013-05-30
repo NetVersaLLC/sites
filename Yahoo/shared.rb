@@ -1,7 +1,9 @@
 def sign_in(business)
 
-    @browser.goto( 'http://listings.local.yahoo.com/' )
-    @browser.link( :text => 'Sign In' ).click
+    @browser.goto( 'login.yahoo.com' )
+    #@browser.link( :text => 'Sign In' ).click
+    puts business['email']
+    puts business['password']
     sleep 2
     business['email'].split("").each do |k|
       @browser.text_field(:id, 'username').when_present.send_keys k
@@ -9,8 +11,13 @@ def sign_in(business)
     business['password'].split("").each do |k|
       @browser.text_field(:id, 'passwd').send_keys k
     end
-    sleep 2
+    #sleep 100000
+    sleep 5
+    @browser.button(:id, '.save').hover
+    sleep 1
     @browser.button(:id, '.save').click
+    sleep 10
+
 end
 
 def retry_captcha(data)

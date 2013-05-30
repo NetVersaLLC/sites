@@ -58,13 +58,12 @@ def provide_business_info( business )
     @browser.text_field( :id => 'addphone' ).set business[ 'business_phone' ]
     # TODO: add website @browser.text_field( :id => '?' ).set business[ 'business_website' ]
 
-    cats = CGI.unescapeHTML(business[ 'business_category' ])
-      cats = cats.split("")
-    cats.each do |cat|
-      @browser.text_field( :id => 'acseccat1' ).send_keys cat
-    end      
-    sleep 5
-    @browser.p( :class => 'autocomplete-row-margins' ).click
+    
+      @browser.text_field( :id => 'acseccat1' ).send_keys business[ 'business_category' ]
+      
+    sleep 2  
+    Watir::Wait.until { @browser.p( :class => 'autocomplete-row-margins' ).exists? }
+    @browser.send_keys :enter
     #@browser.div( :id => 'add-category-row-1' ).click # add the category to test it
 
     @browser.button( :id => 'submitbtn' ).click

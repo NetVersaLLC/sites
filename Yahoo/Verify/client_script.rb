@@ -30,6 +30,8 @@ def verify_phone(data)
 
   sign_in(data)
   sleep 2
+  @browser.goto("http://smallbusiness.yahoo.com/dashboard/mybusinesses?brand=local")
+  sleep 2
 
   @browser.link(:text => "Verify").when_present.click
   sleep(2)
@@ -68,6 +70,9 @@ end
 end
 
 verify_phone(data)
-sleep 10 #Just waiting for the code to verify. Hard to find an element to wait for. 
+sleep 15 #Just waiting for the code to verify. It stick on "Please wait for your Market Place Manager to setup"
+# The account is actually verified almost immediately, but this setup takes forever.
+# Having it wait until the page loads often times out, so if the code was accepted we
+# can just return true and move on. 
 true
 #main( data )

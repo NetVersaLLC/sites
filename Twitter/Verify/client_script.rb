@@ -34,4 +34,8 @@ rescue Exception => e
 end
 
 
+if @chained
+	self.start("Twitter/SendTweet")
+end
+
 true

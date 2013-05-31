@@ -11,7 +11,9 @@ begin
 
 	while 1
 		seed = rand(1000).to_s
+		data['username'] = data['username'][0 .. 10]
 		data['username'] = data['username']+seed
+
 		@browser.text_field(:name => 'user[screen_name]').set data['username']
 		@browser.text_field(:name => 'user[screen_name]').send_keys :tab
 		sleep 2
@@ -29,8 +31,6 @@ begin
 			 # do anything
 	@browser.button(:value => 'Create my account').click
 
-
-sleep 5 
 
 	if @browser.text.include? "Are you human?"
 		retry_captcha
@@ -66,7 +66,7 @@ end
 sleep 2
 Watir::Wait.until{@browser.text.include? "Here are some people you might enjoy following." }
 
-RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['username'], 'account[password]' => data['password'], 'model' => 'Twitter'
+RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['username'], 'account[password]' => data['password'], 'account[twitter_page]' => 'http://twitter.com/'+data['username'], 'model' => 'Twitter'
 
 if @chained
 	self.start("Twitter/Verify")

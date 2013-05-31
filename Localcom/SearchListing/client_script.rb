@@ -20,7 +20,9 @@ thelist.each do |item|
     businessFound['listed_address'] = street_addr + loc_addr
     businessFound['listed_phone'] = item.css('.phoneNumber.tel').text.strip 
 
-    subpage = Nokogiri::HTML(RestClient.get("http://www.local.com"+thelink[0]['href']))
+    link = "http://www.local.com"+thelink[0]['href']
+    businessFound['listed_url'] = link
+    subpage = Nokogiri::HTML(RestClient.get(link))
     if subpage.css("a.blueLink.bold").length == 0
       businessFound['status'] = :unclaimed      
     else

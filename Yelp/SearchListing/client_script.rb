@@ -20,6 +20,9 @@ nok.css("li.business-result").each do |item|
 		else
 			businessFound['status'] = :claimed
 		end
+    item.xpath(".//input[@name='business_url']").each do |input|
+      businessFound['listed_url'] = input.attr('value')
+    end
 
 		businessFound['listed_address'] = item.css("address").inner_text.gsub("\\n"," ").gsub("\\t"," ").strip
 		businessFound['listed_phone'] = item.css("span.phone").inner_text.gsub("\\n"," ").gsub("\\t"," ").strip

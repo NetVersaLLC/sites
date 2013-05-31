@@ -1,4 +1,4 @@
-url = "http://www.ibegin.com/search/phone/?phone=#{data['phone']}"
+url = "http://www.ibegin.com/search/phone/?phone=#{CGI.escape(data['phone'])}"
 puts(url)
 page = Nokogiri::HTML(RestClient.get(url)) 
 
@@ -6,6 +6,7 @@ businessFound = {}
 unless page.css("div.business").length == 0
   link = page.css("div.business a")
   link = "http://www.ibegin.com" + link[0]["href"]
+  businessFound['listed_url'] = link
   subpage = Nokogiri::HTML(RestClient.get(link)) 
   subpage.css("p.bizContactDetails").each do |p|
     contact_details = p.inner_text.to_s

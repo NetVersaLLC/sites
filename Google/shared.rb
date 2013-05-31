@@ -73,6 +73,12 @@ def parse_results( data )
 	return applicableLinks.to_a
 end
 
+def discern_parse_business_exist?( applicableLinks, data)
+
+	return applicableLinks.collect { |listing| listing[0] == data['business'] }.member?(true)
+	
+end
+
 def retry_captcha(data)
   capSolved = false
   count = 1
@@ -105,4 +111,20 @@ def solve_captcha
   obj.save image
   captcha_text = CAPTCHA.solve image, :manual
   return captcha_text
+end
+
+def verify_business()
+if @browser.text.include?('Verify your business')
+puts "Sending request for verification"
+@browser.div(:class => 'a-f-e c-b c-b-M BNa').when_present.click
+@browser.wait()
+@browser.checkbox(:id, 'gwt-uid-50').when_present.set #terms
+@browser.link(:text,'Send postcard').click
+               sleep(5)
+if @browser.div(:id=> 'send-mailer-success-dialog-box').text.include?('You should receive a postcard with your PIN in about a week.')
+puts "Initial business listing is successful"
+@browser.link(:text => 'OK').click
+     true
+end
+end
 end

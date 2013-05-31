@@ -59,9 +59,10 @@ def create_business( data )
 	@browser.checkbox(:name => 'TermsOfService').set
 	@browser.button(:value => 'Continue').click
 
-        verify_phone(data) 
-   	@browser.div(:text => 'Finish').click if @browser.div(:text => 'Finish').exist?
-        @browser.div(:text => 'Edit business information').click if @browser.div(:text => 'Edit business information').exist?
+        verify_phone(data)
+	@browser.div(:class => 'a-f-e c-b c-b-M Bl').when_present.click if @browser.div(:class => 'a-f-e c-b c-b-M Bl').exist? 
+	@browser.wait_until { @browser.div(:text => 'Edit business information').exist?} 
+        @browser.div(:text => 'Edit business information').click 
         
         #Signin if it aski
         if @browser.text_field(:id => 'Passwd').exist?

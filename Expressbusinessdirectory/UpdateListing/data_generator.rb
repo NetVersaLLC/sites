@@ -12,9 +12,12 @@ data[ 'phone' ]			= business.local_phone
 data[ 'fax' ]			= business.fax_number
 data[ 'email' ]			= business.bings.first.email
 data[ 'website' ]		= business.company_website
-data[ 'description' ]		= business.business_description
+data[ 'description' ]	= business.business_description
+data[ 'product' ]		= business.category1
+data[ 'tags' ]			= business.category2 + ", " +business.category3 + ", " +business.category4 + ", " +business.category5
 data[ 'keywords' ]		= business.category1 + ", " +business.category2 + ", " +business.category3 + ", " +business.category4 + ", " +business.category5
 data[ 'fname' ]			= business.contact_first_name
 data[ 'lname' ]			= business.contact_last_name
+data[ 'logo' ]			= business.logo_file_name
 data[ 'position' ]		= "Business Owner / Senior Management"
 data

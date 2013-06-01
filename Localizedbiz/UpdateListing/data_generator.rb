@@ -23,5 +23,5 @@ data['hours']    = Getfav.consolidate_hours( business )
 data['description'] = business.business_description
 data['keywords']    = business.category1 + ", " + business.category2 + ", " + business.category3 + ", " + business.category4 + ", " + business.category5
 data['tagline']    = business.category1 + " " + business.category2 + " " + business.category3
-data['image']      = nil # "C:\\1.jpg"
+data['image']      = business.logo_file_name
 data

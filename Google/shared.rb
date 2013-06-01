@@ -30,31 +30,28 @@ end
 
 def search_for_business( data )
 
-	puts 'Search for the ' + data[ 'business' ] + ' business at ' + data[ 'zip' ] +  data['city']
+  puts 'Search for the ' + data[ 'business' ] + ' business at ' + data[ 'zip' ] +  data['city']
 	
-	#Close pop up if exist
-	if @browser.div(:class => 'U-L-Y U-L-Y-tm').exist? and @browser.div(:class => 'U-L-Y U-L-Y-tm').visible?
-           if @browser.button(:name => 'continue').exist?
-	     @browser.button(:name => 'continue').click
-	   end 
-	end
+  #Close pop up if exist
+  if @browser.div(:class => 'U-L-Y U-L-Y-tm').button(:name => 'continue').exist? and @browser.div(:class => 'U-L-Y U-L-Y-tm').button(:name => 'continue').visible?
+    @browser.div(:class => 'U-L-Y U-L-Y-tm').button(:name => 'continue').click
+  end
 
-        #Upgrade the account
-        if @browser.div(:class => /BSa TVa/).exist?
-          @browser.div(:class => /BSa TVa/).click
-          @browser.div(:class=> 'a-f-e c-b c-b-M YY Tma').click
-          @browser.button(:name => 'continue').click
-          @browser.div(:class=> /a-f-e c-b c-b-M/).click
-          @browser.button(:name => 'continue').click
-        end
-	
-	# 'https://plus.google.com/local' ) # Must be logged in to search
-	@browser.goto('https://plus.google.com/local')
-	@browser.text_field(:name, "qc").set data['business']
-	@browser.text_field(:name, "qb").set data['city']
-	@browser.button(:id,'gbqfb').click
-	@browser.wait
-	sleep(5)
+  #Upgrade the account
+  if @browser.div(:class => /BSa TVa/).exist? && @browser.div(:class => /BSa TVa/).visible?
+     @browser.div(:class => /BSa TVa/).click
+     @browser.div(:class=> 'a-f-e c-b c-b-M YY Tma').click
+     @browser.button(:name => 'continue').click
+     @browser.div(:class=> /a-f-e c-b c-b-M/).click
+     @browser.button(:name => 'continue').click
+  end
+
+  # 'https://plus.google.com/local' ) # Must be logged in to search
+  @browser.goto('https://plus.google.com/local')
+  @browser.text_field(:name, "qc").set data['business']
+  @browser.text_field(:name, "qb").set data['city']
+  @browser.button(:id,'gbqfb').click
+  @browser.wait_until { @browser.text.include?('Loading...') == false}
 end
 
 def parse_results( data )
@@ -74,6 +71,12 @@ def parse_results( data )
 		end
 	end
 	return applicableLinks.to_a
+end
+
+def discern_parse_business_exist?( applicableLinks, data)
+
+	return applicableLinks.collect { |listing| listing[0] == data['business'] }.member?(true)
+	
 end
 
 def retry_captcha(data)
@@ -108,4 +111,20 @@ def solve_captcha
   obj.save image
   captcha_text = CAPTCHA.solve image, :manual
   return captcha_text
+end
+
+def verify_business()
+if @browser.text.include?('Verify your business')
+puts "Sending request for verification"
+@browser.div(:class => 'a-f-e c-b c-b-M BNa').when_present.click
+@browser.wait()
+@browser.checkbox(:id, 'gwt-uid-50').when_present.set #terms
+@browser.link(:text,'Send postcard').click
+               sleep(5)
+if @browser.div(:id=> 'send-mailer-success-dialog-box').text.include?('You should receive a postcard with your PIN in about a week.')
+puts "Initial business listing is successful"
+@browser.link(:text => 'OK').click
+     true
+end
+end
 end

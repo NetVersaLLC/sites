@@ -1,14 +1,19 @@
 @browser.goto("https://twitter.com/signup")
-
+puts("1")
 retries = 5
 begin 
+	puts("2")
 	@browser.text_field(:name => 'user[name]').set data['fullname']
+	puts("3")
 	@browser.text_field(:name => 'user[email]').set data['email']
 	@browser.text_field(:name => 'user[user_password]').set data['password']
+	puts("4")
 
 	while 1
 		seed = rand(1000).to_s
+		data['username'] = data['username'][0 .. 10]
 		data['username'] = data['username']+seed
+
 		@browser.text_field(:name => 'user[screen_name]').set data['username']
 		@browser.text_field(:name => 'user[screen_name]').send_keys :tab
 		sleep 2
@@ -22,10 +27,10 @@ begin
 	@browser.checkbox(:name => 'user[remember_me_on_signup]').clear
 	@browser.checkbox(:name => 'user[use_cookie_personalization]').clear
 
+	sleep 10 # allow all the javascript validation to finish.. otherwise this button doesn't
+			 # do anything
 	@browser.button(:value => 'Create my account').click
 
-
-sleep 5 
 
 	if @browser.text.include? "Are you human?"
 		retry_captcha
@@ -61,7 +66,7 @@ end
 sleep 2
 Watir::Wait.until{@browser.text.include? "Here are some people you might enjoy following." }
 
-RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['username'], 'account[password]' => data['password'], 'model' => 'Twitter'
+RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['username'], 'account[password]' => data['password'], 'account[twitter_page]' => 'http://twitter.com/'+data['username'], 'model' => 'Twitter'
 
 if @chained
 	self.start("Twitter/Verify")

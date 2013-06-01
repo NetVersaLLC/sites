@@ -14,7 +14,6 @@ sign_in(data)
 @browser.text_field( :name => 'phone').set data['last4']
 @browser.text_field( :name => 'email').set data['email']
 
-data['website'] = 'google.com'
 raise Exception, 'Website URL should be provided.' unless data['website']
 @browser.text_field( :name => 'url').set data['website'] 
 @browser.select_list( :name => 'biz_cat1').select data['category1']

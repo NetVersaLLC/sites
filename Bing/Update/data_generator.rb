@@ -25,6 +25,7 @@ data[ 'website' ]           = business.company_website
 data[ 'facebook' ]          = '' # NOTE: unimlemented
 data[ 'twitter' ]           = '' # NOTE: unimplemented
 data[ 'logo' ]				= business.logo_file_name
+data[ 'images' ]			= business.images
 
 data[ 'year_established' ]  = business.year_founded
 data[ 'description' ]       = business.business_description

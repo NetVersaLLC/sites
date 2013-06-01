@@ -6,17 +6,7 @@ def update_business_portal_details( business )
   @browser.div( :class, 'businessCategory').a.click
   puts("Debug: Category Removed")
 
-  @browser.h4( :text, 'Additional Business Details').click
-  sleep(1)
-  @browser.h4( :text, 'Online Presence').click
-  sleep(1)
-  @browser.h4( :text, 'Images and Videos').click
-  sleep(1)
-  @browser.h4( :text, 'Other Contact Information').click
-  sleep(1)
-  @browser.h4( :text, 'General Information').click
-  puts("Debug: All Dropdown pages opened")
-  sleep(1)
+
 
   @browser.checkboxes.each do |at|
     at.clear
@@ -58,9 +48,47 @@ def update_business_portal_online_presence( business )
 end
 
 def update_business_portal_images_and_videos ( business )
-  @browser.file_field(:name, 'fileToUpload').set business[ 'logo' ]
-  puts("Debug: Logo Path Set (Uncomment Later)")
-  @browser.button(:id, 'uploadPhoto1').click
+   #@browser.file_field(:id, 'imageFiles1').set business[ 'logo' ]
+   puts("Debug: Logo Path Set")
+   #@browser.button(:id, 'uploadPhoto1').click
+
+
+  @browser.links(:text => 'X').each do |alink|      
+      
+        alink.click if alink.visible?
+        sleep 1
+
+  end
+
+
+
+   @browser.file_field(:id => 'imageFiles1').set business['logo']
+   sleep 5
+   @browser.button(:id => 'uploadPhoto1').click
+
+  sleep 5
+  
+  while @browser.img(:xpath => '//*[@id="imageContainer1"]/span/div/img').attribute_value("src") == "https://www.bingplaces.com/Images/loading.gif" do sleep 1 end 
+
+   pbm = 0
+   if business['images'].length > 0
+      puts(business[ 'images' ][pbm]['file_name'])
+        while pbm < business[ 'images' ].length
+          @browser.file_field(:id, 'imageFiles2').set business[ 'images' ][pbm]['file_name']
+          sleep 4
+          #@browser.button(:id => 'uploadPhoto2').click
+
+          sleep 2
+          otherpbm = pbm + 1
+          @browser.execute_script("startImageUpload(2)")
+          puts("Before wait")
+          while @browser.img(:xpath => "//*[@id='imageContainer2']/span/div[#{otherpbm}]/img").attribute_value("src") == "https://www.bingplaces.com/Images/loading.gif" do sleep 1 end 
+            puts("Right after wait")
+            sleep 5
+          pbm += 1
+        end
+  end
+  
 end
 
 def update_business_portal_other_contact_information( business )
@@ -98,6 +126,22 @@ def update( business )
   puts("Debug: Signed in")
   editmode()
   puts("Debug: Edit Mode Activated")
+   sleep 2
+   Watir::Wait.until { @browser.h4( :text, 'Additional Business Details').exists? }
+
+  @browser.h4( :text, 'Additional Business Details').click
+  sleep(1)
+  @browser.h4( :text, 'Online Presence').click
+  sleep(1)
+  @browser.h4( :text, 'Images and Videos').click
+  sleep(1)
+  @browser.h4( :text, 'Other Contact Information').click
+  sleep(1)
+  @browser.h4( :text, 'General Information').click
+  puts("Debug: All Dropdown pages opened")
+  sleep(1)
+
+
   update_business_portal_details( business )
   puts("Debug: Details update method complete")
   update_business_portal_additional_details( business )

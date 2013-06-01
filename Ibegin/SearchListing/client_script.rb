@@ -1,3 +1,5 @@
+Proxy.restclient
+
 url = "http://www.ibegin.com/search/phone/?phone=#{CGI.escape(data['phone'])}"
 puts(url)
 page = Nokogiri::HTML(RestClient.get(url)) 

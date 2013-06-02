@@ -1,3 +1,4 @@
+# Login
 def login ( data )
   site = 'https://plus.google.com/local'
   @browser.goto site
@@ -12,15 +13,15 @@ def login ( data )
     @browser.link(:text => 'Sign in').click
   end
 
-  if !data['email'].empty? and !data['pass'].empty? 
+  if !data['email'].empty? and !data['pass'].empty?
     @browser.text_field(:id, "Email").set data['email']
     @browser.text_field(:id, "Passwd").set data['pass']
     @browser.button(:value, "Sign in").click
     sleep(5)
     # If user name or password is not correct
       if @browser.span(:id => 'errormsg_0_Passwd').exist?
-        if  @browser.span(:id => 'errormsg_0_Passwd').visible?
- 	  signup_generic( data )
+        if @browser.span(:id => 'errormsg_0_Passwd').visible?
+  signup_generic( data )
         end
       end
   else
@@ -28,55 +29,76 @@ def login ( data )
   end
 end
 
+#Search for busienss
 def search_for_business( data )
 
-  puts 'Search for the ' + data[ 'business' ] + ' business at ' + data[ 'zip' ] +  data['city']
-	
+  puts 'Search for the ' + data[ 'business' ] + ' business at ' + data[ 'zip' ] + data['city']
+
   #Close pop up if exist
   if @browser.div(:class => 'U-L-Y U-L-Y-tm').button(:name => 'continue').exist? and @browser.div(:class => 'U-L-Y U-L-Y-tm').button(:name => 'continue').visible?
     @browser.div(:class => 'U-L-Y U-L-Y-tm').button(:name => 'continue').click
   end
 
   #Upgrade the account
-  if @browser.div(:class => /BSa TVa/).exist? && @browser.div(:class => /BSa TVa/).visible?
-     @browser.div(:class => /BSa TVa/).click
-     @browser.div(:class=> 'a-f-e c-b c-b-M YY Tma').click
-     @browser.button(:name => 'continue').click
-     @browser.div(:class=> /a-f-e c-b c-b-M/).click
-     @browser.button(:name => 'continue').click
+  if @browser.div(:class => 'BSa TVa').exist? && @browser.div(:class => 'BSa TVa').visible?
+     @browser.div(:class => 'BSa TVa').click
+     if @browser.div(:class=> 'a-f-e c-b c-b-M YY Tma').exist? && @browser.div(:class=> 'a-f-e c-b c-b-M YY Tma').visible?
+     @browser.div(:class=> 'a-f-e c-b c-b-M YY Tma').when_present.click until @browser.div(:class=> 'a-f-e c-b c-b-M YY Tma').exist? == false
+     end
   end
 
   # 'https://plus.google.com/local' ) # Must be logged in to search
   @browser.goto('https://plus.google.com/local')
-  @browser.text_field(:name, "qc").set data['business']
-  @browser.text_field(:name, "qb").set data['city']
-  @browser.button(:id,'gbqfb').click
+  @browser.text_field(:name, "qc").when_present.set data['business']
+  @browser.text_field(:name, "qb").when_present.set data['city']
+  @browser.button(:id,'gbqfb').when_present.click
   @browser.wait_until { @browser.text.include?('Loading...') == false}
+  @browser.wait_until { @browser.span(:text =>'Key to ratings').exist? == true}
 end
 
+#Verify phone
+def verify_phone(data)
+  if @browser.text_field(:id, 'signupidvinput').exist?
+    @browser.text_field(:id, 'signupidvinput').when_present.set data[ 'phone' ]
+    @browser.radio(:id,'signupidvmethod-voice').set
+    @browser.button(:value,'Continue').click
+    # fetch Phone verification code
+    @code = PhoneVerify.ask_for_code
+    if @browser.span(:class,'errormsg').exist?
+      puts "#{@browser.span(:class,'errormsg').text}"
+    end
+    if @browser.text_field(:id,'verify-phone-input').exist?
+      @browser.text_field(:id,'verify-phone-input').when_present.set @code
+      @browser.button(:value,'Continue').click
+        if @browser.span(:class,'errormsg').exist?
+        puts "#{@browser.span(:class,'errormsg').text}"
+        end
+    end
+  end
+end
+
+#Parse result
 def parse_results( data )
-#Parse search result page
-	page = Nokogiri::HTML(@browser.html)
-	page_links = page.css("a").select
-	applicableLinks = {}
-	page_links.each do |link|
-		if not link.nil?
-			if not link['href'].nil? and !!link['href']["/about"]
-				img = ""
-				if not link.at('img').nil?
-					img = link.at('img')['src']
-				end
-				applicableLinks[link.content] = [link['href'], img]
-			end
-		end
-	end
-	return applicableLinks.to_a
+  #Parse search result page
+  page = Nokogiri::HTML(@browser.html)
+  page_links = page.css("a").select
+  applicableLinks = {}
+  page_links.each do |link|
+   if not link.nil?
+     if not link['href'].nil? and !!link['href']["/about"]
+       img = ""
+       if not link.at('img').nil?
+         img = link.at('img')['src']
+       end
+       applicableLinks[link.content] = [link['href'], img]
+     end
+   end
+  end
+  return applicableLinks.to_a
 end
 
 def discern_parse_business_exist?( applicableLinks, data)
-
-	return applicableLinks.collect { |listing| listing[0] == data['business'] }.member?(true)
-	
+  return applicableLinks.collect { |listing| listing[0] == data['business'] }.member?(true)
 end
 
 def retry_captcha(data)
@@ -113,18 +135,19 @@ def solve_captcha
   return captcha_text
 end
 
+#verify business
 def verify_business()
-if @browser.text.include?('Verify your business')
-puts "Sending request for verification"
-@browser.div(:class => 'a-f-e c-b c-b-M BNa').when_present.click
-@browser.wait()
-@browser.checkbox(:id, 'gwt-uid-50').when_present.set #terms
-@browser.link(:text,'Send postcard').click
-               sleep(5)
-if @browser.div(:id=> 'send-mailer-success-dialog-box').text.include?('You should receive a postcard with your PIN in about a week.')
-puts "Initial business listing is successful"
-@browser.link(:text => 'OK').click
-     true
-end
-end
+  if @browser.text.include?('Verify your business')
+    puts "Sending request for verification"
+    @browser.div(:class => 'a-f-e c-b c-b-M BNa').when_present.click
+    @browser.wait()
+    @browser.checkbox(:id, 'gwt-uid-50').when_present.set #terms
+    @browser.link(:text,'Send postcard').click
+    sleep(5)
+    if @browser.div(:id=> 'send-mailer-success-dialog-box').text.include?('You should receive a postcard with your PIN in about a week.')
+      puts "Initial business listing is successful"
+      @browser.link(:text => 'OK').click
+      true
+    end
+  end
 end

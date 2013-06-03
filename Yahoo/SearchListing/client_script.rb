@@ -1,25 +1,32 @@
 html = RestClient.get "http://local.search.yahoo.com/search", { :params => { :p => @data['business'], :addr => @data['citystate'], :fr2 => 'sb-top', :type_param => '' } }
 nok = Nokogiri::HTML(html)
-businessFound = [:unlisted]
+businessFound = {
+  'status' => :unlisted
+}
 nok.xpath("//div[@class='res']/div[@class='content']").each do |content|
   content.xpath("./h3").each do |h3|
-    if @data['business'].strip == h3.inner_text.strip
-      businessFound = [:listed, :unclaimed]
+    if h3.inner_text.strip =~ /#{@data['business'].strip}/i
+      h3.xpath("./a").each do |a|
+        url = a.attr('href')
+        if url =~ /(local.yahoo.com.*)/
+          businessFound['listed_url'] = "http://#{$1}"
+        end
+      end
+      businessFound['status'] = :listed
       content.xpath("./span[@class='merchant-ver']").each do |div|
-        businessFound = [:listed, :claimed]
+        businessFound['status'] = :claimed
       end
       meta = {}
       meta['name'] = h3.inner_text.strip
       content.xpath("./span[@class='phone']").each do |phone|
-        meta['phone'] = phone.inner_text
+        businessFound['listed_phone'] = phone.inner_text.strip
       end
       content.xpath("./div[@class='address']").each do |address|
         address.xpath("./div").each do |div|
           div.remove
         end
-        meta['address'] = address.inner_text
+        businessFound['listed_address'] = address.inner_text.strip
       end
-      businessFound.push meta
     end
   end
 end

@@ -17,3 +17,4 @@ page.css("a").each do |resultLink|
 	end
 end
 
+[true,businessFound]

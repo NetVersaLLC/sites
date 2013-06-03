@@ -10,14 +10,13 @@
 
 if @browser.text.include? "Please log into the email that you used to sign up for your account. You will receive a link from Insider Pages to confirm your email account."
 
-puts( 'Signup complete, verify email.' )
+  puts( 'Signup complete, verify email.' )
 
-RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'InsiderPage'
+  RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'InsiderPage'
 
-if @chained
-  self.start("Insiderpages/Verify")
+  if @chained
+    self.start("Insiderpages/Verify")
+  end
+  true
+
 end
-true
-
-end
-

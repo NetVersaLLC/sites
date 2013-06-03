@@ -1,102 +1,44 @@
-def add_listing( data )
-	@browser.goto( 'http://insiderpages.com/businesses/new' )
+def add_listing(data)
+  # @browser.link(:text => 'Add a New Business').click
+  @browser.goto 'http://www.insiderpages.com/businesses/new'
 
-	@browser.text_field( :id, 'business_name' ).set data[ 'business' ]
-	@browser.text_field( :id, 'business_address_1' ).set data[ 'address' ]
-	
-	@browser.text_field( :name, 'city' ).set data[ 'city' ]
-	sleep(2)
-	@browser.li( :id => 'as-result-item-0', :index => 1).click
+  fill_form data
 
+  @browser.radio(:id => 'yes').click
+  puts "Committing"
+  @browser.button(:text => 'Submit & Go to Step 2').click
+  puts "After commit"
+
+  sleep 5
+
+  if @browser.div(:id => 'possible_duplicates').text.include? data['business']
+    @browser.link(:text => data['business']).click
+  else
+    @browser.button(:id => 'add_potential_duplicate').click
+    @browser.alert.ok
+  end
   
-	@browser.select_list( :id, 'business_state_code' ).select data[ 'state' ]
-	@browser.text_field( :id, 'business_zip_code' ).set data[ 'zip' ]
-	@browser.text_field( :id, 'business_phone' ).set data[ 'phone' ]
-	@browser.text_field( :id, 'business_email_address' ).set data[ 'business_email' ]
-	@browser.text_field( :id, 'business_url' ).set data[ 'website' ]
-	
-	gories = data[ 'categories' ]
-	gories.each do |categ| 
-		if categ != ""
-			@browser.text_field( :name, 'selected_categories').set categ
-			@browser.text_field( :name, 'selected_categories').focus
-			#@browser.li( :id, 'as-result-item-0').wait_until_present
-			sleep(5)
-			@browser.li( :id => 'as-result-item-0', :index => 1).click	
-		end
-	end
-	
-  
-  #tags = data[ 'tags' ]
-	#tags.each do |tag| 
-	#	if tag != ""
-	#		@browser.text_field( :name, 'selected_taggings').set tag
-	#		@browser.text_field( :name, 'selected_taggings').focus
-	#		sleep(5)
-	#		@browser.li( :id => 'as-result-item-0', :index => 2).click	
-	#	end
-	#end
- 
- @browser.radio( :id, 'yes').click
-  puts("Committing")
-	@browser.button( :name, "commit").click
-	sleep(5)
-  puts("After commit")
-	if @browser.text.include? "You might be adding a duplicate"
-		# adding a duplicate? Claim the business.
-		claim_business( data )
+  sleep 5
+  Watir::Wait.until { @browser.div(:class => 'item vcard').exist? }
 
-	else
-		update_business( data )	
-
-	end
-	
-
+  true if claim_business data
 end
 
-def claim_business( data )
+def claim_business(data)
+  raise Exception, 'Business cannot be claimed.' unless @browser.text.include? 'Claim Business'
 
-	@browser.link( :text, /#{data['business']}/i).click
-		@browser.link( :text, 'Claim Business').when_present.click
-	@browser.div( :id, 'recaptcha_widget_div').wait_until_present
-	enter_captcha( data )
-	update_business( data )
-true
-end
+  @browser.link(:text => 'Claim Business').when_present.click
+  Watir::Wait.until { @browser.div(:id => 'recaptcha_widget_div').exist? }
+  enter_captcha data
+  sleep 5
 
-def update_business( data )
-#Regardless of the business existing or being added, this is the last step
-		#all fields are optional
-		@browser.text_field( :id, 'business_name' ).when_present.set data[ 'business' ]
-		@browser.text_field( :id, 'business_email_address' ).set data[ 'business_email' ]
-		@browser.text_field( :id, 'business_url' ).set data[ 'website' ]
-		@browser.text_field( :id, 'business_merchant_attributes_bio' ).set data[ 'business_description' ]
-		@browser.text_field( :id, 'business_merchant_attributes_services' ).set data[ 'services' ]
-		@browser.text_field( :id, 'business_merchant_attributes_message' ).set data[ 'message' ]
-		@browser.button( :value, 'update business' ).click
-		true
-
+  true if update_business data
 end
 
 #*********************************
 #MAIN CONTROLLER THINGY
 #sign in
-sign_in( data )
+sign_in data
 
-#search for the business
-@browser.text_field( :name, 'query').set data[ 'business' ]
-@browser.text_field( :name, 'location').set data[ 'near_city' ]
-@browser.button( :value, 'Search' ).click
-@browser.select_list( :id, 'radius').wait_until_present
-
-# Does the business already exist?
-if @browser.link( :text, /#{data['business']}/i).exists?
-#Claim the business
-claim_business( data )
-true
-else
 #add new listing
-add_listing( data )
-true
-end
-
+true if add_listing data

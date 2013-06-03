@@ -1,25 +1,23 @@
-# Search for the business
-
-def search_business(data)
-  
-  @browser.text_field(:name => 'na').set data['business']
-  sleep(2)
-  @browser.text_field(:name => 'city').set data['location']
-  @browser.radio(:value=> 'N').when_present.set
-  @browser.div(:id=> 'button_search_bs').span(:text=>'Search').click
-  @browser.wait_until { @browser.div(:id=> 'results').exist? }
-  $businessFound = [:unlisted]
-  page = Nokogiri::HTML(@browser.html)
-  page.css('a').each do |link|
-    if link.text.include?(data['business'])
-      "Business is already listed"
-      $businessFound = [:listed,:claimed]
+businessfixed = data['business'].gsub(" ", "%20")
+url = "http://www.ziplocal.com/list.jsp?lang=0&nt=N&na=#{businessfixed}&ct=#{data['zip']}"
+nok = Nokogiri::HTML(RestClient.get url)
+businessFound = {}
+businessFound['status'] = :unlisted
+nok.css("div.listing.vcard.cfix").each do |resultBlock|
+  if resultBlock.css("a.url")[0].text =~ /#{data['business']}/i
+    businessFound['listed_address'] = resultBlock.css("span.street-address").text + ", " + resultBlock.css("span.locality").text + ", " + resultBlock.css("span.region").text
+    businessFound['listed_url'] = "http://www.ziplocal.com/"+resultBlock.css("a.url")[0].attr('href')
+    businessFound['listed_phone'] = resultBlock.css("p.tel").text   
+    subpage = Nokogiri::HTML(RestClient.get businessFound['listed_url'])
+    if subpage.xpath("//a[contains(text(), 'Update')]").length > 0
+      businessFound['status'] = :listed
+    else
+      businessFound['status'] = :claimed
     end
+    break
   end
-  return [true, $businessFound]
+
+
 end
 
-# Main steps
-
-@browser.goto('http://www.ziplocal.com/')
-search_business(data)
+[true,businessFound]

@@ -7,11 +7,11 @@ if not thelist.length == 0
   subpage = Nokogiri::HTML(RestClient.get(link)) 
   claimLink = subpage.xpath("/html/body/div[2]/div/div[3]/div[1]/div[3]/div[2]/a")
   if claimLink.length == 0
-    businessFound = [:listed, :claimed]
+    businessFound['status'] = :claimed
   else
-    businessFound = [:listed, :unclaimed]
+    businessFound['status'] = :listed
   end 
 else
-  businessFound = [:unlisted]
+  businessFound['status'] = :unlisted
 end
 [true, businessFound]

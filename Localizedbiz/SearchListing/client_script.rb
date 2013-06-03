@@ -1,18 +1,19 @@
-@browser.goto('http://www.localizedbiz.com/')
+businessFound = {}
 
+businessfixed        = data['business'].gsub(" ", "+")
+url = "http://www.localizedbiz.com/search.php?q=#{businessfixed}"
+page = Nokogiri::HTML(RestClient.get(url)) 
+if page.css("a.biz_title").length > 0
+	page.css("a.biz_title").each do |resultLink|
+		if 	resultLink.text =~ /#{data['business']}/i
+			businessFound['status'] = :claimed
+			businessFound['listed_address']	= page.css("td.biz_address")[0].text
+			businessFound['listed_url'] = resultLink.attr('href')
+			businessFound['listed_phone'] = page.css("td.biz_phone")[0].text
+		end
+	end
 
-@browser.text_field( :name => 'q').set data['business']
-@browser.text_field( :name => 'loc').clear
-
-@browser.button( :name => 'Submit').click
-Watir::Wait.until { @browser.text.include? "no result found" or @browser.link( :class => 'biz_title').exists? }
-
-if @browser.text.include? "no result found"
-  businessFound = [:unlisted]
-elsif @browser.link( :text => /#{data['business']}/).exists?
-    businessFound = [:listed,:unclaimed]
-  else
-    businessFound = [:unlisted]
-end  
-
+else
+	businessFound['status']		= :unlisted
+end
 [true, businessFound]

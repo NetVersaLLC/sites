@@ -1,18 +1,14 @@
-@browser.goto("http://www.expressbusinessdirectory.com/businesses/#{data['businessfixed']}/")
-if @browser.text.include? "Sorry, no search results found."
-  businessFound = [:unlisted]
-else
- if @browser.link( :text => /#{data['business']}/).exists?
-    @browser.link( :text => /#{data['business']}/).click
-    Watir::Wait.until { @browser.div(:class => 'blueText').exists? }
-    if @browser.link( :id => 'ctl00_ContentPlaceHolder1_hypClaimBusiness').exists?
-      businessFound = [:listed, :unclaimed]
-    else
-      businessFound = [:listed, :claimed]    
-    end  
- else
-    businessFound = [:unlisted]
- end        
+url = "http://www.expressbusinessdirectory.com/businesses/#{data['businessfixed']}/"
+page = Nokogiri::HTML(RestClient.get(url)) 
+businessFound = {}
+businessFound['status'] = :unlisted
+page.css("a#ctl00_ContentPlaceHolder1_dlResults_ctl00_hypBusiness").each do |resultLink|
+	if resultLink.text =~ /#{data['business']}/i
+		businessFound['status'] = :claimed
+		businessFound['listed_url'] = resultLink.attr("href")
+		businessFound['listed_address']	= page.css("span#ctl00_ContentPlaceHolder1_dlResults_ctl00_lblAddress").text
+	end
+
 end
 
 

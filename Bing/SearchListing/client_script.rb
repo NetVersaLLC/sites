@@ -30,7 +30,8 @@ businessFound = {}
 
     if @browser.link(:title => /#{business['business']}/i).exists?
       businessFound['status'] = :listed
-      businessFound['listed_name'] = @browser.link(:title => /#{business['business']}/i).text
+      thelinky = @browser.link(:title => /#{business['business']}/i)      
+      businessFound['listed_name'] = thelinky.attribute_value("href")
       businessFound['listed_address'] = @browser.p(:xpath => '//*[@id="0"]/tbody/tr/td[2]/p[1]').text + @browser.p(:xpath => '//*[@id="0"]/tbody/tr/td[2]/p[2]').text
     else
       businessFound['status'] = :unlisted

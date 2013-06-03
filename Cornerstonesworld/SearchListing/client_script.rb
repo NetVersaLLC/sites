@@ -1,11 +1,15 @@
 
+
+data[ 'businessfixed' ]          = data['business'].gsub(" ", "%20")
+
+
 url = "http://www.cornerstonesworld.com/en/directory/country/USA/keyword/#{data['businessfixed']}/zip/#{data['zip']}/new"
 puts(url)
-puts("Navigated Successfully")
+
 page = Nokogiri::HTML(RestClient.get(url))
-puts("page Assigned")
+
 firstItem = page.css("span.titlesmalldblue")
-puts("firstItem Assigned")
+
 
 #Unneeded Watir rescue script, incomplete
 #rescue
@@ -31,15 +35,16 @@ puts("firstItem Assigned")
 #end
 
 if firstItem.length == 0
-  businessFound = [:unlisted]
-  puts("Unlisted")
+  businessFound['status'] = :unlisted
+
 else
    if firstItem.text == data['business']
-      businessFound = [:listed, :unclaimed]
-      puts("Listed, Uncalimed")     
+      businessFound['status'] = :listed
+      businessFound['listed_address'] 	= firstItem.parent.text
+      businessFound['listed_url']		= url
    else
-      businessFound = [:unlisted]
-      puts("Unlisted2")      
+	  businessFound['status'] = :unlisted
+
    end  
 end
 

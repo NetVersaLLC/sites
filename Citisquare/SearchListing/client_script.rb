@@ -7,16 +7,20 @@ businessFound = []
  if @browser.link( :text => data['business']).exists?
  em = @browser.link( :text => data['business'])
  if em.exists?
+
+    businessFound['listed_url']     = em.attribute_value("href")
+    businessFound['listed_address'] = em.parent.text
    if em.parent.parent.link( :id => 'claimButton').exists?
-     businessFound = [:listed,:unclaimed]
+     businessFound['status'] = :listed
+
    else
-     businessFound = [:listed,:claimed]
+     businessFound['status'] = :claimed
    end
   else
-     businessFound = [:unlisted]
+     businessFound['status'] = :unlisted
   end
   else 
-     businessFound = [:unlisted]
+     businessFound['status'] = :unlisted
   end
 
 [true, businessFound]

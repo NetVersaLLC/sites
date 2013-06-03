@@ -1,11 +1,12 @@
 @browser.goto( 'http://www.expressbusinessdirectory.com/login.aspx' )
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtEmail').set data['email']
-@browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtPassword').set "bNQraOFI"#data['password']
+@browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtPassword').set data['password']
 
 @browser.link( :id => 'ctl00_ContentPlaceHolder1_cmdLogin').click
 
 @browser.link( :text => "#{data[ 'business' ]}").click
 
+sleep 2
 Watir::Wait.until {@browser.link(:id => 'ctl00_hypEditBusiness').exists?}
 
 @browser.link(:id => 'ctl00_hypEditBusiness').click
@@ -28,35 +29,9 @@ sleep(2)
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtBusinessKeywords').set data['keywords']
 @browser.link(:id => 'ctl00_ContentPlaceHolder1_cmdSave').click
 
+sleep 2
 Watir::Wait.until { @browser.text.include? "Your Business Profile is" }
 
-#Begin verifying location
-@browser.link( :id => 'ctl00_ContentPlaceHolder1_A4').click
-sleep(2)
-@browser.link( :id => 'ctl00_ContentPlaceHolder1_cmdSaveMap').click
-sleep(1)
-@browser.goto('http://www.expressbusinessdirectory.com/member/home.aspx')
-
-#Begin adding a product
-#@browser.link( :id => 'ctl00_ContentPlaceHolder1_A7').click
-#@browser.button( :href => 'EditProduct.aspx').click
-#sleep(2)
-#@browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtProductName').set data[ 'product' ]
-#@browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtProductKeywords').set data[ 'tags' ]
-
-#Add a photo
-#@browser.link( :id => 'ctl00_ContentPlaceHolder1_A8').click
-#sleep(2)
-#@browser.file_field( :id => 'ctl00_ContentPlaceHolder1_txtTitle').set data['logo']
-
-#Begin verifying email
-@browser.goto('http://www.expressbusinessdirectory.com/member/home.aspx')
-@browser.link( :id => 'ctl00_ContentPlaceHolder1_A1').click
-sleep(2)
-@browser.link( :id => 'ctl00_ContentPlaceHolder1_cmdVerify').click
-
-	if @chained
-		self.start("Expressbusinessdirectory/VerifyEmail")
-	end
-
 true
+
+

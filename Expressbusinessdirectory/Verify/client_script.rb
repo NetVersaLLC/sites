@@ -15,4 +15,7 @@ end
 
 RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[password]' => data['password'], 'model' => 'Expressbusinessdirectory'
 
+if @chained 
+	self.start('Expressbusinessdirectory/FinishListing')
+
 true

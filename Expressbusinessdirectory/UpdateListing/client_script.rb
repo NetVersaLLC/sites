@@ -4,7 +4,8 @@
 
 @browser.link( :id => 'ctl00_ContentPlaceHolder1_cmdLogin').click
 
-@browser.link( :text => "#{data[ 'business' ]}").click
+sleep 2
+@browser.link( :text => "#{data[ 'business' ]}").when_present.click
 
 sleep 2
 Watir::Wait.until {@browser.link(:id => 'ctl00_hypEditBusiness').exists?}

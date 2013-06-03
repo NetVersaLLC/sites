@@ -58,15 +58,16 @@ end
 @browser.select_list( :id => 'ctl00_ContentPlaceHolder1_cboJobFunction' ).select data['position']
 
 @browser.link( :id => 'ctl00_ContentPlaceHolder1_cmdClaim').click
+sleep 2
+Watir::Wait.until {@browser.text.include? 'Almost there......Now check your email'}
 
-if @browser.text.include? 'Almost there......Now check your email'
+
 RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['email'], 'model' => 'Expressbusinessdirectory'
 	if @chained
 		self.start("Expressbusinessdirectory/Verify")
 	end
 true
 
-end
 
 
 

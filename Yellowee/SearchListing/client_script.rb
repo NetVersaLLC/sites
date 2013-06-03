@@ -1,30 +1,28 @@
-@browser.goto("http://www.yellowee.com/search?what=#{data[ 'businessfixed' ]}&where=#{data['city']}%2C+#{data['state']}%2C+United+States")
+businessfixed         = data[ 'business' ].gsub(" ", "+")
+businessFound = {}
+
+url = "http://www.yellowee.com/search?what=#{businessfixed}&where=#{data['city']}%2C+#{data['state_name']}%2C+United+States"
+puts url
+nok = Nokogiri::HTML(RestClient.get url)
 
 
-if @browser.text.include? "Sorry, we didn't find any results for"
-  
-  businessFound = [:unlisted]
-  puts("Unlisted")
-else
-Watir::Wait.until { @browser.div( :id => 'result_1').exists? }
-sleep(3)#ajax screws the wait up. This short sleep seems to fix that problem. 
-if @browser.link( :title => /#{data['business']}/i).exists?
-    @browser.link( :title => /#{data['business']}/i).click
-    Watir::Wait.until { @browser.link( :id => 'writereview').exists? }   
-    if @browser.link( :title => 'Claim Business').exists?
-        businessFound = [:listed, :unclaimed]
-        puts("listed, uncalimed")
-    else   
-        businessFound = [:listed, :claimed]
-        puts("listed, claimed")
-    end  
- else
-    businessFound = [:unlisted]
-    puts("unlisted")
- end  
-  
-  
+businessFound['status'] = :unlisted
+nok.css("div.business_info").each do |bi|
+    if bi.css("div.title a").text =~ /#{data['business']}/i
+        businessFound['listed_address'] = bi.css("div.address_num_name").text + ", " + bi.css("div.address_city_state").text
+        businessFound['listed_phone'] = bi.css("div.phone").text
+        businessFound['listed_url'] = "http://www.yellowee.com/"+bi.css("div.title a").attr("href")
+puts businessFound['listed_url']
+        subpage = Nokogiri::HTML(RestClient.get businessFound['listed_url'])
+        if subpage.xpath("//a[@title='Claim Business']").length > 0
+            businessFound['status'] = :listed
+        else
+            businessFound['status'] = :claimed
+        end
+        break
+    end
 end
+
 
 
 [true, businessFound]

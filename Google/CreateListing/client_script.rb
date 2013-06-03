@@ -58,19 +58,41 @@ def create_business( data )
   #edit busienss information
   @browser.wait_until { @browser.div(:class => 'a-f-e c-b c-b-M FEjGyb lMPaj').exist?}
   @browser.div(:class => 'a-f-e c-b c-b-M FEjGyb lMPaj').click
-  
+
+  if @browser.text_field(:id => 'Passwd').exist?
+    @browser.text_field(:id => 'Passwd').set data['pass'] if @browser.text_field(:id => 'Passwd').exist?
+    @browser.button(:value, "Sign in").click
+    @browser.wait()
+  end
+
+  # Update Address
+  puts "Updating Address"
+  @browser.div(:text=> 'Address').click
+  @browser.text_field(:class => 'b-Ca Qf NO').when_present.set data['address']
+  @browser.text_field(:class => 'b-Ca Qf OO').when_present.set data['city']
+  @browser.div(:class => "Qf aP c-v-x c-y-i-d rXcQNd-lh-la rXcQNd-lh-la-fW01td-Df1uke").when_present.click
+  sleep(2)
+  @browser.div(:text=> "#{data['state']}").when_present.click
+  @browser.text_field(:class => 'b-Ca Qf cP').when_present.set data['zip']
+  @browser.div(:text=> 'Save').click
+
+  #edit busienss information
+  puts "Updating Business Description"
+
   #Edit description
   @browser.div(:text=> 'Description').when_present.click
   @browser.frame(:class => 'Lj editable').body(:class => 'editable').when_present.send_keys data[ 'business_introduction' ]
   @browser.div(:text=> 'Save').when_present.click
   #~ @browser.div(:text=> 'Done editing').click
-  
+  sleep(5)
+
   #Verify Business
   if @browser.span(:text=> 'Verify').exist?
     @browser.span(:text=> 'Verify').click
-  elsif @browser.div(:class => "c-v-x b-d b-d-nb Fg").exist? 
-    @browser.div(:class => "c-v-x b-d b-d-nb Fg").click
+  elsif @browser.div(:text => "Verify now").exist?
+    @browser.div(:text => "Verify now").click
   end
+
   verify_business()
 end
 
@@ -104,6 +126,12 @@ begin
     create_business( data )
   end
 
+rescue
+  if @browser.div(:class => 'passwd-div').text_field(:id => 'Passwd').exist?
+    login(data)
+  retry
+ end
+
 rescue Timeout::Error
   puts("Caught a TIMEOUT ERROR!")
   retry
@@ -111,3 +139,4 @@ rescue Timeout::Error
 rescue Exception => e
     puts "Caught a #{e.message}"
 end
+

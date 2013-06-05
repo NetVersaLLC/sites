@@ -58,9 +58,14 @@ hours.each_with_index do |hour, day|
 
 end
 
-	@browser.button( :name => 'NextButton').click
+	#@browser.button( :name => 'NextButton').click
 
 end
+
+@browser.button( :name => 'NextButton').click
+
+sleep 2
+Watir::Wait.until {@browser.text.include? "Thank you. Your listing has been added." }
 
 true
 

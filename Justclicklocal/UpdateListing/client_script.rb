@@ -1,5 +1,6 @@
 sign_in(data)
 
+sleep 2
 Watir::Wait.until { @browser.text.include? "Welcome Back" }
 
 @browser.link(:text => 'Edit Listing').click
@@ -59,6 +60,9 @@ hours.each_with_index do |hour, day|
 
 end
 
-	@browser.button( :name => 'NextButton').click
 
 end
+
+@browser.button( :name => 'NextButton').click
+	sleep 10
+	true

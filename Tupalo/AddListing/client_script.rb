@@ -12,13 +12,12 @@ sleep(3)
 
 @browser.text_field(:id => 'spot_city_and_country').clear
 
-citystate = data['citystate'].split("")
+@browser.text_field(:id => 'spot_city_and_country').send_keys data['citystate']
+sleep 5
 
-citystate.each do |cs|
-	@browser.text_field(:id => 'spot_city_and_country').send_keys cs
-end
-@browser.text_field(:id => 'spot_city_and_country').send_keys :tab
+@browser.send_keys :enter
 
+sleep 3
 
 @browser.text_field(:id => 'spot_website').set data['website']
 @browser.text_field(:id => 'spot_phone').set data['phone']
@@ -31,7 +30,7 @@ sleep(3)
 
 @browser.button(:name => 'commit').click
 
-
+sleep 10
 true
 
 #Claim This Business Listing – Free

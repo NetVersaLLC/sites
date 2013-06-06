@@ -10,13 +10,18 @@ def process_tupalo_signup(profile)
 
 	@browser.button(:value, "Join Tupalo's vibrant community").click
 
-	@browser.wait_until {@browser.li(:id, "navUserNavigation").exists?}
+sleep 5
 
-	@browser.li(:id, "navUserNavigation").link(:id, "navLink").click
+@browser.goto("http://tupalo.com/en/user/settings/profile")
+#sleep 1000000
+	#@browser.wait_until {@browser.li(:id, "navUserNavigation").exists?}
+	sleep 2
+	#@browser.li(:id => 'navUserNavigation').when_present.click
 
-	@browser.wait_until {@browser.ul(:id, "userNavigation").visible?}
+	sleep 2
+	#@browser.wait_until {@browser.ul(:id, "userNavigation").visible?}
 
-	@browser.link(:text, "Settings").click
+	
 
 	@browser.wait_until {@browser.div(:class, "settings").exists?}
 

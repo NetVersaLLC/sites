@@ -79,6 +79,7 @@ def photo_upload_pop(data)
   photo_upload_pop.button(:value => "&Open").click
   @browser.wait_until {@browser.div(:class => 'a-zb-xd a-S-Ea a-za-S').div(:text=> 'Upload more').exist? }
   #update other images
+  pic = []
   data[ 'images' ] = pic
   if pic.length > 0
     image_index = ""

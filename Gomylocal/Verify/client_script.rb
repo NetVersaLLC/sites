@@ -1,3 +1,8 @@
-@browser.goto data['url']
+begin
+	@browser.goto data['url']
 
-true
+rescue Selenium::WebDriver::Error::UnhandledAlertError
+	true	
+
+end
+

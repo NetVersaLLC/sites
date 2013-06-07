@@ -31,13 +31,14 @@ enter_captcha( data )
 
 @browser.image( :name => 'imgFinish').click
 
-if @browser.text.include? "Congratulations your listing is now activate."
-	RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[password]' => data['password'], 'account[username]' => data['username'], 'model' => 'Gomylocal'
+sleep 2
+Watir::Wait.until { @browser.text.include? "Congratulations your listing is now activate." }
 
-	if @chained
-		self.start("Gomylocal/Verify")
-	end
+RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[password]' => data['password'], 'account[username]' => data['username'], 'model' => 'Gomylocal'
+
+if @chained
+	self.start("Gomylocal/Verify")
+end
 
 true	
 
-end

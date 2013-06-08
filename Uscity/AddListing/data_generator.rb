@@ -16,4 +16,6 @@ data[ 'security_answer' ] = Uscity.make_secret_answer
 data['state']			= business.state_name
 catty = Uscity.where(:business_id => business.id).first
 data[ 'category' ] = catty.uscity_category.name
+data[ 'logo' ] =	business.logo_file_name
+data[ 'fax' ] =	business.fax_number
 data

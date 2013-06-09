@@ -8,4 +8,6 @@ data['city']				= business.city
 data['zip']					= business.zip
 data['state_name']			= business.state_name
 data['payments']			= Zippro.payment_methods(business)
+data['description']			= business.business_description
+data['tags']				= business.tag_line
 data

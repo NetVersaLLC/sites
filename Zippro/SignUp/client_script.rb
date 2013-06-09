@@ -51,12 +51,12 @@ enter_captcha( data )
 
 sleep 5
 
-@browser.text_field( :id => 'f_name').when_present.set data['fname']
-@browser.text_field( :id => 'l_name').set data['lname']
-@browser.text_field( :id => 'email').set data['email']
-@browser.text_field( :id => 'v_email').set data['email']
-@browser.text_field( :id => 'password').set data['password']
-@browser.text_field( :id => 'c_password').set data['password']
+#@browser.text_field( :id => 'f_name').when_present.set data['fname']
+#@browser.text_field( :id => 'l_name').set data['lname']
+#@browser.text_field( :id => 'email').set data['email']
+#@browser.text_field( :id => 'v_email').set data['email']
+#@browser.text_field( :id => 'password').set data['password']
+#@browser.text_field( :id => 'c_password').set data['password']
 
 @browser.text_field( :id => 'answer').set data[ 'secretAnswer' ]
 

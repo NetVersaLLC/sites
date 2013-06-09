@@ -82,7 +82,7 @@ sleep(2)
 	sleep(1)
 	if @browser.text_field(:id => 'tag_1').exists?
 	@browser.text_field(:id => 'tag_1').set fth[1]
-	puts("Debug: Second Tag Set")
+	puts("Debug: Second Tag Set") 
 	end
 	sleep(1)
 	if @browser.text_field(:id => 'tag_2').exists?

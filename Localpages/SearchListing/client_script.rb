@@ -1,4 +1,6 @@
-url = "http://www.localpages.com/#{data['state_short']}/#{data['city']}/#{data['businessfixed']}"
+businessfixed = data['business'].gsub(" ", "+")
+cityfixed = data['city'].gsub(" ", "+")
+url = "http://www.localpages.com/#{data['state_short']}/#{cityfixed}/#{businessfixed}"
 page = Nokogiri::HTML(RestClient.get(url)) 
 businessFound = {}
 thelist = page.css("ul.results_list").css("li.results_listing")

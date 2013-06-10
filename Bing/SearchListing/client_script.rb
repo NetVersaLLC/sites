@@ -1,3 +1,4 @@
+@browser = Watir::Browser.new
 def search_for_business( business )
 
 businessFound = {}

@@ -1,3 +1,4 @@
+@browser = Watir::Browser.new
 @browser.goto('http://www.justclicklocal.com/')
 @browser.text_field( :name => 'query').set data['business']
 @browser.text_field( :name => 'location').set data['citystate']

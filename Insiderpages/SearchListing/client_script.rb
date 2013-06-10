@@ -1,3 +1,4 @@
+@browser = Watir::Browser.new
 sign_in data
 
 search_business data

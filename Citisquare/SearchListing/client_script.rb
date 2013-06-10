@@ -1,3 +1,4 @@
+@browser = Watir::Browser.new
 @browser.goto('http://my.citysquares.com/search')
 @browser.text_field(:name => 'b_standardname').set data['business']
 @browser.text_field(:name => 'b_zip').set data['zip']

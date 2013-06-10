@@ -1,3 +1,4 @@
+@browser = Watir::Browser.new
 businessfixed        = data['business'].gsub(" ", "+")
 begin
  @browser.goto("https://www.getfave.com")

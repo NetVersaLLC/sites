@@ -1,4 +1,4 @@
-html = RestClient.get "http://local.search.yahoo.com/search", { :params => { :p => data['business'], :addr => data['city']+", "+data['state_short'], :fr2 => 'sb-top', :type_param => '' } }
+html = RestClient.get "http://local.search.yahoo.com/search", { :params => { :p => data['business'], :addr => data['city']+", "+data['state_name'], :fr2 => 'sb-top', :type_param => '' } }
 nok = Nokogiri::HTML(html)
 
 businessFound = {
@@ -17,8 +17,7 @@ nok.xpath("//div[@class='res']/div[@class='content']").each do |content|
       content.xpath("./span[@class='merchant-ver']").each do |div|
         businessFound['status'] = :claimed
       end
-      meta = {}
-      meta['name'] = h3.inner_text.strip
+      
       content.xpath("./span[@class='phone']").each do |phone|
         businessFound['listed_phone'] = phone.inner_text.strip
       end

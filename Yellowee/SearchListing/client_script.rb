@@ -1,7 +1,9 @@
 businessfixed         = data[ 'business' ].gsub(" ", "+")
+cityfixed = data['city'].gsub(" ", "+")
+statenamefixed = data['state_name'].gsub(" ", "+")
 businessFound = {}
 
-url = "http://www.yellowee.com/search?what=#{businessfixed}&where=#{data['city']}%2C+#{data['state_name']}%2C+United+States"
+url = "http://www.yellowee.com/search?what=#{businessfixed}&where=#{cityfixed}%2C+#{statenamefixed}%2C+United+States"
 puts url
 nok = Nokogiri::HTML(RestClient.get url)
 

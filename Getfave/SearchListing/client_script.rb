@@ -51,5 +51,6 @@ else
 
 end
 
+at_exit do @browser.close end
 
 [true, businessFound]

@@ -18,5 +18,5 @@ elsif @browser.link(:class => 'content search_result search_result_clickable cle
   else
   businessFound['status'] = :unlisted
 end  
-
+at_exit do @browser.close end
 [true, businessFound]

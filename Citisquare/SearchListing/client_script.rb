@@ -21,5 +21,5 @@ if @browser.link(:text => data['business']).exists?
   else 
     businessFound['status'] = :unlisted
 end
-
+at_exit do @browser.close end
 [true, businessFound]

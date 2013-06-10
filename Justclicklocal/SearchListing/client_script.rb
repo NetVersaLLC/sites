@@ -13,4 +13,6 @@ Watir::Wait.until { @browser.div(:class => 'initialresults').exists? or @browser
      businessFound = [:unlisted] 
   end
 
+at_exit do @browser.close end
+
 [true, businessFound]

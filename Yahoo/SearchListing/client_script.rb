@@ -1,4 +1,4 @@
-html = RestClient.get "http://local.search.yahoo.com/search", { :params => { :p => data['business'], :addr => data['city']+", "+data['state_name'], :fr2 => 'sb-top', :type_param => '' } }
+html = RestClient.get "http://local.search.yahoo.com/search", { :params => { :p => data['business'], :addr => data['city']+", "+data['state'], :fr2 => 'sb-top', :type_param => '' } }
 nok = Nokogiri::HTML(html)
 
 businessFound = {

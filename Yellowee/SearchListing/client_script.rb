@@ -1,6 +1,6 @@
 businessfixed         = data[ 'business' ].gsub(" ", "+")
 cityfixed = data['city'].gsub(" ", "+")
-statenamefixed = data['state_name'].gsub(" ", "+")
+statenamefixed = data['state'].gsub(" ", "+")
 businessFound = {}
 
 url = "http://www.yellowee.com/search?what=#{businessfixed}&where=#{cityfixed}%2C+#{statenamefixed}%2C+United+States"

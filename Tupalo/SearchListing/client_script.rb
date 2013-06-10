@@ -1,4 +1,4 @@
-query = data['city'].gsub(" ", "-") + "-" + data['state_name'].gsub(" ", "-")
+query = data['city'].gsub(" ", "-") + "-" + data['state'].gsub(" ", "-")
 query = query.downcase
 url = "http://tupalo.com/en/search?q=Starbucks&city_slug=#{query}"
 nok = Nokogiri::HTML(RestClient.get url)

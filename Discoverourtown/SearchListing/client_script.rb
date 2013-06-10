@@ -1,7 +1,7 @@
-businessfixed = = data['business'].gsub(" ", "+")+"+"+data['zip']
+businessfixed = data['business'].gsub(" ", "+")+"+"+data['zip']
 url = "http://www.google.com/cse?cx=partner-pub-9905764502590625%3Anky1c6v46yv&cof=FORID%3A11&q=#{data['businessfixed']}&sa=Search&ad=n9&num=10"
 page = Nokogiri::HTML(RestClient.get(url)) 
-
+businessFound = {}
 businessFound['status'] = :unlisted
 
 page.css("a").each do |resultLink|

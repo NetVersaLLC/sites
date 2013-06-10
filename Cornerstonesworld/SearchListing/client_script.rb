@@ -1,6 +1,6 @@
 
 
-data[ 'businessfixed' ]          = data['business'].gsub(" ", "%20")
+data[ 'businessfixed' ] = data['business'].gsub(" ", "%20")
 
 
 url = "http://www.cornerstonesworld.com/en/directory/country/USA/keyword/#{data['businessfixed']}/zip/#{data['zip']}/new"
@@ -9,7 +9,7 @@ puts(url)
 page = Nokogiri::HTML(RestClient.get(url))
 
 firstItem = page.css("span.titlesmalldblue")
-
+businessFound = {}
 
 #Unneeded Watir rescue script, incomplete
 #rescue

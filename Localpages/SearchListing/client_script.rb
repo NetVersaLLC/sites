@@ -1,5 +1,6 @@
 url = "http://www.localpages.com/#{data['state_short']}/#{data['city']}/#{data['businessfixed']}"
 page = Nokogiri::HTML(RestClient.get(url)) 
+businessFound = {}
 thelist = page.css("ul.results_list").css("li.results_listing")
 if not thelist.length == 0
   link = thelist.css("a")

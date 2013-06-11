@@ -1,6 +1,5 @@
 data = {}
 catty = Gomylocal.where(:business_id => business.id).first
-
 data['category1']   = catty.gomylocal_category.name
 data['username']    = business.bings.first.email.split("@")[0]
 data['password']    = Yahoo.make_password[0 .. 7] #z5U8O36s
@@ -15,4 +14,5 @@ data['keywords']    = business.category1 + ", " + business.category2 + ", " + bu
 data['email']       = business.bings.first.email
 data['hours']       = Localndex.get_hours(business)
 data['business']    = business.business_name
+data['logo']        = ContactJob.logo
 data

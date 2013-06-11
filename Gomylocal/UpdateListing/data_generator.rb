@@ -14,4 +14,5 @@ data['keywords']    = business.category1 + ", " + business.category2 + ", " + bu
 data['email']       = business.bings.first.email
 data['website']     = business.company_website
 data['business']    = business.business_name
+data['logo']        = ContactJob.logo
 data

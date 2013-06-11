@@ -1,5 +1,5 @@
 data = {}
-catty                           = InsiderPage.where(:business_id => business.id).first
+catty                         = InsiderPage.where(:business_id => business.id).first
 data['business']              = business.business_name
 data['near_city']             = business.city + ', ' + business.state
 data['email']                 = business.insider_pages.first.email
@@ -16,6 +16,6 @@ data['services']              = ""#services
 data['message']               = ""#Message to customers
 data['categories']            = [catty.insider_page_category.name.gsub("\n", "")]
 data['tags']                  = [business.category1,business.category2,business.category3,business.category4,business.category5]
-data['image']                 = business.logo_file_name
+data['logo']                  = ContactJob.logo.nil? ? '' : ContactJob.logo
 
 data

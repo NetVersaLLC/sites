@@ -1,8 +1,12 @@
 businessfixed = data['business'].gsub(" ", "+")
 cityfixed = data['city'].gsub(" ", "+")
 url = "http://www.localpages.com/#{data['state_short']}/#{cityfixed}/#{businessfixed}"
-page = Nokogiri::HTML(RestClient.get(url)) 
+puts "halp"
+
 businessFound = {}
+begin
+page = Nokogiri::HTML(RestClient.get(url)) 
+
 thelist = page.css("ul.results_list").css("li.results_listing")
 if not thelist.length == 0
   link = thelist.css("a")
@@ -15,6 +19,9 @@ if not thelist.length == 0
     businessFound['status'] = :listed
   end 
 else
+  businessFound['status'] = :unlisted
+end
+rescue 
   businessFound['status'] = :unlisted
 end
 [true, businessFound]

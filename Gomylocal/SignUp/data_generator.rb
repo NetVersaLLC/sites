@@ -14,5 +14,5 @@ data['keywords']    = business.category1 + ", " + business.category2 + ", " + bu
 data['email']       = business.bings.first.email
 data['hours']       = Localndex.get_hours(business)
 data['business']    = business.business_name
-data['logo']        = ContactJob.logo
+data['logo']        = ContactJob.logo.nil? ? '' : ContactJob.logo
 data

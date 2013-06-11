@@ -1,9 +1,28 @@
 # Upload photo on google profile
-def photo_upload_pop(photo)
+def photo_upload_pop(data)
   require 'rautomation'
-  photo_upload_pop = RAutomation::Window.new :title => /File Upload/
-  photo_upload_pop.text_field(:class => "Edit").set(photo)
-  photo_upload_pop.button(:value => "&Open").click
+  #update logo
+  if data['logo'] > 0
+    photo_upload_pop = RAutomation::Window.new :title => /File Upload/
+    photo_upload_pop.text_field(:class => "Edit").set(data['logo'])
+    photo_upload_pop.button(:value => "&Open").click
+    @browser.wait_until {@browser.div(:class => 'a-zb-xd a-S-Ea a-za-S').div(:text=> 'Upload more').exist? }
+  end
+
+  #update other images
+  pic = []
+  data[ 'images' ] = pic
+  if pic.length > 0
+    image_index = ""
+    for image_index in (0..pic.length-1)
+      @browser.div(:id => 'picker:ap:11').when_present.click
+      photo_upload_pop = RAutomation::Window.new :title => /File Upload/
+      photo_upload_pop.text_field(:class => "Edit").set(pic[image_index])
+      photo_upload_pop.button(:value => "&Open").click
+      @browser.wait_until {@browser.div(:class => 'a-zb-xd a-S-Ea a-za-S').div(:text=> 'Upload more').exist? }
+    end
+  end
+  @browser.div(:class => 'c-v-x b-d b-d-nb b-d-qnnXGd-lTJzwb-rdwzAe').when_present.click
 end
 
 #Create new business
@@ -85,6 +104,12 @@ def create_business( data )
   @browser.div(:text=> 'Save').when_present.click
   #~ @browser.div(:text=> 'Done editing').click
   sleep(5)
+
+ #Update Photo
+  puts "Update Photo"
+  @browser.div(:text=> 'Photos').when_present.click
+  @browser.div(:class => 'a-kb-vA').div(:class => 'c-v-x b-d b-d-nb').when_present.click
+  photo_upload_pop(data)
 
   #Verify Business
   if @browser.span(:text=> 'Verify').exist?

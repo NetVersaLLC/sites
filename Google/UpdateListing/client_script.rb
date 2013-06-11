@@ -58,7 +58,6 @@ def update_listing(applicableLinks, data)
   @browser.div(:text=> 'Photos').when_present.click
   @browser.div(:class => 'a-kb-vA').div(:class => 'c-v-x b-d b-d-nb').when_present.click
   photo_upload_pop(data)
-  @browser.wait_until {@browser.div(:class => 'a-zb-xd a-S-Ea a-za-S').div(:text=> 'Upload more').exist? }
   
   #Verify Business
   if @browser.span(:text=> 'Verify').exist?
@@ -70,14 +69,17 @@ def update_listing(applicableLinks, data)
   verify_business()	
 end
 
-# Upload photo on google profile
+#Update Photo
 def photo_upload_pop(data)
   require 'rautomation'
   #update logo
-  photo_upload_pop = RAutomation::Window.new :title => /File Upload/
-  photo_upload_pop.text_field(:class => "Edit").set(data['logo'])
-  photo_upload_pop.button(:value => "&Open").click
-  @browser.wait_until {@browser.div(:class => 'a-zb-xd a-S-Ea a-za-S').div(:text=> 'Upload more').exist? }
+  if data['logo'] > 0
+    photo_upload_pop = RAutomation::Window.new :title => /File Upload/
+    photo_upload_pop.text_field(:class => "Edit").set(data['logo'])
+    photo_upload_pop.button(:value => "&Open").click
+    @browser.wait_until {@browser.div(:class => 'a-zb-xd a-S-Ea a-za-S').div(:text=> 'Upload more').exist? }
+  end
+
   #update other images
   pic = []
   data[ 'images' ] = pic
@@ -91,6 +93,7 @@ def photo_upload_pop(data)
       @browser.wait_until {@browser.div(:class => 'a-zb-xd a-S-Ea a-za-S').div(:text=> 'Upload more').exist? }
     end
   end
+  @browser.div(:class => 'c-v-x b-d b-d-nb b-d-qnnXGd-lTJzwb-rdwzAe').when_present.click
 end
 
 def edit_business(data)

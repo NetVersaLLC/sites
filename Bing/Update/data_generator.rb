@@ -24,8 +24,8 @@ data[ 'fax_number' ]        = business.fax_number
 data[ 'website' ]           = business.company_website
 data[ 'facebook' ]          = '' # NOTE: unimlemented
 data[ 'twitter' ]           = '' # NOTE: unimplemented
-data[ 'logo' ]				= business.logo_file_name
-data[ 'images' ]			= business.images
+data['logo'] = ContactJob.logo
+data['images'] = ContactJob.images
 
 data[ 'year_established' ]  = business.year_founded
 data[ 'description' ]       = business.business_description

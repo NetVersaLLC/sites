@@ -52,15 +52,19 @@ def signup_generic( data )
   @browser.text_field(:id, "RecoveryPhoneNumber").set phone
   @browser.text_field(:id, "RecoveryEmailAddress").value = data['alt_email']
 	
-  @browser.div(:class => "goog-inline-block goog-flat-menu-button-dropdown", :index => 2).click
-  @browser.div(:text, "#{data['country']}").click
+  #@browser.div(:class => "goog-inline-block goog-flat-menu-button-dropdown", :index => 2).click
+  #@browser.div(:text, "#{data['country']}").click
   @browser.checkbox(:id,'TermsOfService').set
 	
   #get value of email id
   email = @browser.text_field(:id, "GmailAddress").value
   
   #Solve captcha & if there is any captcha mismatch then solve it again
+#sleep 1000000
   retry_captcha(data)
+
+
+#self.save_account("Google", {:email => "#{email}@gmail.com",:password => data['pass']})
   
   RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => "#{email}@gmail.com", 'account[password]' => data['pass'], 'model' => 'Google'
 
@@ -88,11 +92,33 @@ def signup_generic( data )
   else
     throw("Initial Registration is not successful")
   end
+
+  sleep 2
+  Watir::Wait.until{@browser.div(:text => 'Next step').exists?}
+  sleep 5
+  @browser.div(:text => 'Next step').focus
+  @browser.send_keys :enter
+
+  sleep 2
+  Watir::Wait.until{@browser.button(:id => 'submitbutton').exists?}
+  sleep 5
+  @browser.button(:id => 'submitbutton').click
+
+sleep 10
+
+
+@browser.goto("http://gmail.com")
+#RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[cookies]' => save_cookies, 'model' => 'Google'
+sleep 10
+
 end
+#div Next step
+#button id submitbutton or value Get started
+
 
 login (data)
 
 if @chained
-  self.start("Google/CheckListing")
+  self.start("Google/CreateListing")
 end
 true

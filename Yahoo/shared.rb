@@ -30,9 +30,10 @@ def retry_captcha(data)
     #@browser.button( :id => 'VerifyCollectBtn' ).click if @browser.button( :id => 'VerifyCollectBtn' ).exist?
      sleep(3)
      Watir::Wait.until { @browser.div(:id => 'details').exists? or @browser.text.include? "Please try this code instead"}
-    if @browser.div(:id => 'details').exists?
+    if @browser.text.include? "Please try this code instead"#@browser.div(:id => 'details').exists?
+      capSolved = false
+    else
       capSolved = true
-      break
     end
     count+=1
    end
@@ -46,7 +47,7 @@ end
 
 def solve_captcha
       file = "#{ENV['USERPROFILE']}\\citation\\yahoo_captcha.png"
-      @browser.image(:class, 'captchaImage').save file
+      @browser.image(:class, 'captchaImage').when_present.save file
       text = CAPTCHA.solve file, :manual
   return text
 end

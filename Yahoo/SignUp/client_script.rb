@@ -1,7 +1,7 @@
 @browser.goto( 'http://listings.local.yahoo.com/' )
-@browser.link( :text => 'Sign Up' ).click
+@browser.link( :text => /New User?/ ).click
 
-@browser.link(:id => 'signUpBtn').click
+#@browser.link(:id => 'signUpBtn').click
 sleep 2
 @browser.text_field(  :id => 'firstname' ).when_present.set   data[ 'first_name' ]
 @browser.text_field(  :id => 'secondname' ).set  data[ 'last_name' ]
@@ -81,10 +81,12 @@ Watir::Wait.until{ @browser.button( :id => 'VerifyCollectBtn' ).exist? }
 @browser.text_field( :id, 'secquestionanswer2' ).set data[ 'secret_answer_2' ]
 
 sleep 5
+puts data['business_email']
+puts data['password']
 retry_captcha(data)
 sleep 5
 
-RestClient.post "#{@host}/yahoo/save_email.json?auth_token=#{@key}&business_id=#{@bid}", :email => data['business_email'], :password => data['password'], :secret1 => data['secret_answer_1'], :secret2 => data['secret_answer_2']
+RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", :email => data['business_email'], :password => data['password'], :secret1 => data['secret_answer_1'], :secret2 => data['secret_answer_2']
 #Watir::Wait.until { @browser.button( :id => 'ContinueBtn' ).exists? }
 
 #@browser.button( :id => 'ContinueBtn' ).click

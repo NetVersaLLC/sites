@@ -10,4 +10,5 @@ data['citystatecountry']	= business.city + ", " + business.state + ", " + "Unite
 data['citystate']	= business.city + ", " + business.state
 data['website']		= business.company_website
 data['phone']		= business.local_phone
+data['logo']    = ContactJob.logo.nil? ? '' : ContactJob.logo
 data

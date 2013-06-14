@@ -48,7 +48,7 @@ def signup_generic( data )
   @browser.div(:text, "#{data['gender']}").click
   # Country code for US
   country_code = '+1'
-  phone = country_code + data['phone']
+  phone = country_code + data['mobile_phone']
   @browser.text_field(:id, "RecoveryPhoneNumber").set phone
   @browser.text_field(:id, "RecoveryEmailAddress").value = data['alt_email']
 	
@@ -69,7 +69,7 @@ def signup_generic( data )
   RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => "#{email}@gmail.com", 'account[password]' => data['pass'], 'model' => 'Google'
 
   if @browser.text_field(:id, 'signupidvinput').exist?
-    @browser.text_field(:id, 'signupidvinput').when_present.set data[ 'phone' ]
+    @browser.text_field(:id, 'signupidvinput').when_present.set data['mobile_phone']
     @browser.radio(:id,'signupidvmethod-voice').set
     @browser.button(:value,'Continue').click
     # fetch Phone verification code

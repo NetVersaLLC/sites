@@ -36,5 +36,7 @@ rescue Exception => e
 end
 
 if phoneverified
-	true
+	self.start("Zippro/FinishListing")
 end
+
+true

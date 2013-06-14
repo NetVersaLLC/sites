@@ -33,10 +33,6 @@ Watir::Wait.until { @browser.text.include? 'Image has been uploaded successfully
 	@browser.button( :id => 'btnSubContInfo').click
 #End Updating Website & Email
 
-#Begin Tab Selection
-	@browser.lis( :id => /tabt/)[1].click
-#End Tab Selection
-
 #Begin Updating Summary Description
 	@browser.div( :id => 'brief_desc').a.hover
 	sleep(1)

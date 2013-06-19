@@ -1,6 +1,6 @@
 data={}
-data[ 'business' ] = business.business_name 
-data[ 'city' ] = business.city
-data[ 'state' ] = business.state
-
+data['business'] = business.business_name 
+data['city'] = business.city
+data['state'] = business.state
+data['zip'] = business.zip
 data 

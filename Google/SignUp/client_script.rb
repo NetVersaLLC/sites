@@ -73,7 +73,7 @@ def signup_generic( data )
     @browser.radio(:id,'signupidvmethod-voice').set
     @browser.button(:value,'Continue').click
     # fetch Phone verification code
-    @code = PhoneVerify.ask_for_code
+    @code = PhoneVerify.retrieve_code("Google")
     if @browser.span(:class,'errormsg').exist?
       puts "#{@browser.span(:class,'errormsg').text}"
     end

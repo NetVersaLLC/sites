@@ -16,7 +16,7 @@ puts "Updating address information"
 @browser.text_field(:name => 'number').set data['street_number']
 @browser.text_field(:name => 'predir').set data['predirection']
 @browser.text_field(:name => 'street').set data['street']
-@browser.text_field(:name => 'strtype').set data['steet_type']
+@browser.text_field(:name => 'strtype').set data['street_type']
 @browser.text_field(:name => 'postdir').set data['postdirection']
 @browser.text_field(:name => 'apttype').set data['apt_type']
 @browser.text_field(:name => 'aptnbr').set data['apt_number']

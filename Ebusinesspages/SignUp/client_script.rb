@@ -13,8 +13,7 @@
 RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['username'], 'account[password]' => data['password'], 'model' => 'Ebusinesspage'
 
 Watir::Wait.until { @browser.link(:text => 'Log Out') }
-	if @chained
-		self.start("Ebusinesspages/AddListing")
-	end
-	true
-
+if @chained
+	self.start("Ebusinesspages/AddListing")
+end
+true

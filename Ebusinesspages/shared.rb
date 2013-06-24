@@ -4,4 +4,5 @@ def sign_in(data)
 	@browser.text_field(:name => 'UserName').set data['username']
 	@browser.text_field(:name => 'Password').set data['password']
 	@browser.button(:id => 'LoginButton').click
+  sleep 3
 end

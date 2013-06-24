@@ -44,7 +44,7 @@ retries = 3
 begin
   @browser.button(:id => 'btn-phone').when_present.click
     sleep(3)
-  code = PhoneVerify.ask_for_code 
+  code = PhoneVerify.retrieve_code("Yahoo")
   @browser.text_field(:id => 'txtCaptcha').set code
 
   @browser.button(:id => 'btnverifychannel').click

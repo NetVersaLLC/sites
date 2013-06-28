@@ -10,11 +10,15 @@ agent.page.forms[0]['query'] = data['business']
 agent.page.forms[0]['location'] = data['zip']
 page = agent.page.forms[0].submit
 
+#replace & with and
+def replace_and(business)
+  return business.gsub("&","and")
+end
 
 obj = JSON.parse(page.body)
 nok = Nokogiri::HTML(obj.to_s.gsub('\\"',""))
 nok.css("li.business-result").each do |item|
-	if item.css("li.name-col/h3/text()").to_s =~ /#{data['business']}/
+if replace_and(item.css("li.name-col/h3/text()").text.to_s) =~ /#{replace_and(data['business'])}/
 		if item.css("span[text()='Unlock']")
 			businessFound['status'] = :listed
 		else

@@ -1,4 +1,4 @@
-api_key = 'AIzaSyC4ZArgxm2rBr_PqGCIwug0iRqil8Ac9E4'
+api_key = 'AIzaSyCBULo3dEbDt8B1rIG4bKgzkUNx5_ubgs4'
 
 latlon = "#{data['latitude']},#{data['longitude']}"
 formatted_business = data['business'].gsub('&', 'and')

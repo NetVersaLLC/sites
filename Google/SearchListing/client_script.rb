@@ -1,6 +1,7 @@
 api_key = 'AIzaSyC4ZArgxm2rBr_PqGCIwug0iRqil8Ac9E4'
 
 latlon = "#{data['latitude']},#{data['longitude']}"
+formatted_business = data['business'].gsub('&', 'and')
 
 url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=#{latlon}&radius=50000&keyword=#{CGI.escape(data['business'])}&sensor=false&key=#{api_key}"
 
@@ -13,7 +14,9 @@ businessFound = {
 
 if results['results'] and results['results'].length > 0
   results['results'].each do |result|
-    if result['name'] =~ /#{data['business']}/i
+  formatted_business_res =   result['name'].gsub('&', 'and')
+
+    if formatted_business_res =~ /#{formatted_business}/i 
       businessFound = {
 	:status => :listed
       }

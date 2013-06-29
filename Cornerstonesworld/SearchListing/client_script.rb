@@ -1,51 +1,24 @@
-
-
-data[ 'businessfixed' ] = data['business'].gsub(" ", "%20")
-
-
-url = "http://www.cornerstonesworld.com/en/directory/country/USA/keyword/#{data['businessfixed']}/zip/#{data['zip']}/new"
-puts(url)
-
-page = Nokogiri::HTML(RestClient.get(url))
-
-firstItem = page.css("span.titlesmalldblue")
-businessFound = {}
-
-#Unneeded Watir rescue script, incomplete
-#rescue
-#	@browser.goto('www.cornerstonesworld.com')
-#	puts("Arrived at website")
-#	@browser.text_field(:name, 'kw').set data['business']
-#	puts("Keyword Complete")
-#	@browser.select_list(:id, 'cn').select data['country']
-#	puts("Country Selected")
-#	@browser.text_field(:id, 'zip').set data['zip']
-#	puts("Zip Complete")
-#	@browser.button(:name, 'sbm').click
-#	puts("Submitted")
-
-#end
-#begin
-# if @browser.table(:class, 'dirlist').include? data['business'] then
-#	puts("Business Found")
-#	businessFound = [:listed, :unclaimed]
-# else
-# 	puts("Business unlisted")
-#   businessFound = [:unlisted]
-#end
-
-if firstItem.length == 0
-  businessFound['status'] = :unlisted
-
-else
-   if firstItem.text == data['business']
-      businessFound['status'] = :listed
-      businessFound['listed_address'] 	= firstItem.parent.text
-      businessFound['listed_url']		= url
-   else
-	  businessFound['status'] = :unlisted
-
-   end  
+#replace & with and
+def replace_and(business)
+  return business.gsub("&","and")
 end
 
-[true,businessFound]
+url = "http://www.cornerstonesworld.com/en/directory/country/USA/state/#{data['state']}/keyword/#{CGI.escape(data['business'])}/new"
+
+page = Nokogiri::HTML(RestClient.get url)
+businessFound = {}
+page.css("td.dirlisttext").each do |item|
+
+if item.nil?
+  businessFound['status'] = :unlisted
+  else
+  if replace_and(item.css("span.titlesmalldblue").text.gsub(/\t+|\n+/, '') .strip) =~ /#{replace_and(data['business'])}/i
+    businessFound['status'] = :listed
+    businessFound['listed_address'] = item.search("//p")[1].text.gsub(/\t+/, '') .strip
+    businessFound['listed_phone'] = item.search("//p")[2].text.gsub(/[\x80-\xff]|\n+|\t+|[a-zA-Z]|\:/,'')
+    businessFound['listed_url'] = url
+  end
+  end
+end
+
+[true, businessFound]

@@ -13,6 +13,7 @@ businessFound['status'] = :unlisted
 page.css("a#ctl00_ContentPlaceHolder1_dlResults_ctl00_hypBusiness").each do |resultLink|
   if resultLink.text.gsub('&', 'and') =~ /#{data['business'].gsub('&', 'and')}/i
     businessFound['status'] = :claimed
+    businessFound['listed_name'] = resultLink.text # Return business name given on webpage
     businessFound['listed_url'] = resultLink.attr("href")
     businessFound['listed_address']	= page.css("span#ctl00_ContentPlaceHolder1_dlResults_ctl00_lblAddress").text
   end

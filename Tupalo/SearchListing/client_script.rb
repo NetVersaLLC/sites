@@ -12,6 +12,7 @@ businessFound = {}
 businessFound['status'] = :unlisted
 nok.css("div.title").each do |resultBlock|
   if replace_and(resultBlock.xpath("//span[@itemprop='name']")[0].text) =~ /#{replace_and(data['business'])}/i
+    businessFound['listed_name'] = resultBlock.xpath("//span[@itemprop='name']")[0].text # Return business name given on webpage
     businessFound['listed_url'] = resultBlock.css("a")[0].attr("href")
     businessFound['listed_address'] = resultBlock.xpath("//span[@itemprop='streetAddress']")[0].text + ", " + resultBlock.xpath("//span[@itemprop='addressLocality']")[0].text + ", " + resultBlock.xpath("//span[@itemprop='postalCode']")[0].text
     subpage = Nokogiri::HTML(RestClient.get businessFound['listed_url'])

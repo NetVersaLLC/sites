@@ -14,6 +14,7 @@ begin
   page.css("ul.fluid_results_list > li").each do |item|
     if replace_and(item.at_css("h3").text) =~ /#{replace_and(data['business'])}/
       businessFound['status'] = :listed
+      businessFound['listed_name'] = item.at_css("h3").text # Return business name given on webpage
       businessFound['listed_address'] = item.at_css("p").text
       businessFound['listed_phone'] = item.at_css("span.result_phone").text
       businessFound['listed_url'] = item.at_css("a").attr('href')

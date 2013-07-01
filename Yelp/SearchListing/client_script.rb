@@ -27,7 +27,8 @@ if replace_and(item.css("li.name-col/h3/text()").text.to_s) =~ /#{replace_and(da
     item.xpath(".//input[@name='business_url']").each do |input|
       businessFound['listed_url'] = input.attr('value')
     end
-
+		
+		businessFound['listed_name'] = item.css("li.name-col/h3/text()").text.to_s # Return business name given on webpage
 		businessFound['listed_address'] = item.css("address").inner_text.gsub("\\n"," ").gsub("\\t"," ").strip
 		businessFound['listed_phone'] = item.css("span.phone").inner_text.gsub("\\n"," ").gsub("\\t"," ").strip
 		break

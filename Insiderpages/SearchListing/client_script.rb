@@ -25,3 +25,4 @@ if nok.text.include?('There were 0 results')
   end
 end
 
+[true, businessFound]

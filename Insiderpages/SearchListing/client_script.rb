@@ -1,22 +1,27 @@
-@browser = Watir::Browser.new
-sign_in data
+#replace & with and
+def replace_and(business)
+  return business.gsub("&","and")
+end
 
-search_business data
+url = "http://www.insiderpages.com/search/search?query=#{CGI.escape(data['business'])}&location=#{CGI.escape(data['city']+ ' ,' + data['state_short'])}&commit=Go!"
 
-Watir::Wait.until { @browser.text.include? 'There were 0 results' or @browser.link(:text => /#{data['business']}/).exist? }
+nok = Nokogiri::HTML(RestClient.get url)
 
-if @browser.text.include? 'There were 0 results'
+businessFound = {}
+
+if nok.text.include?('There were 0 results')
   businessFound['status'] = :unlisted
-elsif @browser.link(:class => 'content search_result search_result_clickable clearfix').link(:text => /#{data['business']}/).exist?
-    @browser.link(:class => 'content search_result search_result_clickable clearfix').link(:text => /#{data['business']}/).click
-
-    if @browser.text.include? 'Claim Business'
-        businessFound['status'] = :claimed
-    else
-        businessFound['status'] = :listed
-    end
   else
-  businessFound['status'] = :unlisted
-end  
-at_exit do @browser.close end
-[true, businessFound]
+  nok.xpath("//div[@class='content search_result search_result_clickable clearfix']").each do |bi|
+  if replace_and(bi.css('h2').text.gsub(/\n+/,'').strip) =~ /#{replace_and(data['business'])}/i
+    businessFound['listed_name'] = bi.css('h2').text.gsub(/\n+/,'').strip
+    businessFound['listed_url'] = "http://www.insiderpages.com"+bi.css("h2 a").attr("href")
+    businessFound['listed_address'] = bi.css('div.sub_header').text.gsub(/\n+/,'').strip
+    subpage = Nokogiri::HTML(RestClient.get businessFound['listed_url'])
+    businessFound['listed_phone'] = subpage.xpath("//div[@class='bizCardInfo bottom-shadow']/p").text
+    businessFound['status'] = :listed
+    break
+    end
+  end
+end
+

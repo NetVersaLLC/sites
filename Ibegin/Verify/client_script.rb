@@ -22,7 +22,7 @@ end
 
 begin
 	@browser.button( :value => /Click to Call Your Phone & Receive Code/i).click
-	code = PhoneVerify.ask_for_code	
+	code = PhoneVerify.retrieve_code('Ibegin')
 
 	@browser.text_field( :name => 'verification_code').set code
 	@browser.button( :value => /Submit/).click
@@ -34,6 +34,7 @@ rescue
 	if retries > 0
 		if @browser.text.include? "The code you entered did not match. Please re-try below"
        		puts "The code is incorrect."
+		PhoneVerify.wrong_code('Ibegin')
        	end
        	puts("Phone Verify Failed, retrying in 2 seconds.")
        retries -= 1

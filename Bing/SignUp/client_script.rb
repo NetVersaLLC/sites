@@ -122,13 +122,15 @@ end
 
 sleep(3)
 
+data['email'] = data['hotmail']
 puts data['hotmail']
 puts data['password']
 
 enter_captcha
 
     Watir::Wait.until { @browser.text.include? "Account summary" }
-    RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['hotmail'], 'account[password]' => data['password'], 'account[secret_answer]' => data['secret_answer'], 'model' => 'Bing'
+    self.save_account('Bing', data)
+
     if @chained
   		self.start("Bing/CreateRule")
     end

@@ -7,3 +7,5 @@ if data['logo'] != nil and  data['logo'] =~ /\.(?:png|jpe?g)$/
   src = RestClient.get(data['logo'])
   File.open("#{ENV['USERPROFILE']}\\citation\\#{$bid}\\logo.#{$1}", "wb").write src
 end
+
+true

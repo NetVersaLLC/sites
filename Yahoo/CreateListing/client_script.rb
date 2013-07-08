@@ -136,7 +136,7 @@ end
 main(data)
 
 if @chained
-  self.start("Yahoo/Verify")
+  self.start("Yahoo/Notify")
 end
 
 true

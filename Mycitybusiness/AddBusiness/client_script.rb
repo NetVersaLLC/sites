@@ -21,11 +21,8 @@
 @browser.button( :value => 'Submit').click
 sleep 2
 Watir::Wait.until { @browser.text.include? "Thank you for adding your business to mycityBusiness.net" }
-	
-	if @chained
-		self.start("Mycitybusiness/Verify")
-	end
-	true
 
-
-
+if @chained
+  self.start("Mycitybusiness/Verify")
+end
+true

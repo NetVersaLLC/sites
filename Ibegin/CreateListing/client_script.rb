@@ -61,7 +61,7 @@ sleep 2
 Watir::Wait.until { @browser.text.include? "Congratulations" }
 
 if @chained
-	self.start("Ibegin/Verify")
+	self.start("Ibegin/Notify")
 end
 
 true

@@ -63,17 +63,18 @@ puts("1")
 
 puts("3")
 
-  logo = self.logo
+#  logo = self.logo
 puts "logo: " +logo.to_s
 puts("4")
-   @browser.file_field(:id => 'imageFiles1').set logo
+#   @browser.file_field(:id => 'imageFiles1').set logo
    sleep 5
    puts("5")
-   @browser.button(:id => 'uploadPhoto1').click
+ #  @browser.button(:id => 'uploadPhoto1').click
 
   sleep 5
 puts("6")
   images = self.images
+  puts images.to_s
   puts("7")
   while @browser.img(:xpath => '//*[@id="imageContainer1"]/span/div/img').attribute_value("src") == "https://www.bingplaces.com/Images/loading.gif" do sleep 1 end 
 puts("8")

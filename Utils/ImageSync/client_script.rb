@@ -1,5 +1,9 @@
 images = data['images']
 i = 0
+
+directory_name = "#{ENV['USERPROFILE']}\\citation\\#{$bid}\\images"
+Dir.mkdir(directory_name) unless File.exists?(directory_name)
+
 images.each do |image|
   i = i + 1
   if image =~ /\.(png|jpe?g)/i

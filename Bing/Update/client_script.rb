@@ -42,8 +42,10 @@ def update_business_portal_additional_details( business )
 end
 
 def update_business_portal_online_presence( business )
-  @browser.text_field(:name, 'AdditionalBusinessInfo.FacebookWebsite').set business[ 'facebook' ]
-  @browser.text_field(:name,'AdditionalBusinessInfo.TwitterWebsite').set business[ 'twitter' ]
+  if @browser.text_field(:name, 'AdditionalBusinessInfo.FacebookWebsite').visible?
+    @browser.text_field(:name, 'AdditionalBusinessInfo.FacebookWebsite').set business[ 'facebook' ]
+    @browser.text_field(:name,'AdditionalBusinessInfo.TwitterWebsite').set business[ 'twitter' ]
+  end
   puts("Debug: Online Presence Updated Successfully")
 end
 
@@ -51,29 +53,30 @@ def update_business_portal_images_and_videos ( business )
    #@browser.file_field(:id, 'imageFiles1').set business[ 'logo' ]
    puts("Debug: Logo Path Set")
    #@browser.button(:id, 'uploadPhoto1').click
-
-
+puts("1")
   @browser.links(:text => 'X').each do |alink|      
-      
+      puts("2")
         alink.click if alink.visible?
         sleep 1
 
   end
 
-
+puts("3")
 
   logo = self.logo
-
+puts "logo: " +logo.to_s
+puts("4")
    @browser.file_field(:id => 'imageFiles1').set logo
    sleep 5
+   puts("5")
    @browser.button(:id => 'uploadPhoto1').click
 
   sleep 5
-
+puts("6")
   images = self.images
-  
+  puts("7")
   while @browser.img(:xpath => '//*[@id="imageContainer1"]/span/div/img').attribute_value("src") == "https://www.bingplaces.com/Images/loading.gif" do sleep 1 end 
-
+puts("8")
    pbm = 0
    if images.length > 0
       puts(images[pbm]['file_name'])
@@ -81,7 +84,7 @@ def update_business_portal_images_and_videos ( business )
           @browser.file_field(:id, 'imageFiles2').set images[pbm]['file_name']
           sleep 4
           #@browser.button(:id => 'uploadPhoto2').click
-
+puts("9")
           sleep 2
           otherpbm = pbm + 1
           @browser.execute_script("startImageUpload(2)")

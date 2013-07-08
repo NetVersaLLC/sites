@@ -1,7 +1,7 @@
+require 'watir-webdriver'
 def add_new_business(data)
-  #@browser.link(:text => 'Add Company').click
   #Added the username as it is the first one in the list...
-  @browser.text_field(:name => /ownerusername/).set data[ 'username' ]
+  @browser.text_field(:name => /ownerusername/).when_present.set data[ 'username' ]
   @browser.text_field(:name => /ownerpassword/).set data[ 'password' ]
   @browser.text_field(:name => /ownerusername_c/).set data[ 'username' ]
   @browser.text_field(:name => /ownerpassword_c/).set data[ 'password' ]
@@ -16,15 +16,17 @@ def add_new_business(data)
   @browser.text_field(:name => /address/).set data[ 'address' ]
   @browser.text_field(:name => /city/).set data[ 'city' ]
   @browser.select_list(:name => /state/).select data[ 'state' ]
-  sleep(4)
   @browser.text_field(:name => /zip/).set data[ 'zip' ]
   @browser.text_field(:name => /phone/).set data[ 'phone' ]
   @browser.button(:value => 'Add My Listing Now!').click
   
   #Check for confirmation
+ 
+  #Below is the text the is included in the browser when the registration is successfull.
+  Watir::Wait.until { @browser.text.include? 'Thank you for submitting your listing.' }
   @success_text ="Thank you for submitting your listing."
-  
-  sleep 4
+
+
 
   if @browser.text.include? @success_text
     puts "Business has been claimed successful"
@@ -34,10 +36,9 @@ def add_new_business(data)
   else
     throw "Business has not been claimed successful"
   end  
- end
+end
     
 #~ #Main Steps
-#~ # Launch browser
 @url = 'http://yellowtalk.com/businessFreeAdd.php'
 @browser.goto(@url)
 add_new_business(data)

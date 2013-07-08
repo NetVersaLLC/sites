@@ -62,19 +62,23 @@ def update_business_portal_images_and_videos ( business )
 
 
 
-   @browser.file_field(:id => 'imageFiles1').set business['logo']
+  logo = self.logo
+
+   @browser.file_field(:id => 'imageFiles1').set logo
    sleep 5
    @browser.button(:id => 'uploadPhoto1').click
 
   sleep 5
+
+  images = self.images
   
   while @browser.img(:xpath => '//*[@id="imageContainer1"]/span/div/img').attribute_value("src") == "https://www.bingplaces.com/Images/loading.gif" do sleep 1 end 
 
    pbm = 0
-   if business['images'].length > 0
-      puts(business[ 'images' ][pbm]['file_name'])
-        while pbm < business[ 'images' ].length
-          @browser.file_field(:id, 'imageFiles2').set business[ 'images' ][pbm]['file_name']
+   if images.length > 0
+      puts(images[pbm]['file_name'])
+        while pbm < images.length
+          @browser.file_field(:id, 'imageFiles2').set images[pbm]['file_name']
           sleep 4
           #@browser.button(:id => 'uploadPhoto2').click
 

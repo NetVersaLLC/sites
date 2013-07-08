@@ -1,7 +1,11 @@
 images = data['images']
+i = 0
 images.each do |image|
-  src = RestClient.get(image['url'])
-  File.open("#{ENV['USERPROFILE']}\\citation\\#{$bid}\\images\\#{image}", "wb").write src
+  i = i + 1
+  if image =~ /\.(png|jpe?g)/i
+    src = RestClient.get(image)
+    File.open("#{ENV['USERPROFILE']}\\citation\\#{$bid}\\images\\image#{i}.#{$1}", "wb").write src
+  end
 end
 if data['logo'] != nil and  data['logo'] =~ /\.(?:png|jpe?g)$/
   src = RestClient.get(data['logo'])

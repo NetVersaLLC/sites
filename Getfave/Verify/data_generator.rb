@@ -1,4 +1,4 @@
 data = {
-  :link => Getfav.check_email(business)
+  :link => Getfave.check_email(business)
 }
 

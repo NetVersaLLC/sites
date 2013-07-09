@@ -1,4 +1,3 @@
-require 'watir-webdriver'
 def add_new_business(data)
   #Added the username as it is the first one in the list...
   @browser.text_field(:name => /ownerusername/).when_present.set data[ 'username' ]

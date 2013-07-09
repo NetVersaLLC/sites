@@ -64,7 +64,7 @@ puts("1")
 puts("3")
 
 #  logo = self.logo
-puts "logo: " +logo.to_s
+puts "logo: " +logo
 puts("4")
 #   @browser.file_field(:id => 'imageFiles1').set logo
    sleep 5

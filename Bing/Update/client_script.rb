@@ -68,7 +68,7 @@ if self.logo
   logo = self.logo
 #puts "logo: " +logo
 puts("4")
-   @browser.file_field(:id => 'imageFiles1').set "#{ENV['USERPROFILE']}\\citation\\#{$bid}\\images\\"+logo
+   @browser.file_field(:id => 'imageFiles1').set logo
    sleep 5
    puts("5")
   @browser.button(:id => 'uploadPhoto1').click

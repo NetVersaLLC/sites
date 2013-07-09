@@ -1,3 +1,4 @@
+puts "data: #{data.inspect}"
 images = data['images']
 i = 0
 
@@ -11,12 +12,9 @@ Dir.open(directory_name).each do |file|
 end
 
 logo = self.logo
-if File.exists? logo
+puts "Logo: #{logo}"
+if logo != nil and File.exists? logo
   FileUtils.rm logo
-end
-if data['logo'] and data['logo'] =~ /\.(png|jpe?g)/i
-  src = RestClient.get(data['logo'])
-  File.open("#{ENV['USERPROFILE']}\\citation\\#{$bid}\\logo.#{$1}", "wb").write src
 end
 
 images.each do |image|

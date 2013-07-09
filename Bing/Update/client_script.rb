@@ -68,7 +68,7 @@ if self.logo
   logo = self.logo
 #puts "logo: " +logo
 puts("4")
-   @browser.file_field(:id => 'imageFiles1').set logo
+   @browser.file_field(:id => 'imageFiles1').set "#{ENV['USERPROFILE']}\\citation\\#{$bid}\\images\\"+logo
    sleep 5
    puts("5")
   @browser.button(:id => 'uploadPhoto1').click
@@ -86,7 +86,7 @@ puts("8")
    if images.length > 0
       puts(images[pbm])
         while pbm < images.length
-          @browser.file_field(:id, 'imageFiles2').set images[pbm]
+          @browser.file_field(:id, 'imageFiles2').set "#{ENV['USERPROFILE']}\\citation\\#{$bid}\\images\\"+images[pbm]
           sleep 4
           #@browser.button(:id => 'uploadPhoto2').click
 puts("9")

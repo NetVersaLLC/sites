@@ -24,10 +24,13 @@ def update_business_portal_details( business )
   @browser.text_field( :title, 'Website' ).set business[ 'website' ]
   puts("Debug: Basic Data Updated Successfully")
 
-  @browser.text_field( :title, 'Business Category' ).set business[ 'category' ]
+    @browser.text_field(:id => 'categoryInputTextBox').set data['category']
   sleep(10)
-  @browser.send_keys( :enter)
-  @browser.button( :id, 'categoryAddButton').click
+  @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
+  sleep(6)
+  @browser.text_field(:id => 'categoryInputTextBox').send_keys :enter
+  sleep(6)
+  @browser.button(:id => 'categoryAddButton').click
   puts("Debug: Category Updated Successfully")
 end
 

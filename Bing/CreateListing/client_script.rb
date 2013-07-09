@@ -5,13 +5,13 @@ def add_new_listing( data )
 
   puts 'Add new listing'
   sleep 2
-  @browser.button( :text, 'Add New Business' ).when_present.click
+  @browser.button( :value, 'Create New Business' ).when_present.click
 retries = 3
 begin
   sleep 2
   @browser.execute_script("hidePopUp()")
   sleep 2
-  Watir::Wait.until { @browser.text_field(:name => 'BasicBusinessInfo.BusinessName').exists? }
+  Watir::Wait.until {  @browser.text_field( :title, /Business Name/i ).set  }
   @browser.text_field(:name => 'BasicBusinessInfo.BusinessName').clear
   @browser.text_field(:name => 'BasicBusinessInfo.BusinessName').set data['business']
   @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.AddressLine1').set data['address']

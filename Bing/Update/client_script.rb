@@ -25,7 +25,7 @@ def update_business_portal_details( business )
   puts("Debug: Basic Data Updated Successfully")
 
   @browser.text_field( :title, 'Business Category' ).set business[ 'category' ]
-  sleep(1)
+  sleep(10)
   @browser.send_keys( :enter)
   @browser.button( :id, 'categoryAddButton').click
   puts("Debug: Category Updated Successfully")
@@ -168,6 +168,10 @@ def update( business )
   update_business_portal_general_information( business )
   puts("Debug: General information update method complete")
   @browser.button(:id, 'submitBusiness').click
+
+  sleep 2
+  Watir::Wait.until {@browser.text.include? "All Businesses"}
+
   puts("Debug: Overall Update Successful!")
 end
 

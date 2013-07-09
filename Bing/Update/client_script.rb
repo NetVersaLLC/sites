@@ -63,13 +63,13 @@ puts("1")
 
 puts("3")
 
-#  logo = self.logo
+  logo = self.logo
 puts "logo: " +logo
 puts("4")
-#   @browser.file_field(:id => 'imageFiles1').set logo
+   @browser.file_field(:id => 'imageFiles1').set logo
    sleep 5
    puts("5")
- #  @browser.button(:id => 'uploadPhoto1').click
+  @browser.button(:id => 'uploadPhoto1').click
 
   sleep 5
 puts("6")
@@ -135,17 +135,17 @@ def update( business )
   editmode()
   puts("Debug: Edit Mode Activated")
    sleep 2
-   Watir::Wait.until { @browser.h4( :text, 'Additional Business Details').exists? }
+   Watir::Wait.until { @browser.text.include? 'Additional Business Details'}
 
-  @browser.h4( :text, 'Additional Business Details').click
+  @browser.h5( :text, 'Additional Business Details').click
   sleep(1)
-  @browser.h4( :text, 'Online Presence').click
+  @browser.h5( :text, 'Online Presence').click
   sleep(1)
-  @browser.h4( :text, 'Images and Videos').click
+  @browser.h5( :text, 'Images and Videos').click
   sleep(1)
-  @browser.h4( :text, 'Other Contact Information').click
+  @browser.h5( :text, 'Other Contact Information').click
   sleep(1)
-  @browser.h4( :text, 'General Information').click
+  @browser.h5( :text, 'General Information').click
   puts("Debug: All Dropdown pages opened")
   sleep(1)
 

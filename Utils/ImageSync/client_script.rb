@@ -34,7 +34,7 @@ images.each do |image|
   end
 end
 puts "9"
-if data['logo'] != nil and  data['logo'] =~ /\.(?:png|jpe?g)$/
+if data['logo'] != nil and  data['logo'] =~ /\.(?:png|jpe?g)/i
   puts "10"
   src = RestClient.get(data['logo'])
   File.open("#{ENV['USERPROFILE']}\\citation\\#{$bid}\\logo.#{$1}", "wb").write src

@@ -24,7 +24,7 @@ def update_business_portal_details( business )
   @browser.text_field( :title, 'Website' ).set business[ 'website' ]
   puts("Debug: Basic Data Updated Successfully")
 
-    @browser.text_field(:id => 'categoryInputTextBox').set data['category']
+    @browser.text_field(:id => 'categoryInputTextBox').set business['category']
   sleep(10)
   @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
   sleep(6)

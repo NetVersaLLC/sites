@@ -1,5 +1,5 @@
 data = {}
-data[ 'country' ] =		 		"United States"
-data[ 'business' ] = 			business['name']
-data[ 'businessfixed' ] =		data['business'].gsub(" ", "%20")
-data[ 'zip' ] = 				business['zip']
+catty                    		   		= Yellowtalk.where(:business_id => business.id).first
+data['category'] = 						catty.yellowtalk_category.name
+data[ 'city' ] = 						business.city
+data[ 'name' ] = 						business.business_name

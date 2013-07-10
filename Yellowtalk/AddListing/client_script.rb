@@ -19,6 +19,7 @@ def add_new_business(data)
   @browser.text_field(:name => /zip/).set data[ 'zip' ]
   @browser.text_field(:name => /phone/).set data[ 'phone' ]
   @browser.button(:value => 'Add My Listing Now!').click
+
   
   #Check for confirmation
  
@@ -30,7 +31,7 @@ def add_new_business(data)
 
   if @browser.text.include? @success_text
     puts "Business has been claimed successful"
-    RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data[ 'email' ], 'account[password]' => data['password'], 'model' => 'Yellowtalk'
+    RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data[ 'email' ], 'account[password]' => data['password'], 'account[username]' => data['username'], 'model' => 'Yellowtalk'
     #self.save_account("yellowtalk", {:username => data[ 'username' ], :password => data[ 'password' ], :email => data[ 'email' ]})
     return true
   else

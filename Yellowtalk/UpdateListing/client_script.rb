@@ -38,7 +38,7 @@ def Update_Profile_Listing(data)
   @confirmation_msg ="Free Listings..."
 
   if @browser.text.include? @confirmation_msg
-    #puts "Job returned true!"
+    puts "Business hs been updated successfully."
     RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data[ 'email' ],'model' => 'Yellowtalk'
     true
     else

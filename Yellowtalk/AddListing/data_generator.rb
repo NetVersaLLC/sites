@@ -1,11 +1,10 @@
 data = {}
-
-catty                    		   = Yellowtalk.where(:business_id => business.id).first
 data[ 'phone' ] = 					business.local_phone
 #data[ 'username' ] = 				'Forth_Record_recreate_coca_cola'
 data[ 'username' ] = 				business.bings.first.email.split("@")[0] + 9.to_s
 data[ 'email' ] = 					business.bings.first.email 
 #data[ 'email' ] = 					"Cowan_age_cia@inbox.com"
+catty                    		   = Yellowtalk.where(:business_id => business.id).first
 data['category'] = 					catty.yellowtalk_category.name
 #data['category'] = 					'Television Repair'
 data[ 'business' ] = 				business.business_name

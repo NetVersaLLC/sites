@@ -119,7 +119,7 @@ def search_for_business( business )
   sleep 2
   @browser.button( :value , 'Get Started' ).when_present.click
   sleep 2
-  @browser.link(:title => 'Add Your Business').when_present.click
+  @browser.link(:text => /Add Business/i).when_present.click
 
   @businessfound = false
 
@@ -151,7 +151,7 @@ def search_for_business( business )
       
     if retries > 0
       @browser.execute_script("hidePopUp()") #If the Script Error popup comes up this closes it.
-      puts("Something went wrong, refreshing the page and trying again.")
+      puts("Something went wrong trying to search for business, refreshing the page and trying again.")
       @browser.refresh
       retries -= 1
       retry

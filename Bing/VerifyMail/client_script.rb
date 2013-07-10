@@ -6,12 +6,12 @@ begin
 	if retries < 3 
 		@browser.goto("https://www.bingplaces.com/DashBoard")
 	end
-	@browser.link(:text => "Verify").click
+	@browser.link(:text => /Verify now/).click
 	sleep 2
-	@browser.button(:value => 'Verify', :class => "bigButton").when_present.click
+	@browser.button(:value => 'Verify now', :class => "bigButton").when_present.click
 
 	sleep 2
-	@browser.button(:value => 'Go to Manage Your Listings').when_present.click
+	@browser.button(:value => 'OK').when_present.click
 	true
 rescue Exception => e
 	puts(e.inspect)

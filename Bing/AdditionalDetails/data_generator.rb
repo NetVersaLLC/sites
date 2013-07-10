@@ -1,7 +1,7 @@
 data = {}
 data[ 'hotmail' ]      	= business.bings.first.email
 data[ 'password' ]     	= business.bings.first.password
-data[ 'hours' ]			= Getfav.consolidate_hours(business)
+data[ 'hours' ]			= Getfave.consolidate_hours(business)
 data[ 'founded' ]		= business.year_founded
 data[ 'mobile' ]		= business.mobile_phone
 data[ 'mobile_appears' ] = business.mobile_appears

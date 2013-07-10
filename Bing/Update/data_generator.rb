@@ -12,7 +12,7 @@ data[ 'phone' ]             = business.local_phone
 data[ 'country' ]           = 'United States'
 data[ 'hotmail' ]           = business.bings.first.email
 data[ 'password' ]          = business.bings.first.password
-data[ 'hours' ]			    = Getfav.consolidate_hours(business)
+data[ 'hours' ]			    = Getfave.consolidate_hours(business)
 data[ 'brands' ]			= business.get_brands
 
 bingy = Bing.where(:business_id => business.id).first

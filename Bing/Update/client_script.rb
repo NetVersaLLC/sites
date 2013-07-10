@@ -3,7 +3,7 @@ def update_business_portal_details( business )
    puts("Debug: Waiting for page to load")
    sleep(5)
   
-  @browser.div( :class, 'businessCategory').a.click
+  @browser.link( :onclick, 'removeBusinessCategory(this)').click
   puts("Debug: Category Removed")
 
 
@@ -13,8 +13,8 @@ def update_business_portal_details( business )
   end
   puts("Debug: All checkboxes cleared")
 
-  @browser.text_field( :title, 'Business Name' ).set business[ 'businessname' ]
-  @browser.text_field( :title, 'Address Line 1' ).set business[ 'address_uno' ]
+  @browser.text_field( :title, /Business Name/i ).set business[ 'businessname' ]
+  @browser.text_field( :title, /Address Line 1/i ).set business[ 'address_uno' ]
   @browser.text_field( :title, 'Address Line 2' ).set business[ 'address_dos' ]
   @browser.text_field( :title, 'City' ).set business[ 'city' ]
   @browser.text_field( :title, 'State' ).set business[ 'state_full' ]
@@ -24,11 +24,21 @@ def update_business_portal_details( business )
   @browser.text_field( :title, 'Website' ).set business[ 'website' ]
   puts("Debug: Basic Data Updated Successfully")
 
-  @browser.text_field( :title, 'Business Category' ).set business[ 'category' ]
-  sleep(1)
-  @browser.send_keys( :enter)
-  @browser.button( :id, 'categoryAddButton').click
-  puts("Debug: Category Updated Successfully")
+sleep 5
+  until @browser.link(:onclick => "removeBusinessCategory(this)").exists?
+    @browser.text_field(:id => 'categoryInputTextBox').set business['category']
+  	sleep(5)
+  	@browser.text_field(:id => 'categoryInputTextBox').clear
+  	sleep 4
+  	@browser.text_field(:id => 'categoryInputTextBox').set business['category']
+  	@browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
+  	sleep(6)
+  	@browser.text_field(:id => 'categoryInputTextBox').send_keys :enter
+  	sleep(6)
+  	@browser.button(:id => 'categoryAddButton').click
+  	sleep 5
+  end
+puts("Debug: Category Updated Successfully")
 end
 
 def update_business_portal_additional_details( business )
@@ -42,15 +52,17 @@ def update_business_portal_additional_details( business )
 end
 
 def update_business_portal_online_presence( business )
-  if @browser.text_field(:name, 'AdditionalBusinessInfo.FacebookWebsite').visible?
-    @browser.text_field(:name, 'AdditionalBusinessInfo.FacebookWebsite').set business[ 'facebook' ]
-    @browser.text_field(:name,'AdditionalBusinessInfo.TwitterWebsite').set business[ 'twitter' ]
-  end
+  #if @browser.text_field(:name, 'AdditionalBusinessInfo.FacebookWebsite').visible?
+  #  @browser.text_field(:name, 'AdditionalBusinessInfo.FacebookWebsite').set business[ 'facebook' ]
+  #  @browser.text_field(:name,'AdditionalBusinessInfo.TwitterWebsite').set business[ 'twitter' ]
+  #end
   puts("Debug: Online Presence Updated Successfully")
 end
 
 def update_business_portal_images_and_videos ( business )
    #@browser.file_field(:id, 'imageFiles1').set business[ 'logo' ]
+  
+
    puts("Debug: Logo Path Set")
    #@browser.button(:id, 'uploadPhoto1').click
 puts("1")
@@ -62,27 +74,29 @@ puts("1")
   end
 
 puts("3")
-
-#  logo = self.logo
-puts "logo: " +logo.to_s
+if self.logo
+  logo = self.logo
+#puts "logo: " +logo
 puts("4")
-#   @browser.file_field(:id => 'imageFiles1').set logo
+   @browser.file_field(:id => 'imageFiles1').set logo
    sleep 5
    puts("5")
- #  @browser.button(:id => 'uploadPhoto1').click
-
+  @browser.button(:id => 'uploadPhoto1').click
+end
   sleep 5
 puts("6")
+
+if self.images
   images = self.images
-  puts images.to_s
+ # puts images
   puts("7")
   while @browser.img(:xpath => '//*[@id="imageContainer1"]/span/div/img').attribute_value("src") == "https://www.bingplaces.com/Images/loading.gif" do sleep 1 end 
 puts("8")
    pbm = 0
    if images.length > 0
-      puts(images[pbm]['file_name'])
+      puts(images[pbm])
         while pbm < images.length
-          @browser.file_field(:id, 'imageFiles2').set images[pbm]['file_name']
+          @browser.file_field(:id, 'imageFiles2').set "#{ENV['USERPROFILE']}\\citation\\#{$bid}\\images\\"+images[pbm]
           sleep 4
           #@browser.button(:id => 'uploadPhoto2').click
 puts("9")
@@ -96,6 +110,7 @@ puts("9")
           pbm += 1
         end
   end
+end
   
 end
 
@@ -135,17 +150,17 @@ def update( business )
   editmode()
   puts("Debug: Edit Mode Activated")
    sleep 2
-   Watir::Wait.until { @browser.h4( :text, 'Additional Business Details').exists? }
+   Watir::Wait.until { @browser.text.include? 'Additional Business Details'}
 
-  @browser.h4( :text, 'Additional Business Details').click
+  @browser.h5( :text, 'Additional Business Details').click
   sleep(1)
-  @browser.h4( :text, 'Online Presence').click
+  #@browser.h5( :text, 'Online Presence').click
   sleep(1)
-  @browser.h4( :text, 'Images and Videos').click
+  @browser.h5( :text, 'Images and Videos').click
   sleep(1)
-  @browser.h4( :text, 'Other Contact Information').click
+  @browser.h5( :text, 'Other Contact Information').click
   sleep(1)
-  @browser.h4( :text, 'General Information').click
+  @browser.h5( :text, 'General Information').click
   puts("Debug: All Dropdown pages opened")
   sleep(1)
 
@@ -163,6 +178,10 @@ def update( business )
   update_business_portal_general_information( business )
   puts("Debug: General information update method complete")
   @browser.button(:id, 'submitBusiness').click
+
+  sleep 10
+  #Watir::Wait.until {@browser.text.include? "All Businesses"}
+
   puts("Debug: Overall Update Successful!")
 end
 

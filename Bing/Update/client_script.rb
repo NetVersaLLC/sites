@@ -24,14 +24,21 @@ def update_business_portal_details( business )
   @browser.text_field( :title, 'Website' ).set business[ 'website' ]
   puts("Debug: Basic Data Updated Successfully")
 
+sleep 5
+  until @browser.link(:onclick => "removeBusinessCategory(this)").exists?
     @browser.text_field(:id => 'categoryInputTextBox').set business['category']
-  sleep(10)
-  @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
-  sleep(6)
-  @browser.text_field(:id => 'categoryInputTextBox').send_keys :enter
-  sleep(6)
-  @browser.button(:id => 'categoryAddButton').click
-  puts("Debug: Category Updated Successfully")
+  	sleep(5)
+  	@browser.text_field(:id => 'categoryInputTextBox').clear
+  	sleep 4
+  	@browser.text_field(:id => 'categoryInputTextBox').set business['category']
+  	@browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
+  	sleep(6)
+  	@browser.text_field(:id => 'categoryInputTextBox').send_keys :enter
+  	sleep(6)
+  	@browser.button(:id => 'categoryAddButton').click
+  	sleep 5
+  end
+puts("Debug: Category Updated Successfully")
 end
 
 def update_business_portal_additional_details( business )
@@ -172,8 +179,8 @@ def update( business )
   puts("Debug: General information update method complete")
   @browser.button(:id, 'submitBusiness').click
 
-  sleep 2
-  Watir::Wait.until {@browser.text.include? "All Businesses"}
+  sleep 10
+  #Watir::Wait.until {@browser.text.include? "All Businesses"}
 
   puts("Debug: Overall Update Successful!")
 end

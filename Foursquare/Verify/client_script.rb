@@ -6,7 +6,7 @@
 Watir::Wait.until { @browser.text.include? "Send the download link to your phone:" }
 
 if @chained
-	self.start("Foursquare/ClaimListing")
+	self.start("Foursquare/AddListing")
 end
 
 true

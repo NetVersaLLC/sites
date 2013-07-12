@@ -1,6 +1,6 @@
 def solve_captcha
   image = "#{ENV['USERPROFILE']}\\citation\\hotfrog_captcha.png"
-  obj = @browser.image(:src, /ctl00_contentsection_captchamanager/)
+  obj = @browser.image(:src, /LanapCaptcha.aspx/)
   puts "CAPTCHA source: #{obj.src}"
   puts "CAPTCHA width: #{obj.width}"
   obj.save image

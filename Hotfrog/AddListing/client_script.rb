@@ -1,10 +1,10 @@
 #Method for add business
 def add_new_business(data)
-  @browser.link(:text => 'Add your business').click
+  #@browser.link(:text => 'Add your business').click
   @browser.text_field(:name => /BusinessName/).set data[ 'business']
   @browser.text_field(:name => /StreetAddress/).set data[ 'address']
   @browser.text_field(:name => /Suburb/).set data[ 'city']
-  @browser.text_field(:name => /Suburb/).send_keys :tab
+  @browser.text_field(:name => /Suburb/).send_keys :enter
   @browser.select_list(:name => /State/).option(:value => data['state']).select
   @browser.text_field(:name => /Postcode/).set data[ 'zip']
   @browser.text_field(:name => /Email/).set data[ 'email']
@@ -24,7 +24,7 @@ def add_new_business(data)
  
   if @browser.text.include?("Thank you for joining Hotfrog")
     puts "Initial Registration is successful"
-    RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'Hotfrog'
+    self.save_account("Hotfrog", {:email => data['email'], :password => data['password']})
   else
     throw("Initial Registration is Unsuccessful")
   end
@@ -33,7 +33,13 @@ end
 #Main Steps
 # Launch browser
 @browser = Watir::Browser.new
-@url = 'http://www.hotfrog.com/'
+@url = 'http://www.hotfrog.com/AddYourBusinessSingle.aspx'
 @browser.goto(@url)
-@browser.link(:text => 'Add your business').click
+#@browser.link(:text => 'Add your business').click
 add_new_business(data)
+
+if @chained == true
+  self.start("Hotfrog/Verify")
+end
+
+true

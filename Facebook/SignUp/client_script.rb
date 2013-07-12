@@ -33,6 +33,7 @@ def sign_up(data)
   
   if @browser.text.include?('Confirm Your Email Address')
     puts "Initial Registration is successful"
+    RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'Facebook'
     else
     puts "Inital Registration is Unsuccessful"
   end

@@ -12,7 +12,7 @@ begin
 	@browser.radio(:id => 'now').when_present.click
 	@browser.button(:id => 'ipinGenSubmit').click
 
-	code = PhoneVerify.ask_for_code
+	code = PhoneVerify.retrieve_code("Zippro")
 	@browser.text_field(:name => 'ipin_text').set code
 	@browser.button(:id => 'btnPinVerify').click
 

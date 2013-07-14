@@ -1,3 +1,3 @@
 notification = business.notifications.new
-notification.url = "/businesses/#{business.id}/codes/new?site_name=zippro"
+notification.url = "/businesses/#{business.id}/codes/new?site_name=zippro&next_job=VerifyPhone"
 notification.save

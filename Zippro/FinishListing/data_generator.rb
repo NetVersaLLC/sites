@@ -11,6 +11,6 @@ data['payments']			= Zippro.payment_methods(business)
 data['description']			= business.business_description
 data['tags']				= business.tag_line
 data['hours']				= Yahoo.get_hours(business)
-data['logo']				= ContactJob.logo
+data['logo']				= self.logo
 data['website']				= business.company_website
 data

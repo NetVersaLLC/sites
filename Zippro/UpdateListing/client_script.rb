@@ -16,15 +16,24 @@ sign_in(data)
 #End Updating Basic Info
 
 #Begin Updating Logo
+if not data['logo'] == nil then
+	imagetrue = true
 	@browser.div( :id => 'profile_logo_thumb').hover
 	sleep(2)
 	@browser.div( :id => 'profile_logo_thumb').a( :id => 'edit_profile_logo').click
 	@browser.file_field( :id => 'logo_browse_field').set data['logo']
 	sleep(15)
 	@browser.button( :id => 'btnLogoSave').click
+else
+	puts("No Logo Found")
+end
 #End Updating Logo
 
+if imagetrue == true then
 Watir::Wait.until { @browser.text.include? 'Image has been uploaded successfully.' }
+else
+	sleep(2)
+end
 
 #Begin Updating Website & Email
 	@browser.div(:id => 'bc_wrapp').a(:id => 'edit_business_contact').click
@@ -211,12 +220,6 @@ Watir::Wait.until { @browser.text.include? 'Hours of Operation have been saved.'
 #End Updating Tags
 Watir::Wait.until {@browser.text.include? "Profile Tags have been saved."}
 
+
+puts("Success!")
 true
-
-
-
-
-
-
-
-

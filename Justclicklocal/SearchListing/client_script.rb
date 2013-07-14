@@ -1,18 +1,18 @@
-@browser = Watir::Browser.new
-@browser.goto('http://www.justclicklocal.com/')
-@browser.text_field( :name => 'query').set data['business']
-@browser.text_field( :name => 'location').set data['citystate']
-
-@browser.button(:id => 'submit').click
-
-
-Watir::Wait.until { @browser.div(:class => 'initialresults').exists? or @browser.text.include? "Your search term returned no results"}
-  if @browser.link( :text => /#{data['business']}/).exists?
-     businessFound = [:listed, :unclaimed]
+require 'nokogiri'
+require 'open-uri'
+url = "http://www.justclicklocal.com/citydir/#{data[ 'city' ]}-#{data[ 'state' ]}--#{data[ 'businessfixed' ]}.html"
+puts(url)
+page = Nokogiri::HTML(RestClient.get(url)) 
+if page.css("ol.initial-results")
+  result = page.xpath('//*[@id="r"]/div[2]/div[1]/ol[1]/li[1]/div[2]/a').text
+  if result == data[ 'business' ] 
+    puts("Listed")
+    businessFound = [:listed]
   else
-     businessFound = [:unlisted] 
-  end
+    puts("Unlisted")
+    businessFound = [:unlisted]
+end
 
-at_exit do @browser.close end
 
 [true, businessFound]
+end

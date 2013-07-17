@@ -33,13 +33,13 @@ Watir::Wait.until { @browser.text.include? "Update successful!" }
 @browser.button(:id => 'EditCoDescriptionButton').click
 Watir::Wait.until { @browser.text.include? "Update successful!" }
 
-if File.exist? data['logo']
+if not self.logo.nil?
   if @browser.text.include? "Upload or get your Company Logo to feature on the Home Page"
     @browser.span(:id => 'LogoText').click
   else
     @browser.span(:id => 'LogoImage').image.click
   end
-  @browser.file_field(:id => 'filUpload').set data['logo']
+  @browser.file_field(:id => 'filUpload').set self.logo
   sleep 5
 end
 Watir::Wait.until { @browser.span(:id => 'LogoImage').image.exist? }

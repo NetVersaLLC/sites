@@ -10,10 +10,11 @@
 
 @browser.button(:name => 'RegisterButton').click
 
-RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['username'], 'account[password]' => data['password'], 'model' => 'Ebusinesspage'
+self.save_account("Ebusinesspage", {:username => data['username'], :password => data['password']})
 
-Watir::Wait.until { @browser.link(:text => 'Log Out') }
+sleep(10) #Registration takes a long time to appear
+Watir::Wait.until { @browser.link(:text => 'Log Out').exists? }
 if @chained
-	self.start("Ebusinesspages/AddListing")
+	self.start("Ebusinesspage/AddListing")
 end
 true

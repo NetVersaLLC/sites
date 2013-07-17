@@ -17,6 +17,6 @@ data['description'] = business.business_description
 
 data['twitter'] = business.twitters.first.nil? ? '' : business.twitters.first.twitter_page
 # data['facebook'] = business.facebooks.first.nil? ? '' : business.facebooks.first.facebook_page
-data['linkedin'] = business.linkedins.first.nil? ? '' : business.linkedins.first.username
-data['logo'] = ContactJob.logo.nil? ? '' : ContactJob.logo
+data['linkedin'] = ''#business.linkedins.first.nil? ? '' : business.linkedins.first.username #Currently doesn't exist
+#data['logo'] = ContactJob.logo.nil? ? '' : ContactJob.logo #ContactJob outdated, self.logo referred to in client_script.rb
 data

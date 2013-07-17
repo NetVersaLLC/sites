@@ -16,8 +16,9 @@ sleep(3)
 @browser.text_field( :name => 'phone').set data['phone']
 @browser.text_field( :name => 'website').set data['website']
 
-data['logo'] == '' unless File.exist? data['logo']
-@browser.file_field(:id => 'photo1').value = data['logo']
+if not self.logo.nil? then
+@browser.file_field(:id => 'photo1').value = self.logo
+end
 
 @browser.link( :text => /Save Changes/i).click
 

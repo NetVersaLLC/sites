@@ -12,5 +12,4 @@ data['state']			  = business.state_name
 data['zip']			    = business.zip
 data['phone']			  = business.local_phone
 data['website']			= business.company_website
-data['logo']        = ContactJob.logo.nil? ? '' : ContactJob.logo
 data

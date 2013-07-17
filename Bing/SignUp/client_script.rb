@@ -53,30 +53,30 @@ begin
     
 
   else
-    @browser.text_field(  :id, 'iFirstName' ).set data[ "first_name" ]
-    @browser.text_field(  :id, 'iLastName' ).set data[ "last_name" ]
-    @browser.select_list( :id, 'iBirthMonth' ).when_present.select_value data[ 'birth_month' ]
-    @browser.select_list( :id, 'iBirthDay' ).select   data[ 'birth_day' ]
-    @browser.select_list( :id, 'iBirthYear' ).select  data[ 'birth_year' ]
-    @browser.select_list( :id, 'iGender' ).select     data[ 'gender' ]
+    @browser.text_field(  :id, /iFirstName/ ).set data[ "first_name" ]
+    @browser.text_field(  :id, /iLastName/ ).set data[ "last_name" ]
+    @browser.select_list( :id, /iBirthMonth/ ).when_present.select_value data[ 'birth_month' ]
+    @browser.select_list( :id, /iBirthDay/ ).select   data[ 'birth_day' ]
+    @browser.select_list( :id, /iBirthYear/ ).select  data[ 'birth_year' ]
+    @browser.select_list( :id, /iGender/ ).select     data[ 'gender' ]
     # click <get a new email address> to open alt email field
-    @browser.link( :id, 'iliveswitch' ).click
+    @browser.link( :id, /iliveswitch/ ).click
     sleep 4 # or wait until id => imembernamelive exists
     # Choose a security question
-    @browser.link( :id, 'iqsaswitch' ).click
+    @browser.link( :id, /iqsaswitch/ ).click
     sleep 4 # or wait until id => iSA exists
-    @browser.select_list( :id, 'iSQ' ).select      'Name of first pet'
-    @browser.text_field( :id, 'iAltEmail' ).set    data[ 'alt_email' ]
-    @browser.text_field( :id, 'iSA' ).set          data[ 'secret_answer' ]
-    @browser.select_list( :id, 'iCountry' ).select data[ 'country' ]
-    @browser.text_field( :id, 'iZipCode' ).set     data[ 'zip' ]
-    @browser.checkbox( :id, 'iOptinEmail' ).clear
+    @browser.select_list( :id, /iSQ/ ).select      'Name of first pet'
+    @browser.text_field( :id, /iAltEmail/ ).set    data[ 'alt_email' ]
+    @browser.text_field( :id, /iSA/ ).set          data[ 'secret_answer' ]
+    @browser.select_list( :id, /iCountry/ ).select data[ 'country' ]
+    @browser.text_field( :id, /iZipCode/ ).set     data[ 'zip' ]
+    @browser.checkbox( :id, /iOptinEmail/ ).clear
  
-    @browser.text_field( :name, 'iPwd' ).set       data[ 'password' ]
-    @browser.text_field( :name, 'iRetypePwd' ).set data[ 'password' ]
+    @browser.text_field( :name, /iPwd/ ).set       data[ 'password' ]
+    @browser.text_field( :name, /iRetypePwd/ ).set data[ 'password' ]
     email_name = data[ 'name' ].downcase.delete( ' ' ).strip + (rand( 10000 )+200).to_s
-    @browser.text_field( :id, 'imembernamelive' ).set email_name
-    data[ 'hotmail' ] = email_name + '@hotmail.com'
+    @browser.text_field( :id, /imembernamelive/ ).set email_name
+    data[ 'hotmail' ] = email_name + '@outlook.com'
   end
 
   

@@ -18,7 +18,7 @@ Watir::Wait.until { @browser.text.include? "Fax number" }
 @browser.text_field(:name, /txtPhone/).set data['phone'] #Just in case
 @browser.checkbox(:id, /NoTelemarketers/).set #Spam B-GONE
 
-#Check those payment details, Doctor.
+#Check those payment details
 @browser.link(:id, /EditPaymentDetails/).click
 Watir::Wait.until { @browser.text.include? "Payment options"}
 
@@ -31,14 +31,16 @@ data[ 'payments' ].each{ | pay |
 #We're coming full circle.
 Watir::Wait.until { @browser.text.include? "Business details" }
 
-#We need an IV of accurate trading hours, stat!
+#Set trading hours
 @browser.link(:id, /EditOpeningHours/).click
-@browser.radio(:id, /SpecifiedHours_1/).set #Double-check errything
-@browser.checkbox(:id, /DayRepeater/).clear #Why these fools set these automatically? Let's clear 'em.
+@browser.radio(:id, /SpecifiedHours_1/).set
+@browser.checkbox(:id, /DayRepeater/).clear #Clear closed days
 
 if data['24hours'] == true
-	@browser.radio( :id, /SpecifiedHours_0/).set
-	@browser.text_field(:name, /HoursDescription/).set "We're open 24 Hours per day"
+	@browser.select_list( :id, "ctl00_contentSection_ctrlTradingHours_DayRepeater_ctl00_OpeningTime").select "12:00 AM"
+	@browser.select_list( :id, "ctl00_contentSection_ctrlTradingHours_DayRepeater_ctl00_ClosingTime").select "12:00 AM"
+	@browser.link( :id, "ApplyToAll").click
+	@browser.text_field(:name, /HoursDescription/).set "Open 24/7"
 else
 
 count = 0
@@ -70,9 +72,9 @@ count = 0
 end
 end
 
-@browser.span(:text, /Submit/).click #That was a lot of code, let's get outta here!
+@browser.span(:text, /Submit/).click
 
-#We're not in Kansas anymore, are we?
+#Did we complete the form?
 Watir::Wait.until { @browser.text.include? "Business details" }
 @browser.span(:text, /Submit/).click
 if @browser.text.include? "Do you want to continue?" then

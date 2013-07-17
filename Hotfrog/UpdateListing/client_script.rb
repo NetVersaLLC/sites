@@ -46,7 +46,7 @@ if data['24hours'] == true
 	@browser.select_list(:name, "ctl00$contentSection$ctrlTradingHours$DayRepeater$ctl00$OpeningTime").option(:value, "12:00 AM").select
 	@browser.select_list(:name, "ctl00$contentSection$ctrlTradingHours$DayRepeater$ctl00$ClosingTime").option(:value, "12:00 AM").select
 	@browser.link(:id, /ApplyToAll/).click
-	@browser.textarea(:name, /HoursDescription/).set "Always Open"
+	@browser.textarea(:name, /HoursDescription/).set "Open 24/7"
 else
 
 count = 0
@@ -85,14 +85,15 @@ sleep(4)
 @browser.link(:id, /KeywordsPreviewControl/).click
 sleep(4)
 @popup = @browser.frame(:xpath, '//*[@id="fancybox-frame"]')
-licount = @popup.lis(:xpath, '//*[@id="KeywordsUL"]/li[1]').count
+licount = @popup.lis(:xpath, '//*[@id="KeywordsUL"]/li').count
+puts("#{licount} keywords to remove")
 clickedcount = 0
-until clickedcount > licount
+until clickedcount == licount
 @popup.li(:xpath, '//*[@id="KeywordsUL"]/li[1]').click
 clickedcount += 1
 end
 count = 0
-until count > data['keywords'].length
+until count == data['keywords'].length
 @popup.text_field(:name, /KeywordText/).set data['keywords'][count]
 @popup.button(:name, /AddKeywordButton/).click
 count += 1
@@ -105,5 +106,5 @@ Watir::Wait.until { @browser.text.include? "Number of characters left" }
 @browser.textarea(:name, /txtDescription/).set data['description']
 @browser.span(:text, /Submit/).click
 Watir::Wait.until { @browser.text.include? "Best work" }
-puts("UpdateListing finished")
+puts("UpdateListing Success")
 true

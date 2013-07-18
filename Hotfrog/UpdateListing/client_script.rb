@@ -1,4 +1,6 @@
 #Define some stuff, go places
+retries = 5
+begin
 @browser = Watir::Browser.new
 url = "http://www.hotfrog.com/Login.aspx"
 @browser.goto(url)
@@ -107,4 +109,14 @@ Watir::Wait.until { @browser.text.include? "Number of characters left" }
 @browser.span(:text, /Submit/).click
 Watir::Wait.until { @browser.text.include? "Best work" }
 puts("UpdateListing Success")
+rescue
+	if retries == 0
+		puts("Failed after five retries")
+		false
+	end
+	puts("Something went wrong, retrying in two seconds...")
+	sleep(2)
+	retry
+	retries -= 1
+end
 true

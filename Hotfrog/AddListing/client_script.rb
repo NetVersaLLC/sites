@@ -3,7 +3,7 @@ def add_new_business(data)
   #@browser.link(:text => 'Add your business').click
   @browser.text_field(:name => /BusinessName/).set data[ 'business']
   @browser.text_field(:name => /StreetAddress/).set data[ 'address']
-  @browser.text_field(:name => /Suburb/).set data[ 'city']
+  @browser.text_field(:name => /Suburb/).set data['city']
   @browser.text_field(:name => /Suburb/).send_keys :enter
   @browser.select_list(:name => /State/).option(:value => data['state']).select
   @browser.text_field(:name => /Postcode/).set data[ 'zip']
@@ -21,6 +21,12 @@ def add_new_business(data)
   
   #Captcha Text
   enter_captcha(data)
+
+  if @browser.text.include? "Your city and Zip code don't seem to match." then
+  	@browser.text_field(:name => /Suburb/).set " " + data['city']
+  	@browser.text_field(:name => /Suburb/).send_keys :enter
+  	enter_captcha(data)
+  end
  
   if @browser.text.include?("Thank you for joining Hotfrog")
     puts "Initial Registration is successful"

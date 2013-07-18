@@ -3,8 +3,14 @@ def update_business_portal_details( business )
    puts("Debug: Waiting for page to load")
    sleep(5)
   
-  @browser.div( :class, 'businessCategory').a.click
-  puts("Debug: Category Removed")
+  if @browser.element(:css , "a[onclick='removeBusinessCategory(this)']").exists?
+  	@browser.execute_script("hidePopUp()")
+  	sleep(2)
+    @browser.elements(:css , "a[onclick='removeBusinessCategory(this)']").each do |close|
+      close.to_subtype.click
+    end
+    puts("Debug: Categories Removed")
+  end
 
 
 
@@ -13,31 +19,55 @@ def update_business_portal_details( business )
   end
   puts("Debug: All checkboxes cleared")
 
-  @browser.text_field( :title, 'Business Name' ).set business[ 'businessname' ]
-  @browser.text_field( :title, 'Address Line 1' ).set business[ 'address_uno' ]
-  @browser.text_field( :title, 'Address Line 2' ).set business[ 'address_dos' ]
-  @browser.text_field( :title, 'City' ).set business[ 'city' ]
-  @browser.text_field( :title, 'State' ).set business[ 'state_full' ]
-  @browser.text_field( :title, 'Zip Code' ).set business[ 'zip' ]
-  @browser.text_field( :title, 'Primary Phone Number' ).set business[ 'phone' ]
-  @browser.text_field( :title, 'Email Address' ).set business[ 'hotmail' ]
-  @browser.text_field( :title, 'Website' ).set business[ 'website' ]
+  @browser.execute_script("hidePopUp()")
+  sleep(2)
+  if @browser.text.include? "Browse Categories" then
+  	@browser.button(:value, 'Cancel').click
+  	sleep(2)
+  end
+  @browser.text_field(:name => 'BasicBusinessInfo.BusinessName').set business[ 'businessname' ]
+  @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.AddressLine1').set business[ 'address_uno' ]
+  @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.AddressLine2').set business[ 'address_dos' ]
+  @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.City.CityName').set business[ 'city' ]
+  @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.State.StateName').set business[ 'state_full' ]
+  @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.ZipCode').set business[ 'zip' ]
+  @browser.text_field(:name => 'BasicBusinessInfo.MainPhoneNumber.PhoneNumberField').set business[ 'phone' ]
+  @browser.text_field(:name => 'BasicBusinessInfo.BusinessEmailAddress').set business[ 'hotmail' ]
+  @browser.text_field(:name => 'BasicBusinessInfo.WebSite').set business[ 'website' ]
   puts("Debug: Basic Data Updated Successfully")
 
-  @browser.text_field( :title, 'Business Category' ).set business[ 'category' ]
+  @browser.text_field(:id => 'categoryInputTextBox').set business[ 'category' ]
+  sleep(2)
+  @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
   sleep(1)
-  @browser.send_keys( :enter)
+  @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
+  sleep(2)
+  @browser.text_field(:id => 'categoryInputTextBox').send_keys :enter
   @browser.button( :id, 'categoryAddButton').click
   puts("Debug: Category Updated Successfully")
+	if @browser.text.include? "Please enter at least one category." then
+		@browser.text_field(:id => 'categoryInputTextBox').set business[ 'category' ]
+  		sleep(2)
+  		@browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
+  		sleep(2)
+  		@browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
+  		sleep(2)
+  		@browser.text_field(:id => 'categoryInputTextBox').send_keys :enter
+  		@browser.button( :id, 'categoryAddButton').click
+	end
 end
 
 def update_business_portal_additional_details( business )
-  @browser.radio( :name => 'AdditionalBusinessInfo.OpHourDetail.OpHourType').set
-  @browser.text_field( :name, 'AdditionalBusinessInfo.OpHourDetail.AdditionalInformation').set business[ 'hours' ]
-  puts("Debug: Hours Set")
-  @browser.text_field( :name, 'AdditionalBusinessInfo.Description').set business[ 'description' ]
-  @browser.text_field( :name, 'AdditionalBusinessInfo.YearEstablished').set business[ 'year_established' ]
-  @browser.text_field( :name, 'AdditionalBusinessInfo.OpHourDetail.AdditionalInformation').set business[ 'brands ']
+	if business[ '24hours' ] == true then
+		@browser.radio( :name => 'AdditionalBusinessInfo.OpHourDetail.OpHourType', :value => 'Open24Hours').set
+	else
+  	@browser.radio( :name => 'AdditionalBusinessInfo.OpHourDetail.OpHourType').set
+  	@browser.text_field( :name, 'AdditionalBusinessInfo.OpHourDetail.AdditionalInformation').set business[ 'hours' ]
+  	end
+  	puts("Debug: Hours Set")
+  	@browser.text_field( :name, 'AdditionalBusinessInfo.Description').set business[ 'description' ]
+  	@browser.text_field( :name, 'AdditionalBusinessInfo.YearEstablished').set business[ 'year_established' ]
+  	@browser.text_field( :name, 'AdditionalBusinessInfo.OpHourDetail.AdditionalInformation').set business[ 'brands ']
   puts("Debug: Additional Data Updated Successfully")
 end
 
@@ -50,7 +80,7 @@ def update_business_portal_online_presence( business )
 end
 
 def update_business_portal_images_and_videos ( business )
-   #@browser.file_field(:id, 'imageFiles1').set business[ 'logo' ]
+   #@browser.file_field(:id, 'imageFiles1').set self.logo
    puts("Debug: Logo Path Set")
    #@browser.button(:id, 'uploadPhoto1').click
 puts("1")
@@ -73,6 +103,7 @@ puts("4")
 
   sleep 5
 puts("6")
+if not self.images.exists? or self.images.nil? then
   images = self.images
   puts images.to_s
   puts("7")
@@ -96,7 +127,7 @@ puts("9")
           pbm += 1
         end
   end
-  
+end  
 end
 
 def update_business_portal_other_contact_information( business )
@@ -135,17 +166,17 @@ def update( business )
   editmode()
   puts("Debug: Edit Mode Activated")
    sleep 2
-   Watir::Wait.until { @browser.h4( :text, 'Additional Business Details').exists? }
+   Watir::Wait.until { @browser.h5( :text, 'Additional Business Details').exists? }
 
-  @browser.h4( :text, 'Additional Business Details').click
+  @browser.h5( :text, 'Additional Business Details').click
   sleep(1)
-  @browser.h4( :text, 'Online Presence').click
+  #@browser.h5( :text, 'Online Presence').click
+  #sleep(1)
+  @browser.h5( :text, 'Images and Videos').click
   sleep(1)
-  @browser.h4( :text, 'Images and Videos').click
+  @browser.h5( :text, 'Other Contact Information').click
   sleep(1)
-  @browser.h4( :text, 'Other Contact Information').click
-  sleep(1)
-  @browser.h4( :text, 'General Information').click
+  @browser.h5( :text, 'General Information').click
   puts("Debug: All Dropdown pages opened")
   sleep(1)
 
@@ -154,8 +185,8 @@ def update( business )
   puts("Debug: Details update method complete")
   update_business_portal_additional_details( business )
   puts("Debug: Additional details update method complete")
-  update_business_portal_online_presence( business )
-  puts("Debug: Online presence details update method complete")
+  #update_business_portal_online_presence( business )
+  #puts("Debug: Online presence details update method complete")
   update_business_portal_images_and_videos ( business )
   puts("Debug: Images and videos update method complete")
   update_business_portal_other_contact_information( business )

@@ -14,10 +14,10 @@ Watir::Wait.until { @browser.text.include? "Please log into the email that you u
 
   puts( 'Signup complete, verify email.' )
 
-  RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'InsiderPage'
-
+  self.save_account("InsiderPage", {:email => data['email'], :password => data['password']})
+  puts("Credentials Saved")
   if @chained
-    self.start("Insiderpages/Verify")
+    self.start("Insiderpage/Verify")
   end
   true
 

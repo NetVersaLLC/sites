@@ -36,7 +36,14 @@ url = 'https://register.kudzu.com/packageSelect.do'
 
 
 # Fill Add Your Information page
-@browser.select_list( :name, 'prefix' ).select data[ 'prefix' ]
+#Code added by Coin starts below.
+#The prefix need to be modified as per the list of the table...As there is no miss all the miss are missing...
+prefix= data[ 'prefix' ]
+if prefix == 'Miss.'
+	prefix = "Ms."
+end
+@browser.select_list( :name, 'prefix' ).select prefix
+#Code addition/update by Coin ends here.
 @browser.text_field( :name => 'firstName' ).set data[ 'firstName' ]
 @browser.text_field( :name => 'lastName' ).set data[ 'lastName' ]
 
@@ -88,18 +95,26 @@ Watir::Wait.until{ @browser.select_list( :id, 'category' ).exists? }
 Watir::Wait::until{ @browser.text.include? "Add Specialties" }
 @browser.button( :name, 'nextButton' ).click
 
+#Coin code addition Start
+Watir::Wait::until{ @browser.text.include? "Add Specialties" }
+@browser.button( :name, 'nextButton' ).click
+
+#Coin code addition/update ends....
 
 # On Add Specialties page
 # TODO: Steps 1, 2, 3, 4, but probably may vary (N of 4)
 
-Watir::Wait::until{ @browser.text.include? "Preview Your Profile" }
+
+#Watir::Wait::until{ @browser.text.include? "Year Established:" }
 
 # On Preview Your Profile
-@browser.checkbox( :name, 'businessAgreement' ).click
+@browser.checkbox( :name, 'businessAgreement' ).set
 @browser.button( :name, 'submitButton' ).click
 
-RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['userName'], 'account[password]' => data['pass'], 'account[secret_answer]' => data['answer'], 'model' => 'Kudzu'
 
+
+RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['userName'], 'account[password]' => data['pass'], 'account[secret_answer]' => data['answer'], 'model' => 'Kudzu'
+puts("Business SingUp Success!")
 
 #Kudzu.notify_of_join( key )
 

@@ -5,7 +5,7 @@ def add_new_listing( data )
 
   puts 'Add new listing'
   sleep 2
-  @browser.button( :text, 'Add New Business' ).when_present.click
+  @browser.button( :value, 'Create New Business' ).when_present.click
 retries = 3
 begin
   sleep 2
@@ -43,7 +43,7 @@ begin
   @browser.button(:value => 'Verify Later').when_present.click
 
   sleep(4 - retries)
-  Watir::Wait.until { @browser.text.include? "Manage Your Listings" }
+  Watir::Wait.until { @browser.text.include? "All Businesses" }
 rescue Exception => e
   puts(e.inspect)
   if retries > 0

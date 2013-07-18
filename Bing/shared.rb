@@ -119,7 +119,7 @@ def search_for_business( business )
   sleep 2
   @browser.button( :value , 'Get Started' ).when_present.click
   sleep 2
-  @browser.link(:title => 'Add Your Business').when_present.click
+  #@browser.link(:title => 'Add Your Business').when_present.click
 
   @businessfound = false
 

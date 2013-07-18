@@ -1,4 +1,6 @@
 #Define some stuff, go places
+retries = 5
+begin
 @browser = Watir::Browser.new
 url = "http://www.hotfrog.com/Login.aspx"
 @browser.goto(url)
@@ -78,6 +80,7 @@ end
 Watir::Wait.until { @browser.text.include? "Business details" }
 @browser.span(:text, /Submit/).click
 if @browser.text.include? "Do you want to continue?" then
+	@browser.text_field(:name, /txtPhone/).set data['phone']
 	@browser.span(:text, /Submit/).click
 end
 
@@ -89,21 +92,21 @@ end
 #Looks like we could use some imagery.
 #@browser.link(:title, /Add your business images/).click
 #Watir::Wait.until { @browser.text.include? "Upload image" }
-#if data['logo'].nil? then
+#if self.logo.nil? then
 #	puts("No Logo Found")
 #else
-#@browser.file_field(:name, /userfile/).set data['logo']
+#@browser.file_field(:name, /userfile/).set self.logo
 #
 #	while @browser.div(:id, /uploadProcessBar/).size > 0
 #		sleep(1)
 #	end
 #end
 #count2 = 0
-#if data['images'].nil? then
+#if self.images.nil? then
 #	puts("No Images Found")
 #else
-#	until count2 > data['images'].length
-#	@browser.file_field(:name, /userfile/).set data['images'][count2]
+#	until count2 > self.images.length
+#	@browser.file_field(:name, /userfile/).set self.images[count2]
 #		while @browser.div(:id, /uploadProcessBar/).size > 0
 #		sleep(1)
 #		end
@@ -113,4 +116,14 @@ end
 
 #We're done here
 puts("FinishListing Complete")
+rescue
+	if retries == 0
+		puts("Failed after five retries")
+		false
+	end
+	puts("Something went wrong, retrying in two seconds...")
+	sleep(2)
+	retry
+	retries -= 1
+end
 true

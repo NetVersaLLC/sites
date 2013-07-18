@@ -14,6 +14,4 @@ data['phone']		= business.local_phone
 data['payments']	= Hotfrog.payment_methods(business)
 data['24hours']		= business.open_24_hours
 data['hours']		= Localndex.get_hours(business)
-data['logo']		= nil#self.logo #Client_Script issues
-data['images']		= nil#self.images #Client_Script issues
 data

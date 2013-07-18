@@ -10,7 +10,7 @@ process_localdatabase_signup(data)
 		@username_increment += 1
 	end
 
-RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data[ 'username' ], 'account[password]' => data[ 'password' ], 'model' => 'Localdatabase'
+self.save_account("Localdatabase", {:username => data[ 'username' ], :password => data[ 'password' ]})
 
 	if @chained
 		self.start("Localdatabase/Verify")

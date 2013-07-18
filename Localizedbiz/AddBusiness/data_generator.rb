@@ -19,9 +19,7 @@ data['last4']     = business.local_phone.split("-")[2]
 data['fax']       = business.fax_number
 data['email']     = business.bings.first.email
 data['website']   = business.company_website.nil? ? nil : business.company_website.gsub("http://", "")
-data['hours']       = Getfav.consolidate_hours( business )
 data['description'] = business.business_description
 data['keywords']    = business.category1 + ", " + business.category2 + ", " + business.category3 + ", " + business.category4 + ", " + business.category5
 data['tagline']     = business.category1 + " " + business.category2 + " " + business.category3
-data['image']       = business.logo_file_name
 data

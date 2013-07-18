@@ -14,13 +14,17 @@ sign_in(data)
 @browser.text_field( :name => 'email').set data['email']
 
 @browser.text_field( :name => 'url').set data['website']
+sleep(50)
 @browser.select_list( :name => 'biz_cat1').select data['category1']
+sleep(1) #Wait for second list to load
 @browser.select_list( :name => 'biz_cat2').select data['category2']
 @browser.text_field( :name => 'keywords').set data['keywords']
 @browser.text_field( :name => 'tagline').set data['tagline']
 @browser.text_field( :name => 'description').set data['description']
 
-@browser.file_field( :name => 'new_image').set data['image'] unless data['image'].nil?
+if not self.logo.nil?
+@browser.file_field( :name => 'new_image').set self.logo
+end
 
 @browser.button( :name => 'submit').click
 

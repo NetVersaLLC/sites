@@ -12,7 +12,8 @@ data[ 'phone' ]             = business.local_phone
 data[ 'country' ]           = 'United States'
 data[ 'hotmail' ]           = business.bings.first.email
 data[ 'password' ]          = business.bings.first.password
-data[ 'hours' ]			    = Getfav.consolidate_hours(business)
+data[ '24hours' ] 			= business.open_24_hours
+data[ 'hours' ]			    = Getfave.consolidate_hours(business)
 data[ 'brands' ]			= business.get_brands
 
 bingy = Bing.where(:business_id => business.id).first
@@ -24,8 +25,6 @@ data[ 'fax_number' ]        = business.fax_number
 data[ 'website' ]           = business.company_website
 data[ 'facebook' ]          = '' # NOTE: unimlemented
 data[ 'twitter' ]           = '' # NOTE: unimplemented
-#data['logo'] = ContactJob.logo
-#data['images'] = ContactJob.images
 
 data[ 'year_established' ]  = business.year_founded
 data[ 'description' ]       = business.business_description

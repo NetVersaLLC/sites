@@ -64,9 +64,9 @@ end
 @browser.goto("https://twitter.com/")
 
 sleep 2
-Watir::Wait.until{@browser.text.include? "Here are some people you might enjoy following." }
+Watir::Wait.until{@browser.text.include? "Confirm your email address to access all of Twitter's features." }
 
-RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['username'], 'account[password]' => data['password'], 'account[twitter_page]' => 'http://twitter.com/'+data['username'], 'model' => 'Twitter'
+self.save_account("Twitter", {:username => data['username'], :password => data['password'], :twitter_page => 'http://twitter.com/'+data['username']})
 
 if @chained
 	self.start("Twitter/Verify")

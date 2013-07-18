@@ -24,7 +24,6 @@ data['fax']          = business.fax_number
 data['mobile_phone'] = business.mobile_phone
 data['email']        = business.bings.first.email
 data['website']      = business.company_website
-data['hours']        = Getfav.consolidate_hours( business )
 data['description']  = business.business_description
 data['tagline']      = business.category1 + " " + business.category2 + " " + business.category3
 data['country']      = "United States"

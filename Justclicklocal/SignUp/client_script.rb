@@ -10,7 +10,7 @@
 
 sleep(10)
 
-RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['email'], 'account[password]' => data['password'], 'model' => 'Justclicklocal'
+self.save_account("Justclicklocal", {:email => data['email'], :password => data['password']})
 
 if @chained
   self.start("Justclicklocal/CreateListing")

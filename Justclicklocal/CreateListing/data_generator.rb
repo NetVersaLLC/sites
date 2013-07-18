@@ -1,5 +1,5 @@
 data = {}
-data[ 'email' ]			= business.justclicklocals.first.username
+data[ 'email' ]			= business.justclicklocals.first.email
 data[ 'password' ]		= business.justclicklocals.first.password#HQangUpB
 data[ 'business' ]		= business.business_name
 data['address']			= business.address

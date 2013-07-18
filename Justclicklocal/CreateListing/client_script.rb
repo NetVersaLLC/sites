@@ -1,10 +1,25 @@
 sign_in( data )
+
+tries = 0
+
+until @browser.button(:value, 'submit').exists? == false
+	tries += 1
+	sign_in(data)
+	sleep(1)
+	if tries == 5 then
+		throw("Error logging in")
+	end
+end
 sleep(5) # divs inside the dom load in late.
 
 
 hours = data[ 'hours' ]
 
+begin
 @browser.link( :text => 'Submit a New Listing').click
+rescue
+	@browser.link(:text, /Submit a New Listing/).click
+end
 
 @browser.text_field( :id => 'name').set data[ 'business' ]
 @browser.text_field( :id => 'address1').set data['address']
@@ -13,7 +28,11 @@ hours = data[ 'hours' ]
 @browser.text_field( :id => 'phone').set data['phone']
 @browser.select_list( :id => 'state').select data[ 'state' ]
 @browser.text_field( :id => 'zip').set data['zip']
-@browser.text_field( :id => 'url').set data['url']
+if data['url'].length > 0 then
+	@browser.text_field( :id => 'url').set data['url']
+else
+	@browser.text_field( :id, 'url').set "http://"
+end
 @browser.text_field( :id => 'email').set data['email']
 @browser.text_field( :id => 'fax').set data['fax']
 @browser.text_field( :id => 'description').set data['description']

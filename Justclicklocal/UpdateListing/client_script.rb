@@ -17,7 +17,11 @@ hours = data[ 'hours' ]
 @browser.text_field( :id => 'phone').set data['phone']
 @browser.select_list( :id => 'state').select data[ 'state' ]
 @browser.text_field( :id => 'zip').set data['zip']
-@browser.text_field( :id => 'url').set data['url']
+if not data['url'] == nil then
+	@browser.text_field( :id => 'url').set data['url']
+else
+	@browser.text_field( :id => 'url').set "http://"
+end
 @browser.text_field( :id => 'email').set data['email']
 @browser.text_field( :id => 'fax').set data['fax']
 @browser.text_field( :id => 'description').set data['description']

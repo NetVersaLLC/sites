@@ -92,21 +92,21 @@ end
 #Looks like we could use some imagery.
 #@browser.link(:title, /Add your business images/).click
 #Watir::Wait.until { @browser.text.include? "Upload image" }
-#if data['logo'].nil? then
+#if self.logo.nil? then
 #	puts("No Logo Found")
 #else
-#@browser.file_field(:name, /userfile/).set data['logo']
+#@browser.file_field(:name, /userfile/).set self.logo
 #
 #	while @browser.div(:id, /uploadProcessBar/).size > 0
 #		sleep(1)
 #	end
 #end
 #count2 = 0
-#if data['images'].nil? then
+#if self.images.nil? then
 #	puts("No Images Found")
 #else
-#	until count2 > data['images'].length
-#	@browser.file_field(:name, /userfile/).set data['images'][count2]
+#	until count2 > self.images.length
+#	@browser.file_field(:name, /userfile/).set self.images[count2]
 #		while @browser.div(:id, /uploadProcessBar/).size > 0
 #		sleep(1)
 #		end

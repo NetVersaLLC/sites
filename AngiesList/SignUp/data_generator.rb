@@ -3,7 +3,7 @@ catty                       = AngiesList.where(:business_id => business.id).firs
 
 data[ 'email' ]             = business.bings.first.email 
 data[ 'password' ]          = AngiesList.make_password
-data[ 'password2' ]         = AngiesList.make_password
+data[ 'password2' ]         = AngiesList.make_password + "1"
 data[ 'first_name' ]        = business.contact_first_name
 data[ 'last_name' ]         = business.contact_last_name
 data[ 'gender' ]            = business.contact_gender
@@ -33,7 +33,7 @@ data[ 'description' ] 	    = business.business_description
 data[ 'business_description' ] 	    = business.business_description
 data['service_group'] = 'Consumer Services'
 
-data['category'] = catty.angies_list_category.name.gsub("\n", "")
+data['category'] = "Accessories - Auto"#catty.angies_list_category.name.gsub("\n", "")
 
 data[ 'service_not_offered' ] = ''
 data[ 'service_offered' ] = business.category1 + ' ' + business.category2 + ' ' + business.category3 + ' ' + business.category4 + ' ' + business.category5

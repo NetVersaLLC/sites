@@ -3,7 +3,7 @@ def replace_and(business)
   return business.gsub("&","and")
 end
 
-query = data['city'].gsub(" ", "-") + "-" + data['state'].gsub(" ", "-")
+query = data['city'].gsub(" ", "-") + "-" + data['state_name'].gsub(" ", "-")
 query = query.downcase
 url = "http://tupalo.com/en/search?q=#{CGI.escape(data['business'])}&city_slug=#{query}"
 

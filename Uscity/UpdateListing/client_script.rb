@@ -6,7 +6,11 @@ sign_in(data)
 
 
 @browser.text_field(:name => 'Business_Name').when_present.set data[ 'business' ]
-@browser.text_field(:name => 'Business_Web_Site').set data[ 'website' ]
+if data[ 'website' ] == '' or data[ 'website' ].nil? then 
+    @browser.text_field(:name => 'web_url').set "http://www.uscity.net"
+  else
+  @browser.text_field(:name => 'Business_Web_Site').set data[ 'website' ]
+  end
 @browser.text_field(:name => 'Address_Line_1').set data[ 'address' ]
 @browser.text_field(:name => 'City').set data[ 'city' ]
 @browser.select_list(:name => 'State_2_Letter_Abbr').select data['state']

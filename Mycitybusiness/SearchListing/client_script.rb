@@ -1,7 +1,30 @@
+require 'rubygems'
+require 'mechanize'
 businessFound = {}
 
-@browser.goto 'http://www.mycitybusiness.net/search.php'
+agent = Mechanize.new
 
+page = agent.get('http://www.mycitybusiness.net/search.php')
+
+search_form = page.form('quick_search_form')
+search_form.kword = data['business']
+search_form.city = data['city']
+results = agent.submit(search_form)
+if results.search('strong')[3].text == data['business'] then
+  puts("Business is listed")
+  businessFound['status'] = :listed
+  address = results.search('td')[31].text + results.search('td')[32].text
+  puts(address)
+  businessFound['listed_address'] = address
+  phone = results.search('td')[34].text
+  puts(phone)
+  businessFound['listed_phone'] = phone
+else
+  puts("Business is unlisted")
+  businessFound['status'] = :unlisted
+end
+
+=begin
 @browser.text_field(:id => 'kword').set data['last_name'] #data['business']
 @browser.text_field(:id => 'city').set data['city']
 @browser.select_list(:name => 'state').select_value data['state_short']
@@ -23,5 +46,6 @@ else
     businessFound['status'] = :unlisted
   end  
 end
+=end
 
 [true, businessFound]

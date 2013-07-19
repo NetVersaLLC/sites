@@ -1,22 +1,31 @@
 require 'nokogiri'
+require 'open-uri'
 url = "http://#{data['zip']}.zip.pro/#{data['businessfixed']}"
 puts(url)
 page = Nokogiri::HTML(RestClient.get(url)) 
-if not page.css("div.organicListing").size == 0
+if page.css("div.organicListing").size > 0
   link = page.css("a.result-title")
-  link2 = link[0]["href"]
-  subpage = Nokogiri::HTML(RestClient.get(link2)) 
-  claimLink = subpage.css("a#a_prof_claim")
-  if claimLink.size == 0
-    puts("Claimed")
-    businessFound = [:listed, :claimed]
-  else
+  link = link[0]["href"]
+  puts(link)
+  businessFound['listed_url'] = link
+  subpage = Nokogiri::HTML(RestClient.get(link)) 
+  claimLink = subpage.css("div.claim_listing")
+  if claimLink.size > 0
     puts("Unclaimed")
-    businessFound = [:listed, :unclaimed]
-  end 
+    businessFound['status'] = :listed
+  else
+    puts("Claimed")
+    businessFound['status'] = :claimed
+  end
+  phone = subpage.at_css("span.head_phone.iconsprite.inprofile_head").text
+  puts(phone)
+  businessFound['listed_phone'] = phone
+  address = subpage.at_xpath('//*[@id="profile_header"]/div/div[3]/div[1]/div[3]/span/span[1]').text + subpage.at_xpath('//*[@id="profile_header"]/div/div[3]/div[1]/div[3]/span/span[2]').text + subpage.at_xpath('//*[@id="profile_header"]/div/div[3]/div[1]/div[3]/span/span[3]').text + subpage.at_xpath('//*[@id="profile_header"]/div/div[3]/div[1]/div[3]/span/span[4]').text
+  puts(address)
+  businessFound['listed_address'] = address
 else
   puts("Unlisted")
-  businessFound = [:unlisted]
+  businessFound['status'] = :unlisted
 end
 
 

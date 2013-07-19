@@ -112,11 +112,10 @@ def update_business(data)
   @browser.text_field(:id => 'business_merchant_attributes_services').set data['services']
   @browser.text_field(:id => 'business_merchant_attributes_message').set data['message']
 
-  data['logo'] == '' unless File.exist? data['logo']
-  if data['logo'] == ''
+  if self.logo.nil?
     @browser.checkbox(:name => 'business[photos_attributes][0][_destroy]').set if @browser.checkbox(:name => 'business[photos_attributes][0][_destroy]').exist?
   else
-    @browser.file_field(:id => 'business_photos_attributes_99_uploaded_data').value = data['logo']
+    @browser.file_field(:id => 'business_photos_attributes_99_uploaded_data').value = self.logo
   end
 
   @browser.button(:value => 'update business').click

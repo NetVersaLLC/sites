@@ -40,11 +40,11 @@ A file of bundled public CA certs may be downloaded from:
       http.request_get(uri.path) do |response|
         case response
         when Net::HTTPNotFound
-          output "404 - Not Found"
+          puts "404 - Not Found"
           return false
  
         when Net::HTTPClientError
-          output "Error: Client Error: #{response.inspect}"
+          puts "Error: Client Error: #{response.inspect}"
           return false
  
         when Net::HTTPRedirection
@@ -70,7 +70,6 @@ A file of bundled public CA certs may be downloaded from:
             progress = new_progress
           end
  
-          output
  
           temp_file.close
           File.unlink full_path if File.exists?(full_path)
@@ -81,7 +80,7 @@ A file of bundled public CA certs may be downloaded from:
  
     rescue Exception => e
       File.unlink full_path if File.exists?(full_path)
-      output "ERROR: #{e.message}"
+      puts "ERROR: #{e.message}"
       raise "Failed to download file"
     end
   end

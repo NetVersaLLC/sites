@@ -1,5 +1,5 @@
 data = {}
-data[ 'email' ]             = business.angies_lists.first.email
+data[ 'email' ]             = business.bings.first.email 
 data[ 'password' ]          = business.angies_lists.first.password
 data[ 'first_name' ]        = business.contact_first_name
 data[ 'last_name' ]         = business.contact_last_name

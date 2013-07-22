@@ -66,11 +66,9 @@ rescue Exception => e
 end
 
 
-#RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'AngiesList'
-self.save_account("AngiesList", {:email => data['email'], :password => data['password']})
-
+	RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'AngiesList'
 	if @chained
-		self.start("AngiesList/CreateListing")
+		self.start("Angies_list/UpdateListing")
 	end
+	true
 
-true

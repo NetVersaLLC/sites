@@ -33,8 +33,6 @@ begin
   sleep(9 - retries)
   @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
   sleep(6 - retries)
-  @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down #Ensures proper selection of Category
-  sleep(6 - retries)
   @browser.text_field(:id => 'categoryInputTextBox').send_keys :enter
   sleep(6 - retries)
   @browser.button(:id => 'categoryAddButton').click

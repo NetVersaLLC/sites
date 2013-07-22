@@ -1,19 +1,15 @@
-url = "http://search.businessdb.com/?q=#{CGI.escape(data['business'])}&c=#{CGI.escape('United States of America')}"
+#Main steps
+url = 'http://www.businessdb.com/'
+@browser.goto(url)
 
-businessFound = {}
-page = Nokogiri::HTML(RestClient.get(url))
+# Search busienss
+businessFound = []
 
-if page.text.include? "did not match with any companies"
-  businessFound['status'] = :unlisted
+if search_business(data)
+  puts "Business Already Exist"
+  businessFound = [:listed,:unclaimed]
 else
-  page.xpath("//div[@class='search-results']/ul/li").each do |item|
-    if item.css('a.list-by-1-title').text =~ /#{data['business']}/
-      businessFound['status'] = :listed
-      businessFound['listed_name'] = item.css('a.list-by-1-title').text.delete("\t\r\n")
-      businessFound['listed_url'] = item.css('a.list-by-1-web').text
-      break
-    end
-  end
+  businessFound = [:unlisted]
 end
 
 [true, businessFound]

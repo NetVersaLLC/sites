@@ -3,7 +3,7 @@ link = data['link']
 Watir::Wait::until do
   @browser.text.include? "Log Out"
 if @chained
-  self.start("GetFave/CreateListing")
+  self.start("Getfave/CreateListing")
 end
   true
 end

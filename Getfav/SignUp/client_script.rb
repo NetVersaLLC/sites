@@ -22,12 +22,12 @@ if @browser.text.include? 'Please correct the errors and try again.'
 	throw "There are an error while creating the account"
 end
 
-self.save_account("Getfave", {:email => data['email'], :password => data['password']})
+RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'Getfav'
 	puts "Signup successful. Verifying email to continue"
 
 	
 if @chained
-  self.start("GetFave/Verify")
+  self.start("Getfave/Verify")
 end
 
 true

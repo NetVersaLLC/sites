@@ -16,5 +16,6 @@ data['services']              = ""#services
 data['message']               = ""#Message to customers
 data['categories']            = [catty.insider_page_category.name.gsub("\n", "")]
 data['tags']                  = [business.category1,business.category2,business.category3,business.category4,business.category5]
+data['logo']                  = ContactJob.logo.nil? ? '' : ContactJob.logo
 
 data

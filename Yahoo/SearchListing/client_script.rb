@@ -1,6 +1,6 @@
 businessFound = {}
 
-citystate = data['city'] + ", " + data['state_short']
+citystate = data['city']+ ", " + data['state_short']
 html = RestClient.get "http://local.search.yahoo.com/search", { :params => { :p => data['business'], :addr => citystate, :fr2 => 'sb-top', :type_param => '' } }
 nok = Nokogiri::HTML(html)
 
@@ -21,7 +21,7 @@ nok.xpath("//div[@class='res']/div[@class='content']").each do |content|
         businessFound['status'] = :claimed
       end
       
-      content.xpath("./div[@class='phone']").each do |phone|
+      content.xpath("./span[@class='phone']").each do |phone|
         businessFound['listed_phone'] = phone.inner_text.strip
       end
       content.xpath("./div[@class='address']").each do |address|

@@ -25,15 +25,8 @@ Watir::Wait.until { @browser.text.include? "My Dashboard" }
 
 @browser.link( :text => /Business Account Contact/).click
 
-#Code added by Coin starts below.
-#The prefix need to be modified as per the list of the table...As there is no miss all the miss are missing...
-prefix= data[ 'prefix' ]
-if prefix == 'Miss.'
-	prefix = "Ms."
-end
-@browser.select_list( :name, 'prefix' ).select prefix
-#Code addition/update by Coin ends here.
 
+@browser.select_list( :name, 'prefix' ).select data[ 'prefix' ]
 @browser.text_field( :name => 'firstName' ).set data[ 'firstName' ]
 @browser.text_field( :name => 'lastName' ).set data[ 'lastName' ]
 
@@ -65,13 +58,6 @@ data[ 'languagesSpoken' ].each { |item|
 @browser.text_field( :name => 'yearEstablished' ).set data[ 'yearEstablished' ]
 @browser.button( :name, 'nextButton' ).click
 
-if Watir::Wait.until { @browser.text.include? "An exact location for" }
-	@browser.button(:name, 'nextButton').click
-end
-
-
 Watir::Wait.until { @browser.text.include? "Edit or delete your additional locations here." }
-
-puts("The Business Ipdate successfull!")
 
 true

@@ -1,27 +1,39 @@
-begin #If there are no listings found the site redirects the user to a 404 page. Since it returns 404 RestClient treates it as an exception. 
-html = RestClient.get "http://www.kudzu.com/controller.jsp?", { :params => { :N => "0", :searchVal => data['businessfixed'], :currentLocation => data['zip'], :searchType => 'keyword', :Ns => "P_PremiumPlacement", :distFilter => "10" } }
-page = Nokogiri::HTML(html)  
-
-rescue RestClient::ResourceNotFound
-  businessFound = [:unlisted]
-  it404ed = true
+require 'rubygems'
+require 'nokogiri'
+require 'open-uri'
+name=data['name']
+city=data['city']
+state=data['state']
+zip=data['zip']
+url="http://www.kudzu.com/controller.jsp?N=0&searchVal=#{name}&currentLocation=#{city}%2C%20#{state}%20#{zip}&searchType=keyword&Ns=P_PremiumPlacement"
+businessFound = {}
+businessFound['status'] = :unlisted
+name=data['name'].gsub("%20"," ")
+cost=0
+nok = Nokogiri::HTML(RestClient.get url)
+nok.css("div.nvrBox").each do |bi|
+        if (bi.css("h3.nvrName a").text) =~ /#{name}/i
+            businessFound['listed_name'] = bi.css("h3.nvrName a").text
+            businessFound['listed_address'] = bi.css("div.nvrAddr").text            
+            businessFound['listed_url'] = "http://www.kudzu.com/"+bi.css("h3.nvrName a").attr("href")
+            puts businessFound['listed_url']
+            subpage = Nokogiri::HTML(RestClient.get businessFound['listed_url'])
+            if subpage.xpath("//a[@class='topNavLink']").length > 0
+                businessFound['status'] = :listed                
+            else
+                businessFound['status'] = :claimed
+            end        
+            businessFound['listed_phone'] = subpage.search("span.tel").text            
+            businessFound['listed_phone'] = businessFound['listed_phone'].gsub("(","")
+            businessFound['listed_phone'] = businessFound['listed_phone'].gsub(") ","-")
+            puts businessFound['listed_phone']
+            cost=1
+            break
+        end
 end
-
-if not it404ed
-page.css("a.results_recordname").each do |link|
-  
-  if link.text == data['business']
-    thelink = "http://www.kudzu.com"+link.attribute("href")
-    subpage = Nokogiri::HTML(RestClient.get(thelink))
-    if subpage.xpath('//span[contains(text(), "Claim This Profile!")]')
-      businessFound = [:listed, :unclaimed]
-    else
-      businessFound = [:listed, :claimed]
-    end
-  break
-  end
+if cost == 1
+    puts("Business listed.")
+else
+    puts("Business not listed.")
 end
-end
-
-
-[true, businessFound]
+[true,businessFound]

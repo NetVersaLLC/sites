@@ -7,13 +7,14 @@
 # You have to manually add browser.frame statements.
 # See: http://wiki.openqa.org/display/WTR/Frames 
 
-
-@browser.text_field(:name => 'query').set data['business']
+sleep 2
+@browser.text_field(:name => 'query').when_present.set data['business']
 @browser.text_field(:name => 'location').set data['citystate']
 @browser.button(:id => 'searchButton').click
 
 sleep 2
-@browser.link(:class => 'addVenueLink').when_present.click
+@browser.link(:text => /here/).click
+# @browser.link(:class => 'addVenueLink').click
 
 sleep 2
 @browser.text_field(:id => 'inputEmail').set data['email']

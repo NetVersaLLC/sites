@@ -8,7 +8,11 @@ def sign_up(data)
   @browser.select_list(:name => 'security_ques').when_present.select data['security_question']
   @browser.text_field(:name => 'security_ans').set data[ 'security_answer' ]
   @browser.text_field(:name => 'business_name').set data[ 'business' ]
+  if data[ 'website' ] == '' or data[ 'website' ].nil? then 
+    @browser.text_field(:name => 'web_url').set "http://www.uscity.net"
+  else
   @browser.text_field(:name => 'web_url').set data[ 'website' ]
+  end
   @browser.text_field(:name => 'email').set data[ 'email' ]
   @browser.text_field(:name => 'business_address').set data[ 'address' ]
   @browser.text_field(:name => 'town').set data[ 'city' ]
@@ -18,7 +22,7 @@ def sign_up(data)
   @browser.text_field(:name => 'short_description').set data[ 'business_description' ]
   @browser.text_field(:name => 'category_name[]').set data[ 'category' ]
   @browser.text_field(:name => 'Fax_Number').set data[ 'fax' ]
-  @browser.file_field(:id => 'Logo_URL').set business['logo']
+  @browser.file_field(:id => 'Logo_URL').set self.logo if not self.logo.nil?
 
   #Enter Decrypted captcha string here
   enter_captcha(data)

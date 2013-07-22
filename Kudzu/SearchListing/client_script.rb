@@ -1,6 +1,3 @@
-require 'rubygems'
-require 'nokogiri'
-require 'open-uri'
 name=data['name']
 city=data['city']
 state=data['state']
@@ -25,8 +22,7 @@ nok.css("div.nvrBox").each do |bi|
             end        
             businessFound['listed_phone'] = subpage.search("span.tel").text            
             businessFound['listed_phone'] = businessFound['listed_phone'].gsub("(","")
-            businessFound['listed_phone'] = businessFound['listed_phone'].gsub(") ","-")
-            puts businessFound['listed_phone']
+            businessFound['listed_phone'] = businessFound['listed_phone'].gsub(") ","-")            
             cost=1
             break
         end

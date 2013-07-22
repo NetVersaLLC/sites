@@ -1,6 +1,3 @@
-require 'rubygems'
-require 'nokogiri'
-require 'open-uri'
 name=data['name']
 city=data['city']
 state=data['state']

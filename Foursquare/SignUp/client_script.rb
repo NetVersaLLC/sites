@@ -13,7 +13,8 @@ sleep 2
 @browser.button(:id => 'searchButton').click
 
 sleep 2
-@browser.link(:class => 'addVenueLink').when_present.click
+@browser.link(:text => /here/).click
+# @browser.link(:class => 'addVenueLink').click
 
 sleep 2
 @browser.text_field(:id => 'inputEmail').set data['email']

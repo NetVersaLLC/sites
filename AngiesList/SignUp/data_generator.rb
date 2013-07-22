@@ -33,7 +33,7 @@ data[ 'description' ] 	    = business.business_description
 data[ 'business_description' ] 	    = business.business_description
 data['service_group'] = 'Consumer Services'
 
-data['category'] = "Accessories - Auto"#catty.angies_list_category.name.gsub("\n", "")
+data['category'] = catty.angies_list_category.name.gsub("\n", "")
 
 data[ 'service_not_offered' ] = ''
 data[ 'service_offered' ] = business.category1 + ' ' + business.category2 + ' ' + business.category3 + ' ' + business.category4 + ' ' + business.category5

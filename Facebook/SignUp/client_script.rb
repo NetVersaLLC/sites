@@ -40,6 +40,7 @@ def sign_up(data)
 end
 
 #Main Steps
+@browser.goto "https://www.facebook.com/business/build"
 create_page(data)
 sign_up(data)
 

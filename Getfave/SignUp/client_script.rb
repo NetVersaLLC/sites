@@ -27,7 +27,7 @@ self.save_account("Getfave", {:email => data['email'], :password => data['passwo
 
 	
 if @chained
-  self.start("GetFave/Verify")
+  self.start("Getfave/Verify")
 end
 
 true

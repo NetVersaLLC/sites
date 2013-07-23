@@ -59,6 +59,11 @@ puts("Made it out of the username generator! with this username: "+data['usernam
 
 @browser.text_field( :id => 'password' ).set data[ 'password' ]
 @browser.text_field( :id => 'passwordconfirm' ).set data[ 'password' ]
+sleep(5)
+until not @browser.text.include? "The passwords you entered do not match. Please try again."
+	@browser.text_field( :id => 'password' ).set data[ 'password' ]
+	@browser.text_field( :id => 'passwordconfirm' ).set data[ 'password' ]
+end
 @browser.select_list( :id => 'mm' ).select data[ 'month' ]
 @browser.text_field(  :id => 'dd' ).set data[ 'day' ]
 @browser.text_field(  :id => 'yyyy' ).set data[ 'year' ]
@@ -86,7 +91,7 @@ puts data['password']
 retry_captcha(data)
 sleep 5
 
-RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", :email => data['business_email'], :password => data['password'], :secret1 => data['secret_answer_1'], :secret2 => data['secret_answer_2']
+self.save_account("Yahoo", {:email => data['business_email'], :password => data['password'], :secret1 => data['secret_answer_1'], :secret2 => data['secret_answer_2']})
 #Watir::Wait.until { @browser.button( :id => 'ContinueBtn' ).exists? }
 
 #@browser.button( :id => 'ContinueBtn' ).click

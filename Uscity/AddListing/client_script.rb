@@ -46,3 +46,5 @@ sign_up(data)
 if @chained
   self.start("Uscity/Verify")
 end
+
+true

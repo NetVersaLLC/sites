@@ -1,16 +1,17 @@
 #Create business page
 def create_list(data)
-  login(data)
   if @browser.link(:text => data['business']).exist?
     @browser.link(:text => data['business']).click
   end
-  @browser.text_field(:class=> 'inputtext textInput DOMControl_placeholder').set data[ 'category' ]
-  @browser.text_field(:class=> 'inputtext textInput DOMControl_placeholder').send_keys :down
-  @browser.text_field(:class=> 'inputtext textInput DOMControl_placeholder').send_keys :enter
-  @browser.text_field(:class=> 'DOMControl_placeholder uiTextareaNoResize uiTextareaAutogrow').set data[ 'business_description' ]
-  @browser.text_field(:class=> 'inputtext DOMControl_placeholder').set data[ 'website' ]
-  @browser.checkbox(:id=>'u_0_5').set
-  @browser.checkbox(:id=>'u_0_7').set
+  if @browser.text_field(:class=> 'inputtext textInput DOMControl_placeholder').exist?
+    @browser.text_field(:class=> 'inputtext textInput DOMControl_placeholder').set data[ 'category' ]
+    @browser.text_field(:class=> 'inputtext textInput DOMControl_placeholder').send_keys :down
+    @browser.text_field(:class=> 'inputtext textInput DOMControl_placeholder').send_keys :enter
+  end 
+  @browser.text_field(:class=> 'uiTextareaNoResize uiTextareaAutogrow DOMControl_placeholder').set data[ 'business_description' ]
+  @browser.text_field(:class=> 'inputtext', :name=> 'website[]').set data[ 'website' ]
+  @browser.checkbox(:id=>'u_0_1').set
+  @browser.checkbox(:id=>'u_0_3').set
   @browser.button(:value=>'Save Info').click
   
     #upload image
@@ -28,6 +29,13 @@ def create_list(data)
 end
 
 #Main steps
+begin
+
+@browser.goto "www.facebook.com"
 login(data)
 create_list(data)
 true
+
+rescue Exception => e
+    puts "Caught a #{e.message}"
+end

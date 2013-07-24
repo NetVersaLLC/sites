@@ -68,8 +68,8 @@ def fill_form(data)
   gories.each do |categ| 
     if categ != ""
       @browser.text_field(:name => 'selected_categories').set categ
-      sleep(5)
-      Watir::Wait.until { @browser.li(:id => 'as-result-item-0',:index => 0).exist? }
+      sleep(3)
+      Watir::Wait.until { @browser.li(:text => /#{categ}/i).exist? }
       sleep(2)
       @browser.li(:text => categ).click  
     end

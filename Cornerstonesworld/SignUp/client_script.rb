@@ -24,7 +24,7 @@ puts(data['category'])
 enter_captcha( data )
 
 
-RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[password]' => data['password'], 'model' => 'Cornerstonesworld'
+self.save_account("Cornerstonesworld", {:password => data['password']})
 	if @chained
 		self.start("Cornerstonesworld/Verify")
 	end

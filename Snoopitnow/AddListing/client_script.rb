@@ -24,6 +24,12 @@ sleep(2)
 #@browser.ul(:id => 'as_ul').when_present.li(:index => 1).when_present.click
 @browser.button(:id => 'sobi2AddCatBt').click
 
+#taking focus off category area
+sleep 3
+@browser.text_field(:id => 'sobi2MetaKey').click
+sleep 2
+
+#submitting
 @browser.button(:id => 'sobi2SendButton').click
 
 Watir::Wait.until { @browser.text.include? "Your details has been submitted. It will be processed and published by snoopitnow administrator shortly" }

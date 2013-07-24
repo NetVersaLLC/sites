@@ -26,4 +26,5 @@ sleep(2)
 
 @browser.button(:id => 'sobi2SendButton').click
 
-true if @browser.text.include? "Your details has been submitted. It will be processed and published by snoopitnow administrator shortly"
+Watir::Wait.until { @browser.text.include? "Your details has been submitted. It will be processed and published by snoopitnow administrator shortly" }
+true

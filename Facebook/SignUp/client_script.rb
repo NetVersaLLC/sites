@@ -1,25 +1,4 @@
-def create_page(data)
-  @browser.link(:text => 'Create a Page').click
-  @browser.div(:text => 'Local Business or Place').when_present.click
-  @browser.select_list(:id=> 'category').select data[ 'category' ]
-  @browser.text_field(:name => 'page_name').set data[ 'business' ]
-  @browser.text_field(:name => 'address').set data[ 'address' ]
-  @browser.text_field(:name => 'city').set data['location'] 
-  @browser.text_field(:name => 'city').send_keys :down
-  @browser.text_field(:name => 'city').send_keys :enter
-  if @browser.span(:text => data['location'] ).exist?
-    @browser.span(:text => data['location'] ).click
-  end
-  @browser.text_field(:name => 'zip').set data[ 'zip' ]
-  @browser.text_field(:name => 'phone').set data[ 'phone' ] 
-  @browser.checkbox(:name => 'official_check').set
-  @browser.button(:value => 'Get Started').click
-  #Verify
-  if not @browser.link(:text=> 'Create a new business account').exist?
-    puts "Throwing Error..#{@browser.div(:id =>'create_error').text}"
-  end
-  
-end
+
 
 def sign_up(data)
   @browser.link(:text=> 'Create a new business account').when_present.click
@@ -31,9 +10,13 @@ def sign_up(data)
   @browser.checkbox(:id =>'terms').set
   retry_captcha(data)
   
+  sleep 2
+  Watir::Wait.until{@browser.text.include?('Confirm Your Email Address')}
+
   if @browser.text.include?('Confirm Your Email Address')
     puts "Initial Registration is successful"
-    RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'Facebook'
+    #RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'Facebook'
+    self.save_account("Facebook", {:email=>data['email'],:password=>data['password']})
     else
     puts "Inital Registration is Unsuccessful"
   end

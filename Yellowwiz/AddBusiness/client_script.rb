@@ -49,7 +49,8 @@ end
   if @browser.text.include? @success_text
     puts "Business has been claimed successful"
     #RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data[ 'email' ], 'account[password]' => data['password'], 'model' => 'Yellowwiz'
-    self.save_account("yellowwiz", {:username => data[ 'username' ], :password => data[ 'password' ], :email => data[ 'email' ]})
+    # There is no information to save.
+    #self.save_account("yellowwiz", {:username => data[ 'username' ], :password => data[ 'password' ], :email => data[ 'email' ]})
     return true
   else
     throw "Business has not been claimed successful"

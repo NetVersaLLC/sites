@@ -9,25 +9,26 @@ def add_listing(data)
   @browser.button(:text => 'Submit & Go to Step 2').click
   puts "After commit"
 
-  sleep 5
+  sleep 3
+  Watir::Wait.until { @browser.text.include? "You might be adding a duplicate" or @browser.link(:text => 'Write a Review').exists?}
 
-  if @browser.div(:id => 'possible_duplicates').text.include? data['business']
-    @browser.link(:text => data['business']).click
-  else
-    @browser.button(:id => 'add_potential_duplicate').click
+  if @browser.text.include? "You might be adding a duplicate"
+    @browser.button(:id => 'add_potential_duplicate').click  
+    sleep 3
     @browser.alert.ok
   end
-  
-  sleep 5
-  Watir::Wait.until { @browser.div(:class => 'item vcard').exist? }
 
-  true if claim_business data
+  
+  sleep 15
+  #Watir::Wait.until { @browser.link(:text => 'Write a Review').exists? }
+  true if claim_business(data)
 end
 
 def claim_business(data)
   raise Exception, 'Business cannot be claimed.' unless @browser.text.include? 'Claim Business'
 
   @browser.link(:text => 'Claim Business').when_present.click
+  sleep 2
   Watir::Wait.until { @browser.div(:id => 'recaptcha_widget_div').exist? }
   enter_captcha data
   sleep 5

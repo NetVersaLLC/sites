@@ -1,7 +1,7 @@
 def add_new_listing( data )
 
 
-@browser.execute_script("hidePopUp()")
+
 
   puts 'Add new listing'
   sleep 2
@@ -28,19 +28,13 @@ begin
       close.to_subtype.click
     end
   end
-
   @browser.text_field(:id => 'categoryInputTextBox').set data['category']
   sleep(9 - retries)
-  @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
-  sleep(6 - retries)
-  @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down #Ensures proper selection of Category
-  sleep(6 - retries)
   @browser.text_field(:id => 'categoryInputTextBox').send_keys :enter
   sleep(6 - retries)
   @browser.button(:id => 'categoryAddButton').click
   sleep(5 - retries)
   @browser.button(:id => 'submitBusiness').click
-
   sleep(4 - retries)
   @browser.button(:value => 'Verify Later').when_present.click
 

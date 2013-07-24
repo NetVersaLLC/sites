@@ -57,15 +57,25 @@ sleep 5
 #@browser.text_field( :id => 'v_email').set data['email']
 #@browser.text_field( :id => 'password').set data['password']
 #@browser.text_field( :id => 'c_password').set data['password']
-
+aretries = 3
+begin
 @browser.text_field( :id => 'answer').set data[ 'secretAnswer' ]
-
+rescue
+  if aretries > 0 then
+    puts("Answer field not found. Retrying...")
+    @browser.text_field( :name => 'answer').set data[ 'secretAnswer' ]
+    retry
+  else
+    puts("One last try...")
+    @browser.text_field( :class => 'half verticalsprite', :id => 'answer').set data[ 'secretAnswer' ]
+  end
+end
 enter_captcha2( data )
 
 Watir::Wait.until { @browser.text.include? "Verify your email address" }
 
 if @browser.text.include? "Verify your email address"
-	RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['email'], 'account[password]' => data['password'], 'account[secret1]' => data['secretAnswer'], 'model' => 'Zippro'
+	self.save_account("Zippro", {:username => data['email'], :password => data['password'], :secret1 => data['secretAnswer']})
 	if @chained
 		self.start("Zippro/Verify")
 	end

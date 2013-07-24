@@ -1,3 +1,4 @@
+	  retries = 3
 	  # Update Profile
     
     @browser.goto('https://business.angieslist.com/')
@@ -55,6 +56,16 @@
 		loading_wait()
 		@browser.button(:id, /BusinessDetailSaveButton/).click
 		loading_wait()
+		if @browser.text.include? "In Business Since must be four digit year" then
+			@browser.text_field(:id, /BusinessDateTextBox/).set data['year_established']
+			@browser.button(:id, /BusinessDetailSaveButton/).click
+			loading_wait()
+			if @browser.text.include? "In Business Since must be four digit year"
+				@browser.text_field(:id, /BusinessDateTextBox/).clear
+				@browser.button(:id, /BusinessDetailSaveButton/).click
+				loading_wait()
+			end
+		end
 		@browser.link(:id, /EditLicenseDetailButton/).click
 		loading_wait()
 		@browser.select_list(:id, /LicenseSignature/).when_present.select data['license_signature'] 

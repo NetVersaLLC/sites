@@ -131,8 +131,5 @@ enter_captcha
     Watir::Wait.until { @browser.text.include? "Account summary" }
     self.save_account('Bing',  {:email => data['email'],:password => data['password']})
 
-    if @chained
-  		self.start("Bing/CreateRule")
-    end
-    true
+true
 

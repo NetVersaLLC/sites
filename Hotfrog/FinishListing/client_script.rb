@@ -1,7 +1,6 @@
 #Define some stuff, go places
 retries = 5
 begin
-@browser = Watir::Browser.new
 url = "http://www.hotfrog.com/Login.aspx"
 @browser.goto(url)
 
@@ -44,32 +43,43 @@ if data['24hours'] == true
 	@browser.link( :id, "ApplyToAll").click
 	@browser.text_field(:name, /HoursDescription/).set "Open 24/7"
 else
-
+puts"1"
 count = 0
 	until count > 5
+		puts"2"
 	hours = data[ 'hours' ]
 	hours.each_with_index do |hour, day|
+		puts"3"
 		theday = hour[0]	
 		if hour[1][0] != "closed"
 			# Is the day closed?	
+			puts"4"
 			open = hour[1][0]
 			openAMPM = open[-2, 2]
 			close = hour[1][1]
 			closeAMPM = close[-2, 2]
 	
 	    if open.chars.first == "0"
+	    	puts"5"
 	      open[0] = ""
 	    end
 	    if close.chars.first == "0"
+	    	puts"6"
 	      close[0] = ""
 	    end
-	    
+	    puts"7"
 			@browser.select_list( :id, "ctl00_contentSection_ctrlTradingHours_DayRepeater_ctl0#{count}_OpeningTime").select open.upcase
+			puts"8"
 			@browser.select_list( :id, "ctl00_contentSection_ctrlTradingHours_DayRepeater_ctl0#{count}_ClosingTime").select close.upcase
+			puts"9"
+			count += 1
 		else
+			puts"10"
 			@browser.checkbox( :id => "ctl00_contentSection_ctrlTradingHours_DayRepeater_ctl0#{count}_Closed").set
+			puts"11"
+			count += 1
 		end
-	count += 1
+	
 	end
 end
 end
@@ -116,7 +126,8 @@ end
 
 #We're done here
 puts("FinishListing Complete")
-rescue
+rescue Exception => e
+	puts e.inspect
 	if retries == 0
 		puts("Failed after five retries")
 		false

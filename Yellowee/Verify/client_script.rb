@@ -4,13 +4,14 @@ if data['url'].nil? then
 	end
 	true
 else
-@browser.goto(data['url'])
-end
-if @browser.text.include? "Invalid activation key."
-	throw("There was a problem activating the account")
-else
-	if @chained
-		self.start("Yellowee/Notify")
+	@browser.goto(data['url'])
+
+	if @browser.text.include? "Invalid activation key."
+		throw("There was a problem activating the account")
+	else
+		if @chained
+			self.start("Yellowee/Notify")
+		end
+		true
 	end
-	true
 end

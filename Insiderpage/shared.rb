@@ -120,7 +120,8 @@ def update_business(data)
 
   @browser.button(:value => 'update business').click
 
-  Watir::Wait.until { @browser.text.include? 'Your changes were successfully saved.' }
+  sleep 2
+  Watir::Wait.until { @browser.text.include? 'Congratulations' }
 
   true
 end

@@ -38,7 +38,7 @@ end
 
 #Main Steps
 # Launch browser
-@browser = Watir::Browser.new
+
 @url = 'http://www.hotfrog.com/AddYourBusinessSingle.aspx'
 @browser.goto(@url)
 #@browser.link(:text => 'Add your business').click

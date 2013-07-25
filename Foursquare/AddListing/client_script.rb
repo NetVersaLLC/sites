@@ -12,24 +12,32 @@ sleep 2
 puts data['phone']
 @browser.text_field(:id => 'venuePhone_field').set data['phone']
 
-puts "1"
-5.times do
-	@browser.link(:title => "Zoom in").click
-	puts "2"
-	sleep 3
-end 
-puts "3"
-sleep 3
-@browser.image(:xpath => '//img[@class="leaflet-tile leaflet-tile-loaded"][2]').click
-
 @browser.select_list(:name => 'topLevelCategory').select data['category_top']
 sleep 2
 @browser.select_list(:name => 'secondLevelCategory').when_present.select data['category']
 
+puts "1"
+	5.times do
+		@browser.link(:title => "Zoom in").click
+		puts "2"
+		sleep 3
+	end 
+puts "3"
+sleep 3
+@browser.image(:xpath => '//img[@class="leaflet-tile leaflet-tile-loaded"]').click
+
+sleep 5
+
 @browser.button(:value => 'Save').click
 sleep 2
 
-Watir::Wait.until {@browser.text.include? "Total Visitors"}
+Watir::Wait.until {@browser.text.include? "Total Visitors" or @browser.button(:value => 'add venue').exists?}
+
+if @browser.button(:value => 'add venue').exists?
+	@browser.button(:value => 'add venue').click
+	sleep 2
+	Watir::Wait.until {@browser.text.include? "Total Visitors"}
+end	
 
 self.save_account("Foursquare", {:foursquare_page => @browser.url})
 

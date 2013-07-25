@@ -3,13 +3,14 @@ require 'cgi'
 
 
 def goto_sign_up(data)
-  @browser.goto( 'http://listings.local.yahoo.com/' )
-  @browser.link( :text => 'Sign Up' ).click
+  @browser.goto( 'http://smallbusiness.yahoo.com/local-listings/basic-listing/' )
   sleep 2
-  @browser.text_field(:id, 'username').when_present.set data['email']
-  @browser.text_field(:id, 'passwd').set data['password']
+  @browser.link( :text => 'Sign up now' ).when_present.click
+  #sleep 2
+  #@browser.text_field(:id, 'username').when_present.set data['email']
+  #@browser.text_field(:id, 'passwd').set data['password']
   sleep 4
-  @browser.button(:id, '.save').click
+  #@browser.button(:id, '.save').click
 
 end
 
@@ -38,7 +39,49 @@ end
 
 def provide_business_info( business )
   # Provide Your Business Information
+  @browser.text_field( :id => 'bizname' ).set business[ 'business_name' ]
+  @browser.text_field( :id => 'addr' ).set business[ 'business_address' ]
+   #@browser.text_field( :id => 'city' ).set business[ 'business_city' ]
+   #@browser.select_list( :id => 'state' ).select business[ 'business_state' ]
+  @browser.text_field( :id => 'zip' ).set business[ 'business_zip' ]
+  @browser.text_field( :id => 'phone' ).set business[ 'business_phone' ]
+  @browser.text_field(:id => 'acseccat1').set business['business_category']
   sleep 2
+  Watir::Wait.until{@browser.li(:text => /#{business['business_category']}/).exists?}
+  @browser.li(:text => /#{business['business_category']}/).click
+
+  sleep 2
+  @browser.button(:id => 'scannow').click
+  sleep 2
+  @browser.button(:id => 'not-listed-button').when_present.click
+
+  sleep 2
+  @browser.checkbox(:id => 'atc').click
+  sleep 2
+  @browser.button(:id => 'submitbtn').click
+
+  sleep 2
+
+  @browser.radio(:id => 'opt-phone').when_present.click
+  sleep 2
+  @browser.button(:id => 'btn-phone').when_present.click
+  code = PhoneVerify.retrieve_code("Yahoo")
+  @browser.text_field(:id => 'txtCaptcha').set code
+  sleep 4
+  @browser.button(:id => 'btnverifychannel').click
+  sleep 5
+
+  if @browser.text.include? "The verification code you submitted was incorrect. Please enter the new verification code."
+    throw "Phone code was incorrect"
+  end
+
+sleep 2
+Watir::Wait.until {@browser.text.include? "Your Yahoo! Marketing Dashboard is ready for you to use, and your business information is being reviewed by Yahoo! Local."}
+
+true
+#preview_and_submit(business)
+  
+=begin
   @browser.text_field( :id => 'cfirstname' ).when_present.set business[ 'first_name' ]
   @browser.text_field( :id => 'clastname' ).set business[ 'last_name' ]
   @browser.text_field( :id => 'email' ).set business[ 'email' ]
@@ -50,12 +93,6 @@ def provide_business_info( business )
  
 
     # .. fill all the info because its blank
-    @browser.text_field( :id => 'bizname' ).set business[ 'business_name' ]
-    @browser.text_field( :id => 'addr' ).set business[ 'business_address' ]
-    @browser.text_field( :id => 'city' ).set business[ 'business_city' ]
-    @browser.select_list( :id => 'state' ).select business[ 'business_state' ]
-    @browser.text_field( :id => 'zip' ).set business[ 'business_zip' ]
-    @browser.text_field( :id => 'addphone' ).set business[ 'business_phone' ]
     # TODO: add website @browser.text_field( :id => '?' ).set business[ 'business_website' ]
 
     
@@ -70,9 +107,9 @@ def provide_business_info( business )
 
     sleep(3)
     Watir::Wait::until do @browser.text.include? 'Optional Business Information' end
+=end
 
 
-preview_and_submit(business)
 
 end
 =begin
@@ -127,16 +164,12 @@ end
 =end
 
 def main( business )
-  #sign_in(business)
+  sign_in(business)
 
   goto_sign_up(business)
   provide_business_info( business )
 end
 
 main(data)
-
-if @chained
-  self.start("Yahoo/Notify")
-end
 
 true

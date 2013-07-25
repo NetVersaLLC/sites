@@ -100,7 +100,7 @@ self.save_account("Yahoo", {:email => data['business_email'], :password => data[
 
 sleep 10
 if @chained
-  self.start("Yahoo/CreateListing")
+  self.start("Yahoo/Notify")
 end
 
 true

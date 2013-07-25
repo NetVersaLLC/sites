@@ -72,6 +72,7 @@ rescue
 end
 enter_captcha2( data )
 
+sleep 2
 Watir::Wait.until { @browser.text.include? "Verify your email address" }
 
 if @browser.text.include? "Verify your email address"

@@ -28,5 +28,5 @@ data[ 'busFaxNXX' ]		= business.fax_number.split("-")[1]
 data[ 'busFaxPlusFour' ]	= business.fax_number.split("-")[2]
 data[ 'paymentTypes' ] = [ :AmericanExpress, :DebitCard, :MasterCard ]
 data[ 'languagesSpoken' ] = [ :English, :Spanish ]
-data[ 'yearEstablished' ] = business.year_founded
+data[ 'yearEstablished' ] = business.year_founded.to_s
 data

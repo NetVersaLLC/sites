@@ -42,7 +42,10 @@ prefix= data[ 'prefix' ]
 if prefix == 'Miss.'
 	prefix = "Ms."
 end
-@browser.select_list( :name, 'prefix' ).select prefix
+
+if not prefix == ""
+	@browser.select_list( :name, 'prefix' ).select prefix
+end
 #Code addition/update by Coin ends here.
 @browser.text_field( :name => 'firstName' ).set data[ 'firstName' ]
 @browser.text_field( :name => 'lastName' ).set data[ 'lastName' ]
@@ -75,14 +78,19 @@ data[ 'languagesSpoken' ].each { |item|
 @browser.text_field( :name => 'yearEstablished' ).set data[ 'yearEstablished' ]
 @browser.button( :name, 'nextButton' ).click
 
-
-Watir::Wait::until{ @browser.text.include? "Choose the Correct Address" or @browser.text.include? "Pick the best place for your business"}
+sleep 2
+Watir::Wait::until{ @browser.text.include? "Choose the Correct Address" or @browser.text.include? "Pick the best place for your business" or @browser.text.include? "Choose the Correct Company"}
 
 # Confirm on Choose the Correct Address page
 if @browser.text.include? "Choose the Correct Address"
 @browser.button( :name, 'nextButton' ).click
 end
 
+if @browser.text.include? "Choose the Correct Company"
+	@browser.button(:name => 'nextButton').click
+end
+
+sleep 2
 Watir::Wait::until{ @browser.text.include? "Pick the best place for your business"}
 
 # Select on Choose Category page
@@ -91,11 +99,12 @@ Watir::Wait.until{ @browser.select_list( :id, 'category' ).exists? }
 @browser.select_list( :id, 'category' ).select /#{data[ 'category' ]}/
 @browser.button( :name, 'nextButton' ).click
 
-
+sleep 2
 Watir::Wait::until{ @browser.text.include? "Add Specialties" }
 @browser.button( :name, 'nextButton' ).click
 
 #Coin code addition Start
+sleep 2
 Watir::Wait::until{ @browser.text.include? "Add Specialties" }
 @browser.button( :name, 'nextButton' ).click
 
@@ -113,7 +122,8 @@ Watir::Wait::until{ @browser.text.include? "Add Specialties" }
 
 
 
-RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['userName'], 'account[password]' => data['pass'], 'account[secret_answer]' => data['answer'], 'model' => 'Kudzu'
+#RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['userName'], 'account[password]' => data['pass'], 'account[secret_answer]' => data['answer'], 'model' => 'Kudzu'
+self.save_account("Kudzu", {:username=>data['userName'], :password=>data['pass'], :secret_answer=>data['answer']})
 puts("Business SingUp Success!")
 
 #Kudzu.notify_of_join( key )

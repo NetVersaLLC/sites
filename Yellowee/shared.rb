@@ -19,6 +19,8 @@ def enter_captcha( data )
 		@browser.text_field( :id => 'id_password2' ).set data[ 'password' ]
 		@browser.button( :name => 'submit_new_user' ).click
 		
+		sleep 5
+		Watir::Wait.until{ @browser.text.include? "You have successfully registered." or @browser.text.include? "The CAPTCHA solution was incorrect." }
 		if not @browser.text.include? "The CAPTCHA solution was incorrect."
 			capSolved = true
 		end	  

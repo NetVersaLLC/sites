@@ -19,7 +19,9 @@
 @browser.text_field( :id => 'id_email2' ).set data[ 'email' ]
 @browser.checkbox( :id => 'id_tos' ).click
 
+# Wait included in captcha solve, no wait needed after captcha
 enter_captcha( data )
+
 
 RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['email'], 'account[password]' => data['password'], 'model' => 'Yellowee'
 

@@ -7,8 +7,8 @@
 @browser.text_field( :name => 'last_name').set data['lname']
 @browser.text_field( :name => 't8').set data['email']
 
-data['logo'] == '' unless File.exist? data['logo']
-@browser.file_field(:xpath => "//input[@name='f2']").set data['logo']
+logo = self.logo
+@browser.file_field(:xpath => "//input[@name='f2']").set logo
 
 @browser.text_field( :name => 't1').set data['business']
 @browser.text_field( :name => 't16').set data['addressComb']

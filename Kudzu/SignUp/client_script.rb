@@ -75,22 +75,26 @@ data[ 'languagesSpoken' ].each { |item|
 @browser.text_field( :name => 'yearEstablished' ).set data[ 'yearEstablished' ]
 @browser.button( :name, 'nextButton' ).click
 
-
+sleep 2
 Watir::Wait::until{ @browser.text.include? "Choose the Correct Address" or @browser.text.include? "Pick the best place for your business"}
 
+RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['userName'], 'account[password]' => data['pass'], 'account[secret_answer]' => data['answer'], 'model' => 'Kudzu'
 # Confirm on Choose the Correct Address page
 if @browser.text.include? "Choose the Correct Address"
 @browser.button( :name, 'nextButton' ).click
 end
 
+sleep 2
 Watir::Wait::until{ @browser.text.include? "Pick the best place for your business"}
 
 # Select on Choose Category page
 @browser.select_list( :id, 'industry' ).select /#{data[ 'industry' ]}/
+sleep 2
 Watir::Wait.until{ @browser.select_list( :id, 'category' ).exists? }
 @browser.select_list( :id, 'category' ).select /#{data[ 'category' ]}/
 @browser.button( :name, 'nextButton' ).click
 
+sleep 2
 Watir::Wait::until{ @browser.text.include? "Add Specialties" }
 @browser.button( :name, 'nextButton' ).click
 
@@ -107,7 +111,7 @@ Watir::Wait::until{ @browser.text.include? "Add Specialties" }
 @browser.checkbox( :name, 'businessAgreement' ).set
 @browser.button( :name, 'submitButton' ).click
 
-RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['userName'], 'account[password]' => data['pass'], 'account[secret_answer]' => data['answer'], 'model' => 'Kudzu'
+
 puts("Business SingUp Success!")
 
 if @chained

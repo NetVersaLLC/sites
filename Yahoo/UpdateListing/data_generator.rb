@@ -19,7 +19,7 @@ data[ 'business_zip' ]      = business.zip
 data[ 'business_website' ]  = business.company_website
 data[ 'business_phone' ]    = business.local_phone
 catty = Yahoo.where(:business_id => business.id).first
-data[ 'business_category' ] = catty.yahoo_category.subcatname
+data[ 'business_category' ] = catty.yahoo_category.name
 data[ 'fax_number' ]        = business.fax_number
 data[ 'year_established' ]  = business.year_founded
 data[ 'payment_methods' ]   = Yahoo.payment_methods(business)

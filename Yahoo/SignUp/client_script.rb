@@ -1,5 +1,9 @@
-@browser.goto( 'http://listings.local.yahoo.com/' )
-@browser.link( :text => /New User?/ ).click
+@browser.goto( 'http://smallbusiness.yahoo.com/local-listings/' )
+@browser.link( :id => "yucs-login_signIn" ).click
+
+sleep 2
+@browser.link(:id => 'signUpBtn').when_present.click
+
 
 #@browser.link(:id => 'signUpBtn').click
 sleep 2
@@ -12,32 +16,37 @@ begin
   subtries = 3
   while subtries > 0
     seed = rand(10).to_s
-    @browser.text_field(:id => 'yahooid').set data['username'] + seed
+    puts "1"
+
+    @browser.text_field(:id => 'yahooid').send_keys(data['username'] + seed)
+    puts "2"
+    sleep 5
+    @browser.send_keys :tab
+    puts "3"
     sleep 2
-    @browser.text_field(:id => 'yahooid').send_keys :tab
-    @browser.text_field(:id => 'password').focus
-  
+    @browser.text_field(:id => 'password').focus    
     sleep(8 - retries)
 
     if @browser.text.include? "This ID is not available"
+      puts "6"
       subtries -= 1
       next
     else
       data['username'] = data['username'] + seed + "@yahoo.com"
+      puts "7"
       data['business_email'] = data['username']
       nameFound = true
     end
-    if nameFound == true
-      break
-    end
+    break if nameFound == true      
     
   end
-
+puts "8"
   sleep 4
-  Watir::Wait.until(8) { @browser.span( :id => 'choosenyid' ).text ==  data['business_email']}
+  Watir::Wait.until(8) { @browser.span( :id => 'choosenyid' ).visible?}
 
 rescue Watir::Wait::TimeoutError
   if retries > 0
+    puts "9"
     puts("Something went wrong while choosing the username. Changing approach and trying again.")
     case retries
     when 3
@@ -88,10 +97,13 @@ Watir::Wait.until{ @browser.button( :id => 'VerifyCollectBtn' ).exist? }
 sleep 5
 puts data['business_email']
 puts data['password']
+
+self.save_account("Yahoo", {:email => data['business_email'], :password => data['password'], :secret1 => data['secret_answer_1'], :secret2 => data['secret_answer_2']})
+
 retry_captcha(data)
 sleep 5
 
-self.save_account("Yahoo", {:email => data['business_email'], :password => data['password'], :secret1 => data['secret_answer_1'], :secret2 => data['secret_answer_2']})
+
 #Watir::Wait.until { @browser.button( :id => 'ContinueBtn' ).exists? }
 
 #@browser.button( :id => 'ContinueBtn' ).click

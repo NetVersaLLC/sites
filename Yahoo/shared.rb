@@ -29,7 +29,7 @@ def retry_captcha(data)
     @browser.button( :id => 'VerifyCollectBtn' ).click  # if @browser.button( :id => 'IAgreeBtn' ).exist?
     #@browser.button( :id => 'VerifyCollectBtn' ).click if @browser.button( :id => 'VerifyCollectBtn' ).exist?
      sleep(3)
-     Watir::Wait.until { @browser.div(:id => 'details').exists? or @browser.text.include? "Please try this code instead"}
+     Watir::Wait.until(120) { @browser.div(:id => 'details').exists? or @browser.text.include? "Please try this code instead" }     
     if @browser.text.include? "Please try this code instead"#@browser.div(:id => 'details').exists?
       capSolved = false
     else

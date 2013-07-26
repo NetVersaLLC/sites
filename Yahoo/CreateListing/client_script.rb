@@ -53,12 +53,18 @@ def provide_business_info( business )
   sleep 2
   @browser.button(:id => 'scannow').click
   sleep 2
-  @browser.button(:id => 'not-listed-button').when_present.click
 
+  Watir::Wait.until { @browser.button(:id => 'not-listed-button').exists? or @browser.checkbox(:name => 'tos').exists?}
+
+  if @browser.button(:id => 'not-listed-button').exists?
+    @browser.button(:id => 'not-listed-button').click
+  end
+
+#@browser.text_field(:name => 'accphone').set business['phone']
   sleep 2
-  @browser.checkbox(:id => 'atc').click
+  @browser.checkbox(:name => 'tos').when_present.click
   sleep 2
-  @browser.button(:id => 'submitbtn').click
+  @browser.button(:text => 'Submit information').click
 
   sleep 2
 

@@ -14,5 +14,4 @@ data[ 'zip' ] 	 	   	= business.zip
 data[ 'country' ]  	    = 'United States'
 data[ 'image' ]  	    = business.logo_file_name
 data[ 'password' ]	    = business.thumbtacks.first.password
-data[ 'url' ]			= Thumbtack.check_email(business)
 data

@@ -1,4 +1,8 @@
-name=data['name']
+
+
+# COPY AND PASTE THE CONTENTS OF SearchListing/client_script.rb here
+
+name=data['name'].gsub(" ","%20")
 city=data['city']
 state=data['state']
 zip=data['zip']
@@ -6,7 +10,6 @@ url="http://www.kudzu.com/controller.jsp?N=0&searchVal=#{name}&currentLocation=#
 businessFound = {}
 businessFound['status'] = :unlisted
 name=data['name'].gsub("%20"," ")
-cost=0
 nok = Nokogiri::HTML(RestClient.get url)
 nok.css("div.nvrBox").each do |bi|
         if (bi.css("h3.nvrName a").text) =~ /#{name}/i
@@ -23,13 +26,13 @@ nok.css("div.nvrBox").each do |bi|
             businessFound['listed_phone'] = subpage.search("span.tel").text            
             businessFound['listed_phone'] = businessFound['listed_phone'].gsub("(","")
             businessFound['listed_phone'] = businessFound['listed_phone'].gsub(") ","-")            
-            cost=1
             break
         end
 end
-if cost == 1
-    puts("Business listed.")
-else
-    puts("Business not listed.")
-end
-[true,businessFound]
+
+#######
+###
+
+
+puts(businessFound)
+[true, businessFound]

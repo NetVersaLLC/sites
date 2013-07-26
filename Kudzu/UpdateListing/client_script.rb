@@ -21,13 +21,13 @@ languages_spoken = {
 
 sign_in(data)
 
-Watir::Wait.until { @browser.text.include? "My Dashboard" }
+Watir::Wait::until { @browser.text.include? "My Dashboard" }
 
 @browser.link( :text => /Business Account Contact/).click
 
 #Code added by Coin starts below.
 #The prefix need to be modified as per the list of the table...As there is no miss all the miss are missing...
-prefix= data[ 'prefix' ]
+prefix=data[ 'prefix' ]
 if prefix == 'Miss.'
 	prefix = "Ms."
 end
@@ -65,13 +65,12 @@ data[ 'languagesSpoken' ].each { |item|
 @browser.text_field( :name => 'yearEstablished' ).set data[ 'yearEstablished' ]
 @browser.button( :name, 'nextButton' ).click
 
-if Watir::Wait.until { @browser.text.include? "An exact location for" }
+if Watir::Wait::until { @browser.text.include? "Edit or delete your additional locations here. Your changes will be published on Kudzu.com within 24 hours." }
+	@browser.button(:name => /editButton/i).click
+	puts("The Business Update successfull!")	
+elsif Watir::Wait::until { @browser.text.include? "An exact location for" }
 	@browser.button(:name, 'nextButton').click
-end
-
-
-Watir::Wait.until { @browser.text.include? "Edit or delete your additional locations here." }
-
-puts("The Business Ipdate successfull!")
-
+	Watir::Wait::until { @browser.text.include? "Edit or delete your additional locations here." }
+	puts("The Business Update successfull!")	
+end	
 true

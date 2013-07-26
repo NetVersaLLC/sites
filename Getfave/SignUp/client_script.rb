@@ -3,7 +3,6 @@ url = 'https://www.getfave.com'
 @browser.goto url
 
 sign_in data
-
 #~ throw("Login unsuccessful") if @sign_in.exist?
 
 # Check for login error
@@ -19,8 +18,11 @@ if @login_error.exist?
 end
 
 if @browser.text.include? 'Please correct the errors and try again.'
-	throw "There are an error while creating the account"
+	throw "There is an error while creating the account"
 end
+
+sleep 4
+Watir::Wait.until { @browser.text.include? "You must check your email to activate your account before continuing." }
 
 self.save_account("Getfave", {:email => data['email'], :password => data['password']})
 	puts "Signup successful. Verifying email to continue"

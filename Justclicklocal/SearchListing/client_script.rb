@@ -20,5 +20,6 @@ if page.css("ol.initial-results") #Do results even exist?
 end
 
 
+
 [true, businessFound]
 end

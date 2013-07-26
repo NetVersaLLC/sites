@@ -1,3 +1,5 @@
+
+
 sign_in( data )
 
 @browser.goto('http://www.ibegin.com/business-center/submit/')
@@ -12,36 +14,32 @@ sleep(1)
 @browser.text_field( :name, 'zip').set data['zip']
 @browser.text_field( :name, 'phone').set data['phone']
 @browser.text_field( :name, 'fax').set data['fax']
-
+category = data[ 'category1' ]
 query = data[ 'category1' ]
 wordcount = data[ 'category1' ].split(" ").size
 count = 0
 #Categories
 #Category selection involves a popup window that must be attached to than the category searched for, then selected.
 # If the category cannot be found it will split the category into single words and search word by word until it finds the category
-begin
-	@browser.div( :id => 'id_category1_wrap', :index => 0 ).link( :title, 'Select' ).click
-	@browser.window( :title, "Categories Selector | iBegin").when_present.use do
-		sleep(3)
-		@browser.text_field( :id, 'id_q').set query
-		@browser.button( :value, 'Go').click
-		sleep(2)
-		@browser.link( :text => /#{data[ 'category1' ]}/i).click
-		
-	end
-rescue Watir::Exception::UnknownObjectException
-	if wordcount > 0
-		query = data[ 'category1' ].split(" ")[count]
-		count += 1
-		retry
+@browser.div( :id => 'id_category1_wrap', :index => 0 ).link( :title, 'Select' ).click
+
+sleep 2
+Watir::Wait.until { @browser.window( :title, "Categories Selector | iBegin").exists? }
+
+@browser.window( :title, "Categories Selector | iBegin").when_present.use do
+	@browser.text_field( :id, 'id_q').set query
+	@browser.button( :value, 'Go').click
+	sleep 4
+	if @browser.link(:text => "#{data['category1']}").exists?
+		@browser.link(:text => "#{data['category1']}").click
 	else
-		throw "Could not find the specified category: #{data['category1']}"
-	end
-
-rescue Exception => e
-    puts(e.inspect)
-
+		loop_cats(data)
+	end		
 end
+
+
+
+sleep 5
 
 data[ 'payment_methods' ].each{ | method |
     @browser.checkbox( :id => /#{method}/ ).click

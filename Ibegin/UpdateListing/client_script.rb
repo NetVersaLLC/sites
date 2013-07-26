@@ -25,13 +25,24 @@ sleep(1)
 #Categories
 #Category selection involves a popup window that must be attached to than the category searched for, then selected.
 @browser.div( :id => 'id_category1_wrap', :index => 0 ).link( :title, 'Select' ).click
+
+sleep 2
+Watir::Wait.until { @browser.window( :title, "Categories Selector | iBegin").exists? }
+
 @browser.window( :title, "Categories Selector | iBegin").when_present.use do
-sleep(3)
-	@browser.text_field( :id, 'id_q').set data[ 'category1' ]
+	@browser.text_field( :id, 'id_q').set query
 	@browser.button( :value, 'Go').click
-	sleep(2)
-	@browser.link( :text => /#{data[ 'category1' ]}/i).click
+	sleep 4
+	if @browser.link(:text => "#{data['category1']}").exists?
+		@browser.link(:text => "#{data['category1']}").click
+	else
+		loop_cats(data)
+	end		
 end
+
+
+
+sleep 5
 
 data[ 'payment_methods' ].each{ | method |
     @browser.checkbox( :id => /#{method}/ ).clear

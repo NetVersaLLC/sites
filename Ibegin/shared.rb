@@ -27,3 +27,25 @@ retries = 5
    		end
 	end
 end
+
+
+def loop_cats(data)
+	catarray = data['category1'].split(" ")
+	wordcount = catarray.length
+	count = 0
+	
+	while wordcount > count
+		@browser.window( :title, "Categories Selector | iBegin").when_present.use do
+			query = catarray[count]
+			@browser.text_field( :id, 'id_q').set query
+			@browser.button( :value, 'Go').click
+			sleep 5
+			if @browser.link(:text => /#{query}/i).exists?
+				@browser.link(:text => /#{query}/i).click
+				break
+			end
+			count+=1
+		end
+	end
+
+end

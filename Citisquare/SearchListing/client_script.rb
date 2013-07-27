@@ -1,25 +1,37 @@
-@browser = Watir::Browser.new
-@browser.goto('http://my.citysquares.com/search')
-@browser.text_field(:name => 'b_standardname').set data['business']
-@browser.text_field(:name => 'b_zip').set data['zip']
-@browser.button(:id => 'edit-b-search').click
-sleep(5)
-businessFound = {}
-if @browser.link(:text => data['business']).exists?
-  em = @browser.link(:text => data['business'])
-  if em.exists?
-    businessFound['listed_url']     = em.attribute_value("href")
-    businessFound['listed_address'] = em.parent.text
-    if em.parent.parent.link(:id => 'claimButton').exists?
-      businessFound['status'] = :listed
-    else
-      businessFound['status'] = :claimed
+resp = RestClient.post 'http://my.citysquares.com/add_search', {
+  'b_standardname'  => data['business'],
+  'b_zip'           => data['zip']
+}
+#puts resp.headers
+
+nok = Nokogiri::HTML resp
+
+
+businessListed = {}
+businessListed['status'] = :unlisted
+
+
+nok.css('div#bizData').each do |listing|
+
+  listing.xpath("//a[1]").each do |link|
+    
+    if link.text =~ /#{data['business']}/i
+      businessListed['status'] = :claimed
+      businessListed['url'] = link.attr("href")
+
+      resp2 = RestClient.get(businessListed['url'])
+      nok2 = Nokogiri::HTML(resp2)
+
+      businessListed['listed_phone'] = nok2.css("div#bizPhone").text
+      businessListed['listed_address'] = nok2.css("span.street-address").text + ", " + nok2.css("span.locality").text + ", " + nok2.css("span.region").text + ", " + nok2.css("span.postal-code").text
+      businessListed['listed_name'] = data['business']
+
+      break
     end
-    else
-      businessFound['status'] = :unlisted
+
   end
-  else 
-    businessFound['status'] = :unlisted
+  #businessListed['listed_url'] = listing.xpath("//a").attr("href")
+
 end
-at_exit do @browser.close end
-[true, businessFound]
+
+[true, businessListed]

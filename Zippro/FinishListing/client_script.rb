@@ -14,7 +14,7 @@ sign_in(data)
 
 @browser.button(:id => 'btnSubBusInfo').click
 #End Updating Basic Info
-
+data['logo']				= self.logo
 Watir::Wait.until { @browser.text.include? "Business Info has been saved."}
 
 #Begin Updating Logo
@@ -43,7 +43,8 @@ end
 	@browser.text_field(:id => 'website').set data['website']
 	@browser.button( :id => 'btnSubContInfo').click
 #End Updating Website & Email
-
+sleep 2 
+@browser.button( :id => 'btnSubContInfo').wait_while_present
 #Begin Updating Summary Description
 	@browser.div( :id => 'brief_desc').a.hover
 	sleep(1)

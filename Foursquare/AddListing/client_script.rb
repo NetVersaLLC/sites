@@ -16,16 +16,8 @@ puts data['phone']
 sleep 2
 @browser.select_list(:name => 'secondLevelCategory').when_present.select data['category']
 
-puts "1"
-	5.times do
-		@browser.link(:title => "Zoom in").click
-		puts "2"
-		sleep 3
-	end 
-puts "3"
-sleep 3
-@browser.image(:xpath => '//img[@class="leaflet-tile leaflet-tile-loaded"]').click
-
+sleep 5
+@browser.image(:xpath => '//img[@class="leaflet-tile leaflet-tile-loaded"][4]').click
 sleep 5
 
 @browser.button(:value => 'Save').click

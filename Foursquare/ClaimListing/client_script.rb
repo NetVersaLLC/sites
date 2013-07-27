@@ -26,7 +26,7 @@ puts "6"
 sleep 2
 code = @browser.text_field(:id, 'phoneField').when_present.value
 puts "7" + code
-verified = PhoneVerify.send_code("Foursquare", code)
+verified = PhoneVerify.send_code("foursquare", code)
 puts "8"
 until @browser.span( :text, 'Continue').visible?
 	puts "9"
@@ -36,9 +36,10 @@ end
 puts "10"
 sleep 3
 
-@browser.checkbox( :id, 'finalVerificationOption' ).click
+@browser.checkbox( :id, 'finalVerificationOption' ).when_present.click
 puts "11"
-@browser.link( :text, 'Mail me a verification code!').click
+sleep 2
+@browser.link( :text, 'Mail me a verification code!').when_present.click
 puts "12"
 
 end

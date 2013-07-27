@@ -1,45 +1,86 @@
-@browser = Watir::Browser.new
-def search_for_business( business )
+phone = data['phone']
+name = data['business']
+zip = data['zip']
 
-businessFound = {}
-  @browser.goto( 'http://www.bing.com/businessportal/' ) 
-  sleep 2
-  @browser.button( :value , 'Get Started' ).when_present.click
-  sleep 2
-  @browser.link(:title => 'Add Your Business').when_present.click
-  
+html = RestClient.get "https://www.bingplaces.com/DashBoard"
 
-  
-    sleep 2
-    @browser.execute_script("hidePopUp()")
-    @browser.text_field(:name => 'PhoneNumber').when_present.set business['phone']
-    @browser.execute_script("hidePopUp()")
-    @browser.button(:value => 'Search').click
-    @browser.execute_script("hidePopUp()")
-    sleep 2
-    Watir::Wait.until(10) { @browser.text.include? "Search Results" or @browser.text.include? "We found no businesses with the given information"}
+nok = Nokogiri::HTML( html )
+my_token = nil
+trace_id = nil
+nok.xpath("//input[@name='__RequestVerificationToken']").each do |token|
+  my_token = token.attr('value')
 
-    sleep 10
-
-    @browser.links.each do |nk|
-      next if not nk.attribute_value("title")
-      next if not nk.visible?
-      puts "Incoming link title:"
-      puts nk.attribute_value("title")
-
-    end
-
-    if @browser.link(:title => /#{business['business']}/i).exists?
-      businessFound['status'] = :listed
-      thelinky = @browser.link(:title => /#{business['business']}/i)      
-      businessFound['listed_name'] = thelinky.attribute_value("href")
-      businessFound['listed_address'] = @browser.p(:xpath => '//*[@id="0"]/tbody/tr/td[2]/p[1]').text + @browser.p(:xpath => '//*[@id="0"]/tbody/tr/td[2]/p[2]').text
-    else
-      businessFound['status'] = :unlisted
-    end
-  return businessFound
 end
 
-businessFound = search_for_business(data)
-at_exit do @browser.close end
-[true, businessFound]
+nok.xpath("//input[@name='traceId']").each do |token|
+  trace_id = token.attr('value')
+end
+headers = html.headers
+cookie = headers[:set_cookie]
+
+sessId = cookie[0].split(";")[0]
+reqTok = cookie[3].split(";")[0]
+culture = cookie[2].split(";")[0]
+theCookie = culture + "; " + reqTok + "; " + sessId
+
+
+url = 'https://www.bingplaces.com/DashBoard/PerformSearch'
+
+params = {'__RequestVerificationToken' => my_token,
+'TraceId' => trace_id,
+'Market' => 'en-US',
+'PhoneNumber' => phone,
+'BusinessName' => '',
+'City' => '',
+'SearchCond' => 'SearchByCountryAndPhoneNumber',
+'ApplicationContextId' => 'undefined'}
+
+rheaders = {
+  'Accept' => "*/*",
+  "Accept-Encoding" => "gzip,deflate,sdch",
+  "Accept-Language" => "en-US,en;q=0.8",
+  "Connection" => "keep-alive",
+  "Content-Length" => "337",
+  "Content-Type" => "application/x-www-form-urlencoded; charset=UTF-8",
+  "Cookie" => theCookie,
+  "Host" => "www.bingplaces.com",
+  "Origin" => "https://www.bingplaces.com",
+  "Referer" => "https://www.bingplaces.com/DashBoard",
+  "User-Agent" => "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.72 Safari/537.36",
+  "X-Requested-With" => "XMLHttpRequest"
+}
+
+#puts params
+
+resp = RestClient.post url,params,rheaders
+resNok = Nokogiri::HTML(resp)
+
+businessListed = {}
+businessListed['status'] = :unlisted
+
+if result = resNok.xpath("//a[@title='#{name}']")
+
+  businessListed['listed_url'] = result.attr("href").text
+  businessListed['listed_phone'] = phone
+  businessListed['listed_name'] = result.text
+  
+  listPage = RestClient.get result.attr("href").text
+  listNok = Nokogiri::HTML(listPage)    
+
+  businessListed['listed_address'] = listNok.css("span.business_address")[0].text
+  
+
+  if resNok.css('a[@value="Select"]')
+    businessListed['status'] = :unclaimed
+  else
+    businessListed['status'] = :claimed
+  end
+
+
+  #puts resNok.xpath('//*[@id="0"]/tbody/tr/td[2]/p[1]').text  
+  #puts resNok.xpath("a[@title='#{name}']following-sibling")
+
+end
+
+#puts resp
+[true, businessListed]

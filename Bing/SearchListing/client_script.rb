@@ -71,7 +71,7 @@ if result = resNok.xpath("//a[@title='#{name}']")
   
 
   if resNok.css('a[@value="Select"]')
-    businessListed['status'] = :unclaimed
+    businessListed['status'] = :listed
   else
     businessListed['status'] = :claimed
   end

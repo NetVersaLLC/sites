@@ -36,6 +36,9 @@ else
   @confirmation = @browser.div(:id => 'landingWelcome')
   @confirmation_msg = "Welcome to your business dashboard #{data['first_name']}"
   
+sleep 2 
+Watir::Wait.until{ @browser.text.include? @confirmation_msg}
+
   #Check for successful registration
   if @confirmation.exist? && @confirmation.text.include?(@confirmation_msg)
     puts "Business successfully registered"

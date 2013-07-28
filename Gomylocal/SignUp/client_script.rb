@@ -8,7 +8,9 @@
 @browser.text_field( :name => 't8').set data['email']
 
 logo = self.logo
-@browser.file_field(:xpath => "//input[@name='f2']").set logo
+if logo 
+	@browser.file_field(:xpath => "//input[@name='f2']").set logo
+end
 
 @browser.text_field( :name => 't1').set data['business']
 @browser.text_field( :name => 't16').set data['addressComb']
@@ -30,7 +32,7 @@ sleep(4)
 @browser.checkbox( :name => 'ch1').click
 enter_captcha( data )
 
-@browser.image( :name => 'imgFinish').click
+#@browser.image( :name => 'imgFinish').click
 
 sleep 2
 Watir::Wait.until { @browser.text.include? "Congratulations your listing is now activate." }

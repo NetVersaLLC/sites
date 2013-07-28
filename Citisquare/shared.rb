@@ -4,6 +4,10 @@ def login(data)
   @browser.button(:value => 'Log In').click
 
   #check for validation error
+
+  sleep 3
+  Watir::Wait.until{ @browser.link(:text => 'My Account').exists? or @browser.text.include? 'Sorry, unrecognized username or password'}
+
   if @browser.text.include? 'Sorry, unrecognized username or password'
     puts "User name doesn't exist. Creating a new one"
     sign_up data

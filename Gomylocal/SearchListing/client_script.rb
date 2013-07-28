@@ -1,4 +1,5 @@
 #Written by Kazyyk, 7/25/13
+#Made better by bluedot, on the evening of July 27th, the year of our Lord, 2013
 
 data['businessfixed'] = data['business'].gsub(" ","+").gsub(",","")
 
@@ -6,7 +7,7 @@ page = Nokogiri::HTML(open("http://www.gomylocal.com/listings/" + data['zip'] + 
 if page.at_css("a.links_12pt_bold").text.include? data['business'] then
   if not page.at_xpath("//a[text()='Claim Business']").nil? then
     puts("Business is not claimed")
-    businessFound['status'] = :unclaimed
+    businessFound['status'] = :listed
   else
     puts("Business is claimed")
     businessFound['status'] = :claimed

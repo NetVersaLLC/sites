@@ -10,6 +10,7 @@ url = "http://www.hotfrog.com/Login.aspx"
 @browser.span(:text, /Login/).click
 
 #Let's make sure we're in the right place
+sleep 2
 Watir::Wait.until { @browser.text.include? "My dashboard" }
 
 #Start adding some minor stuff
@@ -21,6 +22,8 @@ Watir::Wait.until { @browser.text.include? "Fax number" }
 
 #Check those payment details
 @browser.link(:id, /EditPaymentDetails/).click
+
+sleep 2
 Watir::Wait.until { @browser.text.include? "Payment options"}
 
 data[ 'payments' ].each{ | pay |
@@ -30,12 +33,14 @@ data[ 'payments' ].each{ | pay |
 @browser.span(:text, /Submit/).click
 
 #We're coming full circle.
+sleep 2
 Watir::Wait.until { @browser.text.include? "Business details" }
 
 #Set trading hours
 @browser.link(:id, /EditOpeningHours/).click
 @browser.radio(:id, /SpecifiedHours_1/).set
 @browser.checkbox(:id, /DayRepeater/).clear #Clear closed days
+
 
 if data['24hours'] == true
 	@browser.select_list( :id, "ctl00_contentSection_ctrlTradingHours_DayRepeater_ctl00_OpeningTime").select "12:00 AM"
@@ -68,14 +73,20 @@ count = 0
 	      close[0] = ""
 	    end
 	    puts"7"
-			@browser.select_list( :id, "ctl00_contentSection_ctrlTradingHours_DayRepeater_ctl0#{count}_OpeningTime").select open.upcase
+	    	if @browser.select_list( :id, "ctl00_contentSection_ctrlTradingHours_DayRepeater_ctl0#{count}_OpeningTime").visible?
+				@browser.select_list( :id, "ctl00_contentSection_ctrlTradingHours_DayRepeater_ctl0#{count}_OpeningTime").select open.upcase
+			end
 			puts"8"
-			@browser.select_list( :id, "ctl00_contentSection_ctrlTradingHours_DayRepeater_ctl0#{count}_ClosingTime").select close.upcase
+			if @browser.select_list( :id, "ctl00_contentSection_ctrlTradingHours_DayRepeater_ctl0#{count}_ClosingTime").visible?
+				@browser.select_list( :id, "ctl00_contentSection_ctrlTradingHours_DayRepeater_ctl0#{count}_ClosingTime").select close.upcase
+			end
 			puts"9"
 			count += 1
 		else
 			puts"10"
-			@browser.checkbox( :id => "ctl00_contentSection_ctrlTradingHours_DayRepeater_ctl0#{count}_Closed").set
+			if @browser.checkbox( :id => "ctl00_contentSection_ctrlTradingHours_DayRepeater_ctl0#{count}_Closed").visible?
+				@browser.checkbox( :id => "ctl00_contentSection_ctrlTradingHours_DayRepeater_ctl0#{count}_Closed").set
+			end
 			puts"11"
 			count += 1
 		end
@@ -87,6 +98,7 @@ end
 @browser.span(:text, /Submit/).click
 
 #Did we complete the form?
+sleep 2
 Watir::Wait.until { @browser.text.include? "Business details" }
 @browser.span(:text, /Submit/).click
 if @browser.text.include? "Do you want to continue?" then

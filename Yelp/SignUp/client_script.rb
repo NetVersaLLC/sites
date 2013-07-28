@@ -95,6 +95,7 @@ if not businessListed
         puts "Somekinda error"
     end
 else
-    puts "Not yet"
+    puts "Already listed"
+    true
 end
 

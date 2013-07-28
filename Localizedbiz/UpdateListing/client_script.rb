@@ -1,5 +1,4 @@
 sign_in(data)
-
 @browser.goto("http://www.localizedbiz.com/login/manage.php")
 
 @browser.link(:text => /Edit/).click
@@ -18,14 +17,18 @@ raise Exception, 'Website URL should be provided.' unless data['website']
 @browser.text_field( :name => 'url').set data['website'] 
 @browser.select_list( :name => 'biz_cat1').select data['category1']
 @browser.select_list( :name => 'biz_cat2').select data['category2']
-@browser.text_field( :name => 'keywords').set data['keywords']
+@browser.textarea( :name => 'keywords').set data['keywords']
 @browser.text_field( :name => 'tagline').set data['tagline']
-@browser.text_field( :name => 'description').set data['description']
+@browser.textarea( :name => 'description').set data['description']
 
-@browser.file_field( :name => 'new_image').set data['image'] unless data['image'].nil?
+unless self.logo.nil? 
+  @browser.file_field(:name => 'new_image').set self.logo
+else
+  @browser.file_field(:name => 'new_image').set self.images.first unless self.images.nil?
+end
 
 @browser.button( :name => 'submit').click
-
+sleep 2
 Watir::Wait.until { @browser.text.include? "Data Successfully Updated" }
 
 true

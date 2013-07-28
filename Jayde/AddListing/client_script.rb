@@ -18,7 +18,10 @@
 @browser.text_field(:xpath => '//*[@id="additional-info-form"]/tbody/tr[12]/td[2]/input').set data['twitter_account']
 @browser.text_field(:xpath => '//*[@id="additional-info-form"]/tbody/tr[13]/td[2]/input').set data['twellow_account']
 @browser.text_field(:xpath => '//*[@id="additional-info-form"]/tbody/tr[14]/td[2]/input').set data['youtube_url']
-@browser.text_field(:xpath => '//*[@id="additional-info-form"]/tbody/tr[15]/td[2]/input').set data['company_logo_url']
+#@browser.text_field(:xpath => '//*[@id="additional-info-form"]/tbody/tr[15]/td[2]/input').set data['company_logo_url']
 @browser.text_field(:xpath => '//*[@id="additional-info-form"]/tbody/tr[16]/td[2]/input').set data['google_maps_url']
 
 enter_captcha data
+
+sleep 10
+true

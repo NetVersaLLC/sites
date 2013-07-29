@@ -17,6 +17,7 @@ require 'tmpdir'
  
       if uri.scheme.downcase == 'https'
         http.use_ssl = true
+	puts "Ca file: #{ENV['ca_file']}"
         if ENV['ca_file']
           cert_file = ENV['ca_file'].dup
           cert_file.gsub!(File::ALT_SEPARATOR, File::SEPARATOR) if File::ALT_SEPARATOR

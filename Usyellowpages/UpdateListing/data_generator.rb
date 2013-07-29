@@ -15,6 +15,6 @@ data['areacode']			= data['phone'].split("-")[0]
 data['prefix']				= data['phone'].split("-")[1]
 data['suffix']				= data['phone'].split("-")[2]
 
-data[ 'hours' ]				= Getfav.consolidate_hours( business )
+data[ 'hours' ]				= Usyellowpages.consolidate_hours( business )
 data[ 'payments']			= Usyellowpages.payment_methods(business)
 data

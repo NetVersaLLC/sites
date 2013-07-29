@@ -22,8 +22,8 @@ thelist.each do |item|
     businessFound['status'] = :claimed
     break
   else
-    
-    businessFound['status'] = :listed
+    #Claimed listings show the same links
+    businessFound['status'] = :claimed
     break
   end
 end

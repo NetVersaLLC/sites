@@ -17,9 +17,9 @@ nok.css('div#bizData').each do |listing|
     
     if link.text =~ /#{data['business']}/i
       businessListed['status'] = :claimed
-      businessListed['url'] = link.attr("href")
+      businessListed['listed_url'] = link.attr("href")
 
-      resp2 = RestClient.get(businessListed['url'])
+      resp2 = RestClient.get(businessListed['listed_url'])
       nok2 = Nokogiri::HTML(resp2)
 
       businessListed['listed_phone'] = nok2.css("div#bizPhone").text

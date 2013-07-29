@@ -5,15 +5,15 @@ end
 
 data[ 'businessfixed' ] = format_business(data['business'])
 
-url = "http://www.expressbusinessdirectory.com/businesses/#{data[ 'businessfixed' ] }/"
-#puts(url)
+url = "http://www.expressbusinessdirectory.com/businesses/#{data[ 'businessfixed' ] }"+"-"+data['zip']+"/"
+puts(url)
 
 page = Nokogiri::HTML(RestClient.get(url))
 businessFound = {}
 businessFound['status'] = :unlisted
 page.css("a#ctl00_ContentPlaceHolder1_dlResults_ctl00_hypBusiness").each do |resultLink|
   if resultLink.text.gsub('&', 'and') =~ /#{data['business'].gsub('&', 'and')}/i
-    resultContent = Nokogiri::HTML(open(resultLink["href"]))
+    resultContent = Nokogiri::HTML(RestClient.get(resultLink["href"]))
     businessFound['status'] = :claimed
     businessFound['listed_name'] = resultLink.text # Return business name given on webpage
     #puts("Listed Name: " + businessFound['listed_name'])

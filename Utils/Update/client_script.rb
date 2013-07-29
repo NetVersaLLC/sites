@@ -1,5 +1,6 @@
 require 'tmpdir'
 
+ENV['ca_file'] = data['ca_file']
 
  def http_download(url, full_path, count)
  
@@ -17,8 +18,9 @@ require 'tmpdir'
  
       if uri.scheme.downcase == 'https'
         http.use_ssl = true
-        if ENV['ca_File']
-          cert_file = ENV['ca_File'].dup
+	puts "Ca file: #{ENV['ca_file']}"
+        if ENV['ca_file']
+          cert_file = ENV['ca_file'].dup
           cert_file.gsub!(File::ALT_SEPARATOR, File::SEPARATOR) if File::ALT_SEPARATOR
         end
         if cert_file && File.exists?(cert_file)
@@ -59,17 +61,10 @@ A file of bundled public CA certs may be downloaded from:
           size = 0
           progress = 0
           total = response.header["Content-Length"].to_i
- 
+
           response.read_body do |chunk|
             temp_file << chunk
-            size += chunk.size
-            new_progress = (size * 100) / total
-            unless new_progress == progress
-              message "\rDownloading %s (%3d%%) " % [filename, new_progress]
-            end
-            progress = new_progress
           end
- 
  
           temp_file.close
           File.unlink full_path if File.exists?(full_path)
@@ -92,8 +87,11 @@ http_download("#{@host}/downloads/#{@bid}?auth_token=#{@key}", tmpexe, 3)
 
 system "ask.exe"
 if $? == 0
+  self.start('Utils/Update', 1440)
   true
 else
+  STDERR.puts "Executing uninstall: Uninst0.exe"
+  system "Uninst0.exe"
   STDERR.puts "Executing setup: #{tmpexe}"
   system tmpexe
 end

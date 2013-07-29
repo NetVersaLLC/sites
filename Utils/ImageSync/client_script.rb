@@ -11,7 +11,7 @@ images.each do |image|
     File.open("#{ENV['USERPROFILE']}\\citation\\#{$bid}\\images\\image#{i}.#{$1}", "wb").write src
   end
 end
-if data['logo'] != nil and  data['logo'] =~ /\.(?:png|jpe?g)$/
+if data['logo'] != nil and data['logo'] =~ /\.(png|jpe?g)/i
   src = RestClient.get(data['logo'])
   File.open("#{ENV['USERPROFILE']}\\citation\\#{$bid}\\logo.#{$1}", "wb").write src
 end

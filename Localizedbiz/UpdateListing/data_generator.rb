@@ -1,8 +1,8 @@
 data = {}
 
 catty = Localizedbiz.where(:business_id => business.id).first
-data['category1'] = catty.localizedbiz_category.parent.name.nil? ? nil : catty.localizedbiz_category.parent.name.gsub("\n", "")
-data['category2'] = catty.localizedbiz_category.name.nil? ? nil : catty.localizedbiz_category.name.gsub("\n", "")
+data['category1'] = catty.localizedbiz_category.parent.nil? ? nil : catty.localizedbiz_category.parent.name.gsub("\n", "")
+data['category2'] = catty.localizedbiz_category.nil? ? nil : catty.localizedbiz_category.name.gsub("\n", "")
 
 data['username'] = business.localizedbizs.first.username[0..14]
 data['password'] = business.localizedbizs.first.password#xqPe2Sg82LuTHbk
@@ -19,7 +19,7 @@ data['last4']    = business.local_phone.split("-")[2]
 data['fax']      = business.fax_number
 data['email']    = business.bings.first.email
 data['website']  = business.company_website.nil? ? nil : business.company_website.gsub("http://", "")
-data['hours']    = Getfav.consolidate_hours( business )
+data['hours']    = Getfave.consolidate_hours( business )
 data['description'] = business.business_description
 data['keywords']    = business.category1 + ", " + business.category2 + ", " + business.category3 + ", " + business.category4 + ", " + business.category5
 data['tagline']    = business.category1 + " " + business.category2 + " " + business.category3

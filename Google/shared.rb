@@ -53,7 +53,7 @@ def search_for_business( data )
   @browser.text_field(:name, "qb").when_present.set data['city']
   @browser.button(:id,'gbqfb').when_present.click
   @browser.wait_until { @browser.text.include?('Loading...') == false}
-  @browser.wait_until { @browser.span(:text =>'Key to ratings').exist? == true}
+  #@browser.wait_until { @browser.span(:text =>'Key to ratings').exist? == true}
 end
 
 #Verify phone

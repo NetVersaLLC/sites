@@ -2,6 +2,7 @@
 def photo_upload_pop(data)
   require 'rautomation'
   #update logo
+  data['logo'] = self.logo
   if data['logo'] > 0
     photo_upload_pop = RAutomation::Window.new :title => /File Upload/
     photo_upload_pop.text_field(:class => "Edit").set(data['logo'])
@@ -10,7 +11,7 @@ def photo_upload_pop(data)
   end
 
   #update other images
-  pic = []
+  pic = self.images
   data[ 'images' ] = pic
   if pic.length > 0
     image_index = ""
@@ -142,12 +143,26 @@ def verify_phone(data)
   end
 end
 
+def match_business(data)
+  page = Nokogiri::parse(@browser.html)
+  businessFound = false
+  page.css("h3.drb").each do |item|
+    if item.text =~ /#data['business']/i
+      businessFound = true
+    end
+  end
+  return businessFound
+end
+
 #Main Steps
 begin
   login( data )
   search_for_business( data )
   if @browser.html.include?('No results')
-    puts "Create a new busienss"
+    puts "Create a new business"
+    create_business( data )
+  elsif match_business(data)
+    puts "Create a new business"
     create_business( data )
   end
 

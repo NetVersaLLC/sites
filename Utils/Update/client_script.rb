@@ -92,8 +92,11 @@ http_download("#{@host}/downloads/#{@bid}?auth_token=#{@key}", tmpexe, 3)
 
 system "ask.exe"
 if $? == 0
+  self.start('Utils/Update', 1440)
   true
 else
+  STDERR.puts "Executing uninstall: Uninst0.exe"
+  system "Uninst0.exe"
   STDERR.puts "Executing setup: #{tmpexe}"
   system tmpexe
 end

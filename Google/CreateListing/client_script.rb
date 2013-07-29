@@ -2,6 +2,7 @@
 def photo_upload_pop(data)
   require 'rautomation'
   #update logo
+  data['logo'] = self.logo
   if data['logo'] > 0
     photo_upload_pop = RAutomation::Window.new :title => /File Upload/
     photo_upload_pop.text_field(:class => "Edit").set(data['logo'])
@@ -10,7 +11,7 @@ def photo_upload_pop(data)
   end
 
   #update other images
-  pic = []
+  pic = self.images
   data[ 'images' ] = pic
   if pic.length > 0
     image_index = ""

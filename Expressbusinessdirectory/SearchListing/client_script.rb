@@ -1,10 +1,3 @@
-require 'nokogiri'
-require 'rest-client'
-
-data = {}
-data['business'] = "J. Martinez & Company"
-data['zip']		 = "30341"
-
 def format_business(business)
   business_formatted = business.gsub(' ', '-')
   return business_formatted.gsub('&', '')
@@ -32,7 +25,5 @@ page.css("a#ctl00_ContentPlaceHolder1_dlResults_ctl00_hypBusiness").each do |res
     #puts("Listed Phone: " + businessFound['listed_phone'])
   end
 end
-
-puts businessFound
 
 [true, businessFound]

@@ -1,5 +1,6 @@
-require 'nokogiri'
-require 'open-uri'
+data[ 'businessfixed' ]          = data['business'].gsub(" ", "+").gsub("-","+")
+
+businessFound = {}
 url = "http://#{data['zip']}.zip.pro/#{data['businessfixed']}"
 puts(url)
 page = Nokogiri::HTML(RestClient.get(url)) 
@@ -12,7 +13,8 @@ if page.css("div.organicListing").size > 0
   claimLink = subpage.css("div.claim_listing")
   if claimLink.size > 0
     puts("Unclaimed")
-    businessFound['status'] = :listed
+    businessFound['status'] = :claimed
+    #No way to tell if claimed or unclaimed, both show "CLAIM LISTING" link. 
   else
     puts("Claimed")
     businessFound['status'] = :claimed
@@ -27,6 +29,5 @@ else
   puts("Unlisted")
   businessFound['status'] = :unlisted
 end
-
 
 [true, businessFound]

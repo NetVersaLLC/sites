@@ -75,4 +75,6 @@ end
 
 Watir::Wait.until { @browser.link(:id => '_ctl0_hlBusinessDashboard').exists? }
 
+puts("Business update success!")
+
 true

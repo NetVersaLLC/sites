@@ -1,5 +1,6 @@
-require 'nokogiri'
-require 'open-uri'
+data[ 'businessfixed' ]      = data['business'].gsub(" ","+").gsub(",","")
+data['city']                   = data['city'].gsub(" ", "+")
+
 businessFound = {}
 results = Nokogiri::HTML(open("http://www.google.com/custom?q=#{data['businessfixed']}+#{data['city']}++#{data['state']}&client=rbi-cse&cof=FORID:10%3BAH:left%3BCX:HotFrog%2520US%2520Custom%2520Search%2520Engine%3BL:http://www.google.com/intl/en/images/logos/custom_search_logo_sm.gif%3BLH:30%3BLP:1%3BVLC:%23551a8b%3BDIV:%23cccccc%3B&cx=015071188996636028084:ihs3t9hzgq8&channel=hotfrog"))
 resultshref = results.css(' a').map { |link| link['href']} #Compile results
@@ -47,5 +48,4 @@ else
   businessFound['status'] = :unlisted
 end
 
-puts("Success!")
 [true, businessFound]

@@ -3,7 +3,7 @@ def replace_and(business)
   return business.gsub("&","and")
 end
 
-url = "https://www.getfave.com/search?q=#{CGI.escape(data['business'])}&g=#{CGI.escape(data['location'])}"
+url = "https://www.getfave.com/search?q=#{CGI.escape(data['business'])}&g=#{CGI.escape(data['zip'])}"
 businessFound = {}
 page = Nokogiri::HTML(RestClient.get(url))
 

@@ -1,7 +1,18 @@
 #Replace '&' with 'and'
+
+require 'nokogiri'
+require 'rest-client'
+
+
+data = {}
+data['business'] = "Pizza By Marco"
+data['zip'] = "75093"
+
 def replace_and(business)
   return business.gsub("&","and")
 end
+
+
 
 url = "https://www.getfave.com/search?q=#{CGI.escape(data['business'])}&g=#{CGI.escape(data['zip'])}"
 businessFound = {}
@@ -17,6 +28,7 @@ else
       businessFound['listed_url'] = item.attr('href')
 
       nok = Nokogiri::HTML(RestClient.get businessFound['listed_url'])
+      businessFound['listed_phone'] = nok.css("phone-number")[0].text
       if nok.css("a#claim").length > 0
         businessFound['status'] = :listed
       else
@@ -27,4 +39,5 @@ else
   end
 end
 
+puts businessFound
 [true, businessFound]

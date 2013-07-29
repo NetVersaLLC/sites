@@ -61,17 +61,10 @@ A file of bundled public CA certs may be downloaded from:
           size = 0
           progress = 0
           total = response.header["Content-Length"].to_i
- 
+
           response.read_body do |chunk|
             temp_file << chunk
-            size += chunk.size
-            new_progress = (size * 100) / total
-            unless new_progress == progress
-              message "\rDownloading %s (%3d%%) " % [filename, new_progress]
-            end
-            progress = new_progress
           end
- 
  
           temp_file.close
           File.unlink full_path if File.exists?(full_path)

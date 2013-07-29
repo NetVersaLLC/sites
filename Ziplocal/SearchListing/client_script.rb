@@ -10,7 +10,8 @@ nok.css("div.listing.vcard.cfix").each do |resultBlock|
     businessFound['listed_phone'] = resultBlock.css("p.tel").text   
     subpage = Nokogiri::HTML(RestClient.get businessFound['listed_url'])
     if subpage.xpath("//a[contains(text(), 'Update')]").length > 0
-      businessFound['status'] = :listed
+      businessFound['status'] = :claimed
+      #Claimed listings show the same links
     else
       businessFound['status'] = :claimed
     end

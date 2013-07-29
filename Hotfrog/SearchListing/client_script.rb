@@ -16,7 +16,8 @@ if page.at_css('h1.company-heading') then #Check type of result returned
       businessFound['status'] = :claimed
     else
       puts("Businesss is listed")
-      businessFound['status'] = :listed
+      businessFound['status'] = :claimed
+      #Claimed listings show the same links
     end
     puts("Listed Address: " + page.at_xpath('//*[@id="content"]/div[2]/div[4]/text()[1]').text)
     businessFound['listed_address'] = page.at_xpath('//*[@id="content"]/div[2]/div[4]/text()[1]').text
@@ -37,7 +38,8 @@ elsif page.xpath("//a[text()='#{data['businesses']}']") # Does the business exis
     businessFound['status'] = :claimed
   else
     puts("Business is listed")
-    businessFound['status'] = :listed
+    businessFound['status'] = :claimed
+    #Claimed listings show the same links
   end
   puts("Listed Address: " + factual.at_xpath('//*[@id="content"]/div[2]/div[4]/text()[1]').text)
   businessFound['listed_address'] = factual.at_xpath('//*[@id="content"]/div[2]/div[4]/text()[1]').text

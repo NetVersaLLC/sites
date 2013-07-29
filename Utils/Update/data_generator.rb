@@ -1,3 +1,3 @@
 data = {}
-ENV['ca_file'] = 'ca-bundle.crt'
+data['ca_file'] = 'ca-bundle.crt'
 data

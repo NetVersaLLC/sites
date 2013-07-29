@@ -1,5 +1,6 @@
 require 'tmpdir'
 
+ENV['ca_file'] = data['ca_file']
 
  def http_download(url, full_path, count)
  

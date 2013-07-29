@@ -29,15 +29,16 @@ end
 def enter_captcha(data)
 
   capSolved = false
-  count = 1
+  count = 0
   until capSolved or count > 5 do
   captcha_code = solve_captcha
   @browser.text_field(:name => 'password').set data[ 'password' ]
 
   @browser.text_field( :id, 'recaptcha_response_field').set captcha_code
-  @browser.button(:value => 'SUBMIT').click
+  @browser.button(:value => "SUBMIT").click
+  #@browser.button(:value => "SUBMIT").click
   sleep(5)
-    if not @browser.html.include?('Add Your Listing')
+    if not @browser.text.include?('security code box')
       capSolved = true
     end
   count+=1
@@ -46,7 +47,7 @@ def enter_captcha(data)
   if capSolved == true
     true
   else
-  throw("Captcha was not solved")
+    throw("Captcha was not solved")
   end
 end
 

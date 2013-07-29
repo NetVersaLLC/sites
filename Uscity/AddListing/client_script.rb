@@ -33,7 +33,7 @@ def sign_up(data)
 
   if @browser.text.include?(@confirmation_msg)
     puts "Initial registration Successful"
-    RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data[ 'email' ], 'account[password]' => data['password'], 'account[secret_answer]' => data['security_answer'], 'model' => 'Uscity'
+    self.save_account("Uscity", {:email => data[ 'email' ], :password => data['password'], :secret_answer => data['security_answer']})
     true
   else
     throw "Initial registration not successful"

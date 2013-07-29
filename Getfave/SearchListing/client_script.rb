@@ -1,13 +1,4 @@
 #Replace '&' with 'and'
-
-require 'nokogiri'
-require 'rest-client'
-
-
-data = {}
-data['business'] = "Pizza By Marco"
-data['zip'] = "75093"
-
 def replace_and(business)
   return business.gsub("&","and")
 end
@@ -39,5 +30,4 @@ else
   end
 end
 
-puts businessFound
 [true, businessFound]

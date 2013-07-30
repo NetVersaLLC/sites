@@ -28,6 +28,9 @@
 @browser.select_list( :name => 'attn').fire_event('onBlur')
 
 enter_captcha( data )
+
+@browser.button(:name => 'Submit').click
+
 sleep 2
 Watir::Wait.until {@browser.text.include? "Your Listing Update Request has been received successfully..."}
 

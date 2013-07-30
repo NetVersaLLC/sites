@@ -1,8 +1,7 @@
 #Method for update listing
 
-def update_business(data)
-  @browser.span(:text => 'Update Listings').click
-  @browser.text_field(:name=> 'visitor').set data['full_name']
+def update_business(data)  
+  @browser.text_field( :name => /visitor/).set data['full_name']
   @browser.text_field( :name => 'visitormail').set data[ 'email' ]
   @browser.text_field( :name => 'phone').set data[ 'phone' ]
   @browser.text_field( :name => 'fax').set data[ 'fax' ]
@@ -11,13 +10,14 @@ def update_business(data)
   @browser.text_field( :name => 'city').set data[ 'city' ]
   @browser.text_field( :name => 'state').set data[ 'state' ]
   @browser.text_field( :name => 'zip').set data[ 'zip' ]
-  @browser.text_field( :name => 'keyword').set data[ 'keywords' ]
+  @browser.text_field( :name => 'keyword').set data[ 'category' ]
   @browser.text_field( :name => 'url').set data[ 'website' ]
   @browser.text_field( :name => 'notes').set data[ 'description' ]
   @browser.select_list( :name => 'attn').select "Listing Update Request"
   @browser.text_field(:name => 'fact').set data['reason_for_update']
 
   enter_captcha( data )
+  @browser.button(:name => 'Submit').click
 
   if @browser.text.include? "Your Listing Update Request has been received successfully..."
     puts "Listing Update is successfully"
@@ -27,6 +27,6 @@ def update_business(data)
 end
 
 #Main update steps
-@url = 'http://www.yellowbrowser.com/'
+@url = 'http://www.yellowbrowser.com/update_Listings.php'
 @browser.goto(@url)
 update_business(data)

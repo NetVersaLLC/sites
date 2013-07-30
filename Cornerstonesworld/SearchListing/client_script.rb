@@ -1,9 +1,17 @@
 #replace & with and
+#require 'nokogiri'
+#require 'rest-client'
+
+
+#data = {}
+#data['business']  = "Pizza By Marco"
+#data['state']     = "TX"
+
 def replace_and(business)
   return business.gsub("&","and")
 end
 
-url = "http://www.cornerstonesworld.com/en/directory/country/USA/state/#{data['state']}/keyword/#{CGI.escape(data['business'])}/new"
+url = "http://www.cornerstonesworld.com/en/directory/country/USA/state/#{data['state_short']}/keyword/#{CGI.escape(data['business'])}/new"
 
 page = Nokogiri::HTML(RestClient.get url)
 businessFound = {}

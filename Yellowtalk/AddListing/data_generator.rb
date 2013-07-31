@@ -5,7 +5,7 @@ data[ 'username' ] = 				business.bings.first.email.split("@")[0] + 9.to_s
 data[ 'email' ] = 					business.bings.first.email 
 #data[ 'email' ] = 					"Cowan_age_cia@inbox.com"
 catty                    		   = Yellowtalk.where(:business_id => business.id).first
-data['category'] = 					catty.yellowtalk_category.name
+data['category'] = 					catty.yellowtalk_category.name.gsub("\r","").chomp
 #data['category'] = 					'Television Repair'
 data[ 'business' ] = 				business.business_name
 data[ 'address' ] = 				business.address + ' ' + business.address2

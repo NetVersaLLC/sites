@@ -1,7 +1,16 @@
-goto_signup_page
-process_tupalo_signup data
+#Enter your email address to register
+url="http://tupalo.com/en/accounts/sign_up"
+@browser.goto(url)
 
-RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['email'],  'model' => 'Tupalo'
+@browser.text_field(:id => /account_email/).set data['email']
+@browser.button(:name => /commit/).click
+
+sleep 2 
+Watir::Wait::until {@browser.text.include? "My Favorites"}
+
+self.save_account("Tupalo", {:username => data[ 'username' ], :password => data[ 'password' ], :email => data[ 'email' ]})
+
+puts("SignUp Success!!")
 
 if @chained
 	self.start("Tupalo/Verify")

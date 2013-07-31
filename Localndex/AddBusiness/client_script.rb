@@ -13,8 +13,12 @@
 enter_captcha( data )
 
 
+sleep 2
+Watir::Wait::until {@browser.text.include? "Add A New Business"}
+
 @browser.button(:value => /Submit for revision/i).click
 
+sleep 2
+Watir::Wait::until {@browser.text.include? "Thank You for Submitting"}
+
 true
-
-

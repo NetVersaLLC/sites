@@ -1,38 +1,29 @@
-require 'rest-client'
-require 'nokogiri'
 
-data = {}
-data['state_short']		= "TX"
-data['business']		= "Pizza By Marco"
-data['city']			= "Plano"
 
-#data['businessfixed'] = 
+# COPY AND PASTE THE CONTENTS OF SearchListing/client_script.rb here
 
+name=data['name']
+city=data['city']
+url="http://www.showmelocal.com/local_search.aspx?q=#{name}&s=ga&c=#{city}"
 businessFound = {}
-url = "http://www.showmelocal.com/local_search.aspx?q=#{CGI.escape(data['business'])}&s=#{data['state_short']}&c=#{data['city']}"
-resp = RestClient.get url
-
-nok = Nokogiri::HTML(resp)
-
 businessFound['status'] = :unlisted
-
-nok.css('div.serachresult').each do |result|
-	if result.css("a")[0].text =~ /#{data['business']}/i
-		businessFound['listed_url']		= "http://www.showmelocal.com/"+result.css("a")[0].attr('href')
-		subpage = Nokogiri::HTML(RestClient.get businessFound['listed_url'])
-		businessFound['listed_address'] = subpage.xpath("//span[@itempr='streetAddress']").text + ", " + subpage.css("span[@itempr='addressRegion']").text + ', ' + subpage.css("span[@itempr='postalCode']").text
-		businessFound['listed_phone']	= subpage.xpath("//span[@itempr='telephone']").text
-		businessFound['listed_name']	= subpage.xpath("//span[@itempr='name']").text
-		businessFound['status']			= :claimed
-		puts subpage
-		break
-	end
-
-
+name=data['name'].gsub("+"," ")
+nok = Nokogiri::HTML(RestClient.get url)
+nok.css("table#dgBusiness").each do |bi|   
+        if (bi.css("div.h a").text) =~ /#{name}/i                                 
+            businessFound['listed_name']    = bi.css("div.h a").text
+            businessFound['listed_url']     = "http://www.showmelocal.com/"+ bi.css("div.h a").attr("href")
+            businessFound['listed_address'] = bi.css("div.address").text
+            subpage = Nokogiri::HTML(RestClient.get businessFound['listed_url'])            
+            businessFound['listed_phone']   = subpage.css("span#_ctl5_lblPhoneNumber").text.gsub("(","").gsub(")","-")
+            businessFound['status'] = :claimed
+            break
+        end
 end
 
+#######
+###
 
-#puts resp
- 
-puts businessFound
+
+
 [true, businessFound]

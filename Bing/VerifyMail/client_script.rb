@@ -12,11 +12,17 @@ begin
 
 	sleep 2
 	@browser.button(:value => 'OK', :class => "bigButton").when_present.click
+	
+
+	if @chained 
+		self.start("Bing/MailNotify", 4320)
+	end
 	true
+
 rescue Exception => e
 	puts(e.inspect)
 	if retries > 0
-		puts("Something went wrong while tring to Verify the account. Retrying in 2 seconds...")
+		puts("Something went wrong while trying to Verify the account. Retrying in 2 seconds...")
 		sleep
 		retries -= 1
 		retry

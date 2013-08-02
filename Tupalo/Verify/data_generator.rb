@@ -1,4 +1,5 @@
 data = {}
-data[ 'email' ]	= business.bings.first.email
-data[ 'password' ] 	= Tupalo.check_email( business )
+data[ 'pass' ] 				= Tupalo.check_email(business)
+data[ 'email' ]				= business.tupalos.first.email
+data[ 'password' ]			= business.tupalos.first.password
 data

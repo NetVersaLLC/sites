@@ -1,13 +1,33 @@
-goto_signin_page
-process_tupalo_signin data
+url="http://tupalo.com/en/accounts/sign_in"
+@browser.goto(url)
 
-@browser.li(:class => 'navItem logged_in tinyUser').link.click
+sleep 2
+Watir::Wait::until {@browser.text.include? "Login"}
 
-@browser.div(:xpath => "//*[@data-filter='discovered_spots']").click
-@browser.link(:text => /#{data['business']}/).click
+@browser.text_field(:id => "account_email").set data ['email']
+@browser.text_field(:id => "account_password").set data['password']
+@browser.button(:id => "spot_submit").click
 
-@browser.link(:text => /Is this your business?/).click
-@browser.link(:text => /Claim this business now/).click
+sleep 2
+Watir::Wait::until {@browser.text.include? "My Favorites"}
 
-Watir::Wait.until { @browser.h1(:text => /#{data["business"]}/).exist? }
+url=@browser.url+"?only=discovered_spots"
+@browser.goto(url)
+
+sleep 2
+Watir::Wait::until {@browser.text.include? "My Discoveries"}
+
+@browser.span(:class => "index" ).click
+
+sleep 2
+Watir::Wait::until {@browser.text.include? "Category:"}
+
+url=@browser.a(:text => /Claim your business listing/).href
+@browser.goto(url)
+
+sleep 2
+Watir::Wait::until {@browser.text.include? "Promote your business"}
+
+@browser.a(:class => /button green color/).click
+sleep 2
 true

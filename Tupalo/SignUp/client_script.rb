@@ -10,8 +10,6 @@ Watir::Wait::until {@browser.text.include? "My Favorites"}
 
 self.save_account("Tupalo", {:username => data[ 'username' ], :password => data[ 'password' ], :email => data[ 'email' ]})
 
-puts("SignUp Success!!")
-
 if @chained
 	self.start("Tupalo/Verify")
 end

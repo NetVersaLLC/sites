@@ -17,5 +17,8 @@ url = 'https://register.kudzu.com/packageSelect.do'
 sleep 2
 Watir::Wait::until {@browser.text.include? "Add Your Contact Name" }
 RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['userName'], 'account[password]' => data['pass'], 'account[secret_answer]' => data['answer'], 'model' => 'Kudzu'
+if @chained
+	self.start("Kudzu/CreateListing")
+end
 true
 #Basic SignUp ends

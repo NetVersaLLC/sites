@@ -47,4 +47,7 @@ data[ 'languagesSpoken' ].each { |item|
 
 sleep 2
 Watir::Wait::until{ @browser.text.include? "Manage Locations and Hours"}
+if @chained
+	self.start("Kudzu/Verify")
+end
 true

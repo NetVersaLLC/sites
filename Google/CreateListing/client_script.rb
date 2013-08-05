@@ -2,28 +2,34 @@
 def photo_upload_pop(data)
   require 'rautomation'
   #update logo
+  @browser.div(:class => 'G8iV4').when_present.click
+  @browser.div(:text => 'Select a photo from your computer').when_present.click
   data['logo'] = self.logo
   if data['logo'] > 0
     photo_upload_pop = RAutomation::Window.new :title => /File Upload/
     photo_upload_pop.text_field(:class => "Edit").set(data['logo'])
     photo_upload_pop.button(:value => "&Open").click
-    @browser.wait_until {@browser.div(:class => 'a-zb-xd a-S-Ea a-za-S').div(:text=> 'Upload more').exist? }
+    @browser.wait_until {@browser.div(:text => 'Set as profile photo').visible? }
+    @browser.div(:text => 'Set as profile photo').click
+    @browser.button(:value => 'Cancel').when_present.click
   end
 
   #update other images
   pic = self.images
   data[ 'images' ] = pic
+  @browser.div(:text => 'Change cover').when_present.click
+  @browser.div(:text => 'Upload').when_present.click
+  @browser.div(:text => 'Select a photo from your computer').when_present.click
   if pic.length > 0
     image_index = ""
     for image_index in (0..pic.length-1)
-      @browser.div(:id => 'picker:ap:11').when_present.click
       photo_upload_pop = RAutomation::Window.new :title => /File Upload/
       photo_upload_pop.text_field(:class => "Edit").set(pic[image_index])
       photo_upload_pop.button(:value => "&Open").click
-      @browser.wait_until {@browser.div(:class => 'a-zb-xd a-S-Ea a-za-S').div(:text=> 'Upload more').exist? }
+      @browser.wait_until {@browser.div(:text => 'Select cover photo').visible? }
+      @browser.div(:text => 'Select cover photo').click
     end
   end
-  @browser.div(:class => 'c-v-x b-d b-d-nb b-d-qnnXGd-lTJzwb-rdwzAe').when_present.click
 end
 
 #Create new business
@@ -82,11 +88,13 @@ def create_business( data )
   if @browser.text_field(:id => 'Passwd').exist?
     @browser.text_field(:id => 'Passwd').set data['pass'] if @browser.text_field(:id => 'Passwd').exist?
     @browser.button(:value, "Sign in").click
-    @browser.wait()
+    sleep(3) 
   end
 
   # Update Address
   puts "Updating Address"
+  @browser.span(:text => 'About').click if @browser.span(:text => 'About').exist?
+  @browser.div(:text => 'Edit business information').click if @browser.div(:text => 'Edit business information').exist?
   @browser.div(:text=> 'Address').click
   @browser.text_field(:class => 'b-Ca Qf NO').when_present.set data['address']
   @browser.text_field(:class => 'b-Ca Qf OO').when_present.set data['city']
@@ -101,15 +109,16 @@ def create_business( data )
 
   #Edit description
   @browser.div(:text=> 'Description').when_present.click
-  @browser.frame(:class => 'Lj editable').body(:class => 'editable').when_present.send_keys data[ 'business_introduction' ]
+  @browser.frame(:class => 'Lj editable').body(:class => 'editable').when_present.send_keys data[ 'business_description' ]
   @browser.div(:text=> 'Save').when_present.click
-  #~ @browser.div(:text=> 'Done editing').click
+  @browser.div(:text=> 'Done editing').click if @browser.div(:text=> 'Done editing').exist?
   sleep(5)
 
  #Update Photo
   puts "Update Photo"
-  @browser.div(:text=> 'Photos').when_present.click
-  @browser.div(:class => 'a-kb-vA').div(:class => 'c-v-x b-d b-d-nb').when_present.click
+  @browser.div(:text=> 'Change cover').when_present.click
+  @browser.div(:text=> 'Upload').when_present.click
+  @browser.div(:text => 'Select a photo from your computer').when_present.click
   photo_upload_pop(data)
 
   #Verify Business

@@ -7,6 +7,7 @@ data[ 'phone' ]           = business.local_phone
 data[ 'address' ]         = business.address
 data[ 'city' ]		= business.city
 data[ 'website'] 	= business.company_website
-data[ 'business_introduction' ] = business.business_description
+data[ 'business_description'] = business.business_description
 data['category']	= business.category1
+data['country'] = 'United States'
 data

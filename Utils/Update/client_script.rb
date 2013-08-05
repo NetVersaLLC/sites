@@ -85,15 +85,19 @@ tmpexe = "#{Dir.tmpdir}/setup.exe"
 
 http_download("#{@host}/downloads/#{@bid}?auth_token=#{@key}", tmpexe, 3)
 
-system "ask.exe"
-if $? == 0
-  self.start('Utils/Update', 1440)
-  true
+if File.exists? tmpexe
+  system "ask.exe"
+  if $? == 0
+    self.start('Utils/Update', 1440)
+    true
+  else
+    STDERR.puts "Executing uninstall: uninstall.exe"
+    system "uninstall.exe"
+    STDERR.puts "Executing setup: #{tmpexe}"
+    system tmpexe
+  end
 else
-  STDERR.puts "Executing uninstall: Uninst0.exe"
-  system "Uninst0.exe"
-  STDERR.puts "Executing setup: #{tmpexe}"
-  system tmpexe
+  puts "Could not download client sofware update!"
 end
 
 true

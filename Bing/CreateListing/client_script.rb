@@ -5,7 +5,7 @@ def add_new_listing( data )
 
   puts 'Add new listing'
   sleep 2
-  @browser.button( :value, 'Create New Business' ).when_present.click
+  @browser.button( :value, /Create new business/i ).when_present.click
 retries = 3
 begin
   sleep 2

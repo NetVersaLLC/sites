@@ -116,9 +116,6 @@ def create_business( data )
 
  #Update Photo
   puts "Update Photo"
-  @browser.div(:text=> 'Change cover').when_present.click
-  @browser.div(:text=> 'Upload').when_present.click
-  @browser.div(:text => 'Select a photo from your computer').when_present.click
   photo_upload_pop(data)
 
   #Verify Business

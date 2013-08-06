@@ -8,7 +8,5 @@ data[ 'address' ] = business.address
 data[ 'city' ]	= business.city
 data[ 'website'] = business.company_website
 data[ 'business_introduction' ] = business.business_description
-data[ 'logo' ] = ContactJob.logo 
 data['category']	= business.category1
-data[ 'images' ]	= ContactJob.images
 data

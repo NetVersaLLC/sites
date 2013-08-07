@@ -1,3 +1,4 @@
+if data['gender'] == "Unknown" then data['gender'] = "Male" end
 puts data
 
 @browser.goto('https://signup.live.com/signup.aspx?')

@@ -1,32 +1,18 @@
-@browser.goto('http://www.localndex.com/claim/')
-@browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtStartPhone1').set data['phone']
-@browser.button(:id => 'ctl00_ContentPlaceHolder1_btnGetStarted1').click 
-Watir::Wait.until { @browser.span(:id => 'ctl00_ContentPlaceHolder1_lblBusNameHead2').exists? or @browser.text.include? "We couldn't find your business with the information provided" } 
-
-if @browser.text.include? "We couldn't find your business with the information provided."
-
-  businessFound = [:unlisted]
-
-true
-elsif @browser.text.include? "Welcome"
-
-  @browser.button( :src => 'images/localndex_promo_advtoday.png').click
-
-  Watir::Wait.until { @browser.text.include? "This is the information we found for the business" } 
-  
-  thelink = @browser.link( :id => 'ctl00_ContentPlaceHolder1_lnkProfilePage2').attribute_value("href")
-  @browser.goto(thelink)
-  
-  Watir::Wait.until { @browser.div( :id => 'panBusiness').exists? }
-  
-    if @browser.link( :id => 'lnkBusLogo').exists?
-        businessFound = [:listed, :unclaimed]
-    else
-        businessFound = [:listed, :claimed]
-    end
-        
+name=data['business'].gsub(" ","+").gsub("'","%27")
+city=data['city'].gsub(" ","+")
+state=data['state_short']
+url = "http://www.localndex.com/results.aspx?wht=#{name}&whr=#{city}%2c+#{state}"
+name = name.gsub("+"," ").gsub("%27","'")
+nok = Nokogiri::HTML(RestClient.get url)
+businessFound = {}
+businessFound['status'] = :unlisted
+if nok.css("span.Verdana16 a").text =~ /#{name}/i   
+  businessFound['listed_name'] = nok.css("span.Verdana16 a").text
+  businessFound['listed_url'] = nok.css("a#ctl00_MainContentPlaceHolder_repRegListing_ctl00_wucRegListing_lnkRegBusName").attr("href").value
+  zip=nok.css("span#ctl00_MainContentPlaceHolder_repRegListing_ctl00_wucRegListing_lblRegBusZip").text
+  businessFound['listed_address'] = nok.css("span#ctl00_MainContentPlaceHolder_repRegListing_ctl00_wucRegListing_lblRegBusAddress").text
+  businessFound['listed_address'] = businessFound['listed_address'] +" " +city+", "+state + " "+ zip
+  businessFound['listed_phone'] = nok.css("span#ctl00_MainContentPlaceHolder_repRegListing_ctl00_wucRegListing_lblRegBusPhone").text.gsub("(","").gsub(") ","-")
+  businessFound['status'] = :claimed
 end
-
-
-
 [true, businessFound]

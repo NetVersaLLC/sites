@@ -1,6 +1,6 @@
-name=data['name'].gsub(" ","+").gsub("'","%27")
+name=data['business'].gsub(" ","+").gsub("'","%27")
 city=data['city'].gsub(" ","+")
-state=data['state']
+state=data['state_short']
 url = "http://tupalo.com/en/search?q=#{name}&city_select=#{city}%2C+#{state}"
 name = name.gsub("+"," ").gsub("%27","'")
 nok = Nokogiri::HTML(RestClient.get url)

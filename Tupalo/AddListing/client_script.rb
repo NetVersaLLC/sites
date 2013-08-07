@@ -36,8 +36,11 @@ days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
 
 days.each do |day|
 	if data["#{day}"] == true		
-		@browser.select_list(:name => "new_opening_hour_hours_begin").select data["#{day}_open"].gsub(/[AP]M/,"")		
-		closehours = data["#{day}_close"].gsub(/[AP]M/,"").split(":")[0].to_i + 12
+		@browser.select_list(:name => "new_opening_hour_hours_begin").select data["#{day}_open"].gsub(/[AP]M/,"")
+		closehours = data["#{day}_close"].gsub(/[AP]M/,"").split(":")[0].to_i
+		if 	data["#{day}_close"] =~ /PM$/i #Convert closing hours to 24 hours format
+			closehours = closehours + 12
+		end
 		closemin = data["#{day}_close"].gsub(/[AP]M/,"").split(":")[1]
 		close = closehours.to_s + ":" + closemin		
 		@browser.select_list(:name => "new_opening_hour_hours_end").select close

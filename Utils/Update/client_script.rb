@@ -1,13 +1,10 @@
 require 'tmpdir'
 
 ENV['ca_file'] = data['ca_file']
-
  def http_download(url, full_path, count)
- 
     begin
       uri = URI.parse(url)
       filename = File.basename(uri.path)
- 
       if ENV['HTTP_PROXY']
         protocol, userinfo, proxy_host, proxy_port  = URI::split(ENV['HTTP_PROXY'])
         proxy_user, proxy_pass = userinfo.split(/:/) if userinfo
@@ -15,7 +12,6 @@ ENV['ca_file'] = data['ca_file']
       else
         http = Net::HTTP.new(uri.host, uri.port)
       end
- 
       if uri.scheme.downcase == 'https'
         http.use_ssl = true
 	puts "Ca file: #{ENV['ca_file']}"
@@ -27,7 +23,7 @@ ENV['ca_file'] = data['ca_file']
           http.ca_file = cert_file
           http.verify_mode = OpenSSL::SSL::VERIFY_PEER
           http.verify_depth = @max_ca_verify_depth
-        else
+        else          
           raise <<-EOT
 To download using HTTPS you must first set the ca_File
 environment variable to the path of a valid CA certificate file.
@@ -38,13 +34,11 @@ A file of bundled public CA certs may be downloaded from:
           EOT
         end
       end
- 
       http.request_get(uri.path) do |response|
-        case response
+        case response          
         when Net::HTTPNotFound
           puts "404 - Not Found"
           return false
- 
         when Net::HTTPClientError
           puts "Error: Client Error: #{response.inspect}"
           return false
@@ -57,15 +51,12 @@ A file of bundled public CA certs may be downloaded from:
         when Net::HTTPOK
           temp_file = Tempfile.new("download-#{filename}")
           temp_file.binmode
- 
           size = 0
           progress = 0
           total = response.header["Content-Length"].to_i
-
           response.read_body do |chunk|
             temp_file << chunk
           end
- 
           temp_file.close
           File.unlink full_path if File.exists?(full_path)
           FileUtils.mkdir_p File.dirname(full_path)
@@ -82,8 +73,11 @@ A file of bundled public CA certs may be downloaded from:
 
 
 tmpexe = "#{Dir.tmpdir}/setup.exe"
-
-http_download("#{@host}/downloads/#{@bid}?auth_token=#{@key}", tmpexe, 3)
+if @host.match(/http/)
+  http_download("#{@host}/downloads/#{@bid}?auth_token=#{@key}", tmpexe, 3)
+else
+  http_download("http://#{@host}/downloads/#{@bid}?auth_token=#{@key}", tmpexe, 3)
+end
 
 if File.exists? tmpexe
   system "ask.exe"

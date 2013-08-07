@@ -1,92 +1,67 @@
-#method for adding the company to the Manta listing
+#Add a company
 
 def add_company( data )
 
-	#verify we are on the correct page. 
-	Watir::Wait::until do @browser.text.include? 'Tell Us About Your Company' end
-	
-	#select the country
-	#There is obfuscated javascript that causes dynamic events to occur live while you enter data
-	#To fire these events I needed to focus, enter the information, than send the tab key.
-	@browser.select_list(:id, 'co_Country').focus
-	@browser.select_list( :id => 'co_Country').select data[ 'country' ]
-	@browser.send_keys :tab
+  #select the country
+  @browser.select_list( :id => 'co_Country').when_present.select data[ 'country' ]
+  #select the state
+  @browser.select_list( :id => 'co_State' ).when_present.select data[ 'state' ]
 
-	if @browser.select_list( :id => 'co_State' ).exists?
-		@browser.select_list(:id, 'co_State').focus
-		@browser.select_list( :id => 'co_State' ).select data[ 'state' ]
-		@browser.send_keys :tab		
-	end
+  #enter the rest of the company information
+  @browser.text_field( :id, 'co_City').when_present.set data[ 'city' ]
+  @browser.text_field( :id, 'co_Name').set data[ 'business' ]
+  @browser.text_field( :id, 'co_Address').set data[ 'address' ]
+  @browser.text_field( :id, 'co_Phone').set data[ 'phone' ]
+  @browser.text_field( :id, 'co_Zip').set data[ 'zip' ]
 
-	#enter the rest of the company information
-	@browser.text_field( :id, 'co_City').set data[ 'city' ]
-	@browser.text_field( :id, 'co_Name').set data[ 'business' ]
-	@browser.text_field( :id, 'co_Address').set data[ 'streetnumber' ]
-	@browser.text_field( :id, 'co_Phone').set data[ 'phone' ]
-	@browser.text_field( :id, 'co_Zip').set data[ 'zip' ]	
+  #Select the What is your relationship to this company radio group
+  @browser.radio( :value, 'owner').set
+  @browser.button( :id, 'SUBMIT').fire_event("onClick")
+  @browser.button( :id, 'SUBMIT').click
 
-	#Select the What is your relationship to this company radio group
-	@browser.radio( :value, 'owner').set
-	@browser.button( :id, 'SUBMIT').click
-	
-	#wait until the next page loads
-	Watir::Wait::until do @browser.text.include? "What's your relationship to" end
+  #fill out member form
+  sleep(5)
+  @browser.text_field( :id, 'member-firstname-preroll').fire_event("onClick")
+  @browser.text_field( :id, 'member-firstname-preroll').when_present.set data[ 'first_name' ]
+  @browser.text_field( :id, 'member-lastname-preroll').fire_event("onClick")
+  @browser.text_field( :id, 'member-lastname-preroll').when_present.set data[ 'last_name' ]
+  @browser.text_field( :id, 'member-email').focus
+  @browser.text_field( :id, 'member-email').set data[ 'email' ]
+  @browser.text_field( :id, 'member-email_confirm').focus
+  @browser.text_field( :id, 'member-email_confirm').set data[ 'email' ]
+  @browser.text_field( :id, 'member-password').focus
+  @browser.text_field( :id, 'member-password').set data[ 'password' ]
+  @browser.text_field( :id, 'member-confirm_password').focus
+  @browser.text_field( :id, 'member-confirm_password').set data[ 'password']
 
-	#fill out member form
-	@browser.text_field( :id, 'member-firstname-preroll').focus
-	@browser.text_field( :id, 'member-firstname').set data[ 'first_name' ]
-	@browser.text_field( :id, 'member-lastname-preroll').focus
-	@browser.text_field( :id, 'member-lastname').set data[ 'last_name' ]
-	@browser.text_field( :id, 'member-email').focus
-	@browser.text_field( :id, 'member-email').set data[ 'email' ]
-	@browser.text_field( :id, 'member-email_confirm').focus
-	@browser.text_field( :id, 'member-email_confirm').set data[ 'email' ]
-	@browser.text_field( :id, 'member-password').focus
-	@browser.text_field( :id, 'member-password').set data[ 'password' ]
-	@browser.text_field( :id, 'member-confirm_password').focus
-	@browser.text_field( :id, 'member-confirm_password').set data[ 'password' ]	
 
-	#uncheck the newsletters
-	@browser.checkbox( :id, 'manta-smb' ).clear
-	@browser.checkbox( :id, 'over-quota' ).clear
-	
-	@browser.link(:class, 'btn-join btn-continue').click
-	
+  #uncheck the newsletters
+  @browser.checkbox( :id, 'manta-smb' ).clear
+  @browser.checkbox( :id, 'over-quota' ).clear
+  @browser.link(:class, 'btn-join btn-continue').click
+
   RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'Manta'
-	sleep(5)
-	
-	@browser.goto('http://www.manta.com/')
-	
-	thelink = @browser.link( :text , data[ 'business' ]).href
-	@browser.goto(thelink)
-	
-	
-sleep(5)
-@browser.button(:text, 'Done').click
-sleep(2)
+  sleep(5)
 
-
-true
-
-
-end 
-
-
-
-def main( data )
-
-#load the browser and navigate to the business search page
-
-	@browser.goto('http://www.manta.com/profile/my-companies/select?add_driver=home-getstarted')
-
-add_company( data )
-
+  @modal_box = @browser.div(:class => 'ui-dialog ui-widget ui-widget-content ui-corner-all ui-front manta-dialog-fancy fancy-overlay-border get-verified-overlay get-verified-overlay-v2 ui-draggable')
+  @browser.wait_until{@modal_box.exist?}
+  notify_text = @modal_box.div(:class => 'verify-overlay-copy').text
+  # Close modal
+  @modal_box.link(:text => 'Close').click
+  
+  @browser.text_field(:id=>'product-selector-autocomplete').when_present.set data['category']
+  @browser.text_field(:id=>'product-selector-autocomplete').send_keys :down
+  @browser.text_field(:id=>'product-selector-autocomplete').send_keys :enter
+  @browser.div(:id => 'product-selector-suggested').li(:text => data['category']).when_present.click
+  @browser.button(:class => 'ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only').click
 end
 
+def main( data )
+  #load the browser and navigate to the business search page
+  @browser.goto('http://www.manta.com/profile/my-companies/select?add_driver=home-getstarted')
+  add_company( data )
+end
+
+#Main Steps
 main( data )
-
-if @chained
-      self.start("Manta/Verify")
-    end
-
 true

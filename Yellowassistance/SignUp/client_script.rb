@@ -12,11 +12,13 @@
 
 @browser.img(:id => 'btnRegister').click
 
-Watir::Wait.until { @browser.text.include? "Thank You, Here's how your information will be displayed to others." }
+sleep 2
+Watir::Wait::until { @browser.text.include? "Thank You, Here's how your information will be displayed to others." }
 
 @browser.button(:name => 'btnS2Continue').click
 
-Watir::Wait.until { @browser.text.include? "Check your e-mail now!" }
+sleep 2
+Watir::Wait::until { @browser.text.include? "Check your e-mail now!" }
 
 RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['username'], 'account[password]' => data['password'], 'account[secret_answer]' => data['secret_answer'], 'model' => 'Yellowassistance'
 

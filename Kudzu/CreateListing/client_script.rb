@@ -85,7 +85,7 @@ if @chained
   self.start("Kudzu/Verify")
 end
 if @chained
-	self.start("Kudzu/Addisting")
+	self.start("Kudzu/AddListing")
 end
 true
 

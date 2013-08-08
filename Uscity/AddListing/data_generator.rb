@@ -1,6 +1,6 @@
 data = {}
 data[ 'first_name' ]	  = business.contact_first_name
-data[ 'last_name' ]	  = "joojoojoo@outlook.com"#business.contact_last_name
+data[ 'last_name' ]	  = business.contact_last_name
 data[ 'full_name' ]	  = data[ 'first_name' ] +' '+ data[ 'last_name' ] 
 data[ 'email' ]           = business.bings.first.email
 data[ 'password']	  = Yahoo.make_password

@@ -21,10 +21,10 @@ def add_company( data )
 
   #fill out member form
   sleep(5)
-  @browser.text_field( :id, 'member-firstname-preroll').fire_event("onClick")
-  @browser.text_field( :id, 'member-firstname-preroll').when_present.set data[ 'first_name' ]
-  @browser.text_field( :id, 'member-lastname-preroll').fire_event("onClick")
-  @browser.text_field( :id, 'member-lastname-preroll').when_present.set data[ 'last_name' ]
+  @browser.text_field( :id, 'member-firstname-preroll').send_keys :enter
+  @browser.text_field( :id, 'member-firstname').when_present.set data[ 'first_name' ]
+  @browser.text_field( :id, 'member-lastname-preroll').send_keys :enter
+  @browser.text_field( :id, 'member-lastname').when_present.set data[ 'last_name' ]
   @browser.text_field( :id, 'member-email').focus
   @browser.text_field( :id, 'member-email').set data[ 'email' ]
   @browser.text_field( :id, 'member-email_confirm').focus

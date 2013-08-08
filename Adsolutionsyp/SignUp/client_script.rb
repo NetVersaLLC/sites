@@ -43,6 +43,11 @@ data['payments'].each do |pay|
 end
 enter_captcha
 sleep 2
+
+#Click continue button
+@browser.div(:class=>'buttonContainer30').button.click
+
+#Step 3
 @browser.text_field(:id => 'RepeatEmail').when_present.set data['email']
 @browser.text_field(:id => 'Password').set data['password']
 @browser.text_field(:id => 'RepeatPassword').set data['password']

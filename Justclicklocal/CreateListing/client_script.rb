@@ -81,10 +81,14 @@ end
 
 end
 
-@browser.button( :name => 'NextButton').click
+@browser.button( :name => 'NextButton').when_present.click
 
-sleep 2
-Watir::Wait.until {@browser.text.include? "Thank you. Your listing has been added." }
+@browser.wait()
+if @browser.wait_until {@browser.text.include? "Thank you. Your listing has been added." }
+  puts("Business listing created successfully")
+else
+  throw("Business listing didn't create successfully")
+end
 
 true
 

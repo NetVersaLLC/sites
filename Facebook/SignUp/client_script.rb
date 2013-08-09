@@ -1,33 +1,44 @@
-
-
-def sign_up(data)
-  @browser.link(:text=> 'Create a new business account').when_present.click
-  @browser.text_field(:id =>'alogin_reg_email').set data['email']
-  @browser.text_field(:id =>'reg_passwd__').set data['password']
-  @browser.select_list(:id =>'birthday_month').select data['birth_month']
-  @browser.select_list(:id =>'birthday_day').select data['birth_day']
-  @browser.select_list(:id =>'birthday_year').select data['birth_year']
-  @browser.checkbox(:id =>'terms').set
-  retry_captcha(data)
-  
-  sleep 2
-  Watir::Wait.until{@browser.text.include?('Confirm Your Email Address')}
-
-  if @browser.text.include?('Confirm Your Email Address')
-    puts "Initial Registration is successful"
-    #RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'Facebook'
-    self.save_account("Facebook", {:email=>data['email'],:password=>data['password']})
-    else
-    puts "Inital Registration is Unsuccessful"
-  end
+def create_profile( data )
+	@browser.text_field(:name, 'firstname').set data['first_name']
+	@browser.text_field(:name, 'lastname').set data['last_name']
+	@browser.text_field(:name, 'reg_email__').set data['email']
+	@browser.text_field(:name, 'reg_email_confirmation__').set data['email']
+	@browser.text_field(:name, 'reg_passwd__').set data['password']
+	@browser.select_list(:id, 'month').select data['month']
+	@browser.select_list(:id, 'day').select data['day']
+	@browser.select_list(:id, 'year').select data['year']
+	if data['gender'] == "Male" or "Unknown"
+		@browser.radio(:name => 'sex', :value => "2").set
+	else
+		@browser.radio(:name => 'sex', :value => "1").set
+	end
+	@browser.button(:text, 'Sign Up').click
 end
 
-#Main Steps
-@browser.goto "https://www.facebook.com/business/build"
-create_page(data)
-sign_up(data)
-
-if @chained
-  self.start("Facebook/Verify")
+def end_result( data )
+	if @browser.button(:value =>'Find Friends').exists?
+		puts("No Verification Required")
+		if @chained
+			self.start("Facebook/CreatePage")
+			true
+		end
+	elsif @browser.text.include? "Please Verify Your Identity"
+		puts("Phone Verification Required")
+		if @chained
+			self.start("Facebook/Notify")
+			true
+		end
+	else
+		puts("Email Verification Required")
+		if @chained
+	  		self.start("Facebook/Verify")
+	  		true
+		end
+	end
 end
-true
+
+@browser.goto("https://www.facebook.com/")
+create_profile( data )
+sleep(15)
+self.save_account("Facebook", {:email=>data['email'],:password=>data['password']})
+end_result( data )

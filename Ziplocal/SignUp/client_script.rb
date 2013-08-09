@@ -19,6 +19,7 @@ def add_business( data )
 	@browser.button( :id, 'listingForm:addTest2' ).fire_event("onClick")
 	
 	#wait until category text field loads
+	sleep 2#Bug fix 54811800
 	Watir::Wait::until do @browser.text_field( :id, 'listingForm:newSic1').exists? end
 	
 	#focus the field so we can get the javascript happy

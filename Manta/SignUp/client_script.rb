@@ -21,6 +21,9 @@ def add_company( data )
 
   #fill out member form
   sleep(5)
+
+Watir::Wait.until { @browser.text_field( :id, 'member-firstname').exists? }
+
   @browser.text_field( :id, 'member-firstname-preroll').send_keys :enter
   @browser.text_field( :id, 'member-firstname').when_present.set data[ 'first_name' ]
   @browser.text_field( :id, 'member-lastname-preroll').send_keys :enter

@@ -14,17 +14,18 @@ sleep(10)
   #No business found with that phone - this will call the add_business method
   @no_business_found = @browser.text.include? "We couldn't find your business based on phone number"
 
+  sleep(2)
   Watir::Wait::until do
     @this_your_business or @no_business_found
   end
   
-  if @this_your_business 
-    businessFound = [:listed, :unclaimed]
+  if @this_your_business
+    businessFound['status'] = :claimed
   elsif @no_business_found
-    businessFound = [:unlisted]
+    businessFound['status'] = :unlisted
   else
-    businessFound = [:unlisted]
+    businessFound['status'] = :unlisted
   end
 
-puts(businessFound)
+
 return true, businessFound

@@ -21,6 +21,7 @@ sleep(10)
   
   if @this_your_business
     businessFound['status'] = :claimed
+    businessFound['listed_name'] = @browser.span(:class, "blue_header_text bold").h4.text
   elsif @no_business_found
     businessFound['status'] = :unlisted
   else

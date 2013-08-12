@@ -1,9 +1,18 @@
+#Get the validation error
+def validation_error()
+  page = Nokogiri.parse(@browser.html)
+  page.css("p.error-msg").each do |error|
+     puts error.text.gsub(/\t+|\r+|\n+/,'').strip
+  end
+end
+
 #Method for add business
 def add_new_business(data)
   #@browser.link(:text => 'Add your business').click
   @browser.text_field(:name => /BusinessName/).set data[ 'business']
   @browser.text_field(:name => /StreetAddress/).set data[ 'address']
   @browser.text_field(:name => /Suburb/).set data['city']
+  @browser.text_field(:name => /Suburb/).send_keys :down
   @browser.text_field(:name => /Suburb/).send_keys :enter
   @browser.select_list(:name => /State/).option(:value => data['state']).select
   @browser.text_field(:name => /Postcode/).set data[ 'zip']
@@ -33,16 +42,24 @@ def add_new_business(data)
     self.save_account("Hotfrog", {:email => data['email'], :password => data['password']})
   else
     throw("Initial Registration is Unsuccessful")
+    #Show error
+    validation_error()
   end
 end
 
 #Main Steps
 # Launch browser
 
+begin
 @url = 'http://www.hotfrog.com/AddYourBusinessSingle.aspx'
 @browser.goto(@url)
 #@browser.link(:text => 'Add your business').click
 add_new_business(data)
+
+rescue Exception => e
+  puts("Exception Caught in Business Listing")
+  puts(e)
+end
 
 if @chained == true
   self.start("Hotfrog/Verify")

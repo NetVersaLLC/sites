@@ -10,18 +10,34 @@ def add_listing(data)
   puts "After commit"
 
   sleep 3
-  Watir::Wait.until { @browser.text.include? "You might be adding a duplicate" or @browser.link(:text => 'Write a Review').exists?}
+  Watir::Wait.until { @browser.text.include? "You might be adding a duplicate" or @browser.text.include? 'Congratulations on updating your business on Insider Pages.'}
 
   if @browser.text.include? "You might be adding a duplicate"
     @browser.button(:id => 'add_potential_duplicate').click  
     sleep 3
     @browser.alert.ok
+  	sleep 15
+  	#Watir::Wait.until { @browser.link(:text => 'Write a Review').exists? }
+  	true if claim_business(data)
   end
+  	#Watir::Wait.until(10) { @browser.text_field(:id => 'business_name').exists? }
+  	#@browser.text_area(:id, 'business_merchant_attributes_bio').set data['business_description']
+  	#if self.logo.nil?
+  	#	puts "No Logo"
+  	#else
+  	#	begin
+  	#	@browser.file_field(:id, "business_photos_attributes_99_uploaded_data").set self.logo
+  	#	rescue
+  	#		puts "Error in setting logo."
+  	#	end
+  	#end
 
-  
-  sleep 15
-  #Watir::Wait.until { @browser.link(:text => 'Write a Review').exists? }
-  true if claim_business(data)
+  	# Hours
+  	#hours = InsiderPage.get_hours
+  	#@browser.ul(:class, 'addresses').li.address.click
+  	#@browser.checkboxes.each { |checkbox| checkbox.clear }
+  	#@browser.text_field(:id, 'business_addresses_attributes_0_hours_attributes_mon_opens_at_formatted').set hours["monday", "open"]
+  #end
 end
 
 def claim_business(data)

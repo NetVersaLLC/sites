@@ -15,7 +15,8 @@ def enter_captcha(data)
     @browser.checkbox(:id => 'terms_of_service').set
     @browser.text_field(:id => 'recaptcha_response_field').set captcha_code
     @browser.button(:value => 'submit').click
-
+    sleep 2
+    Watir::Wait.until(10) { @browser.text_field(:id => 'business_name').exists? }
   rescue Exception => e
     puts(e.inspect)
     if captcharetries > 0      
@@ -75,6 +76,7 @@ def fill_form(data)
     end
   end
     
+  #Keywords treated as categories, TODO
   # tags = data['tags']
   # tags.each do |tag| 
   #   if tag != ""
@@ -117,6 +119,12 @@ def update_business(data)
   else
     @browser.file_field(:id => 'business_photos_attributes_99_uploaded_data').value = self.logo
   end
+
+  # Hours
+    #hours = InsiderPage..get_hours
+    #@browser.ul(:class, 'addresses').li.address.click
+    #@browser.checkboxes.each { |checkbox| checkbox.clear }
+    #@browser.text_field(:id, 'business_addresses_attributes_0_hours_attributes_mon_opens_at_formatted').set hours["monday", "open"]
 
   @browser.button(:value => 'update business').click
 

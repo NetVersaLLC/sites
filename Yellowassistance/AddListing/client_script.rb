@@ -10,7 +10,7 @@ sleep(3)
 @browser.text_field( :id => 'txtTitle').set data['title']
 @browser.text_field( :id => 'txtEmail').set data['email']
 @browser.text_field( :id => 'txtCEmail').set data['email']
-@browser.text_field( :id => 'txtPhone').set data['phone']
+@browser.text_field( :id => 'txtPhone').set data['phone'].gsub("-","")
 
 @browser.text_field( :id => 'txtBusName').set data['business']
 @browser.text_field( :id => 'txtAddress').set data['addressComb']
@@ -18,8 +18,8 @@ sleep(3)
 @browser.select_list( :id => 'ddlState').select data['state'].upcase
 @browser.text_field( :id => 'txtZip').set data['zip']
 
-@browser.text_field( :id => 'txtBusPhone').set data['phone']
-@browser.text_field( :id => 'txtTollFree').set data['tollfree']
+@browser.text_field( :id => 'txtBusPhone').set data['phone'].gsub("-","")
+@browser.text_field( :id => 'txtTollFree').set data['tollfree'].gsub("-","")
 @browser.text_field( :id => 'txtBusEmail').set data['email']
 @browser.text_field( :id => 'txtWebsite').set data['website']
 
@@ -38,7 +38,13 @@ hours.each_with_index do |hour,day|
 		close = hour[1][1]
 		closeAMPM = close[-2, 2]
 		open = open.gsub( / [ap]m/i, '')
-		close = close.gsub( / [ap]m/i, '')		
+		close = close.gsub( / [ap]m/i, '')
+		if open.chars.first=="0"
+			open=open[1..-1]
+		end
+		if close.chars.first=="0"
+			close=close[1..-1]
+		end
 		@browser.text_field( :id => "txt#{theday}Open").set open
 		@browser.text_field( :id => "txt#{theday}Close").set close
 		@browser.select_list( :id => "ddl#{theday}Open").select openAMPM		
@@ -47,7 +53,6 @@ hours.each_with_index do |hour,day|
 		@browser.checkbox( :id => "chk#{theday}Closed").click
 	end
 end
-
 
 payments = data['payments']
 payments.each do |payment|
@@ -72,4 +77,6 @@ end
 
 if @browser.text.include? "Thank you for your submission!"
 	true
+elsif @browser.text.include? "Click here to go back"
+	puts "IP has been blocked"
 end

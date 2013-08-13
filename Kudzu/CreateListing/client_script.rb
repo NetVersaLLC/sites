@@ -38,10 +38,16 @@ end
 @browser.text_field( :name => 'busNXX' ).set data[ 'busNXX' ]
 @browser.text_field( :name => 'busPlusFour' ).set data[ 'busPlusFour' ]
 @browser.text_field( :name => 'busExtension' ).set data[ 'busExtension' ]
-@browser.text_field( :name => 'busFaxNPA' ).set data[ 'busFaxNPA' ]
-@browser.text_field( :name => 'busFaxNXX' ).set data[ 'busFaxNXX' ]
-@browser.text_field( :name => 'busFaxPlusFour' ).set data[ 'busFaxPlusFour' ]
-
+#Code logic added for fax number to be empty
+fax=data['fax']
+if fax != ""
+	faxnpa=fax.split("-")[0]
+	faxnxx=fax.split("-")[1]
+	faxplusfour=fax.split("-")[2]
+	@browser.text_field(:name => 'busFaxNPA' ).set faxnpa
+	@browser.text_field(:name => 'busFaxNXX' ).set faxnxx
+	@browser.text_field(:name => 'busFaxPlusFour' ).set faxplusfour
+end
 @browser.button( :name, 'nextButton' ).click
 
 sleep 2

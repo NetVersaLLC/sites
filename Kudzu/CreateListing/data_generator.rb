@@ -18,7 +18,5 @@ data[ 'busNPA' ]			= business.local_phone.split("-")[0]
 data[ 'busNXX' ]			= business.local_phone.split("-")[1]
 data[ 'busPlusFour' ]		= business.local_phone.split("-")[2]
 data[ 'busExtension' ]		= ''#TODO
-data[ 'busFaxNPA' ]			= business.fax_number.split("-")[0]
-data[ 'busFaxNXX' ]			= business.fax_number.split("-")[1]
-data[ 'busFaxPlusFour' ]	= business.fax_number.split("-")[2]
+data[ 'fax' ]				= business.fax_number
 data

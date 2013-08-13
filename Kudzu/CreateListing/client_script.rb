@@ -40,7 +40,7 @@ end
 @browser.text_field( :name => 'busExtension' ).set data[ 'busExtension' ]
 #Code logic added for fax number to be empty
 fax=data['fax']
-if fax != ""
+if not fax.nil?
 	faxnpa=fax.split("-")[0]
 	faxnxx=fax.split("-")[1]
 	faxplusfour=fax.split("-")[2]

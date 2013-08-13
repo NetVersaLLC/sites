@@ -1,6 +1,6 @@
 def sign_up(data)
   @browser.link(:text => 'Sign Up Now').click
-  @browser.text_field(:name => 'name').set data['email']
+  @browser.text_field(:name => 'name').when_present.set data['username']
   @browser.text_field(:name => 'mail').set data['email'] 
   @browser.text_field(:name => 'conf_mail').set data['email'] 
   @browser.text_field(:name => 'pass[pass1]').set data['password'] 
@@ -37,7 +37,7 @@ else
   @confirmation_msg = "Welcome to your business dashboard #{data['first_name']}"
   
 sleep 2 
-Watir::Wait.until{ @browser.text.include? @confirmation_msg}
+Watir::Wait::until{ @browser.text.include? @confirmation_msg}
 
   #Check for successful registration
   if @confirmation.exist? && @confirmation.text.include?(@confirmation_msg)

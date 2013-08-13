@@ -5,18 +5,15 @@
 
 sleep 2
 Watir::Wait::until{@browser.text.include? "Address"}
-
 @browser.link(:text => 'edit profile').click
-
 sleep 2
 Watir::Wait::until{@browser.text.include? "Business Information"}
 @browser.button(:name, "cmdAdd").click
-
 sleep 2
 Watir::Wait::until{@browser.text.include? "Business Information"}
 
 @browser.text_field(:name => 'txtBusinessName').set data['name']
-@browser.text_field(:name => 'txtType').set data['category']
+@browser.text_field(:name => 'txtType').set data['keyword']
 @browser.text_field(:name => '_ctl1:txtPhone1').set data['phone']
 @browser.text_field(:name => '_ctl1:txtFax').set data['fax']
 @browser.text_field(:name => '_ctl1:txtEmail').set data['email']
@@ -24,7 +21,6 @@ Watir::Wait::until{@browser.text.include? "Business Information"}
 @browser.text_field(:name => '_ctl0:txtCity').set data['city']
 @browser.select_list(:name => '_ctl0:cboState').option(:value, data['state']).select
 @browser.text_field(:name => '_ctl0:txtZip').set data['zip']
-
 @browser.button(:name, "cmdAdd").click
 sleep 2
 Watir::Wait::until{@browser.text.include? "Business Name:"}
@@ -41,8 +37,14 @@ Watir::Wait::until{@browser.text.include? "Business Hours"}
 days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
 days.each do |day|
 	if data["#{day}"] == true	
-		open=data["#{day}_open"].downcase.gsub("a"," a").gsub("p"," p")[1..-1]
-		close=data["#{day}_close"].downcase.gsub("a"," a").gsub("p"," p")[1..-1]
+		if data["#{day}_open"].chars.first=="0"					#using the opne class to make the code more readable
+			open=data["#{day}_open"][1..-1]			
+		end
+		if data["#{day}_close"].chars.first=="0"
+			close=data["#{day}_close"][1..-1]
+		end
+		open=data["#{day}_open"].downcase.gsub("a"," a").gsub("p"," p")
+		close=data["#{day}_close"].downcase.gsub("a"," a").gsub("p"," p")
 		day=day.capitalize
 		@browser.select_list(:name => "_ctl0:ddOpen#{day}").select open
 		@browser.select_list(:name => "_ctl0:ddClose#{day}").select close

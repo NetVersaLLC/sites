@@ -1,80 +1,64 @@
+@browser.goto('https://www.showmelocal.com/Login.aspx')
+@browser.text_field( :id => '_ctl0_txtUserName').set data[ 'email' ]
+@browser.text_field( :id => '_ctl0_txtPassword').set data[ 'password' ]
+@browser.button(:name => '_ctl0:cmdLogin').click
 
-sign_in(data)
-
-@browser.link(:text => 'Business Dashboard').when_present.click
-
-Watir::Wait.until { @browser.select_list(:name => 'cboBusinesses').exists? }
+sleep 2
+Watir::Wait::until{@browser.text.include? "Address"}
 
 @browser.link(:text => 'edit profile').click
 
-Watir::Wait.until { @browser.link(:id => '_ctl0_hlBusinessDashboard').exists? }
+sleep 2
+Watir::Wait::until{@browser.text.include? "Business Information"}
+@browser.button(:name, "cmdAdd").click
 
-@browser.button(:name => 'cmdBusinessHours').click
-@browser.radio(:id => '_ctl0_rbOpenOptions_2').when_present.click
+sleep 2
+Watir::Wait::until{@browser.text.include? "Business Information"}
 
-hours = data['hours']
-hours.each_pair do |day,hour|
-	theday = day.dup.capitalize!
-	if hour == "closed"
-		@browser.select_list(:name => "_ctl0:ddOpen#{theday}").select "Closed"
-		@browser.select_list(:name => "_ctl0:ddClose#{theday}").select "Closed"
-		next
-	end
-		openHour = hour['open']
-		closeHour = hour['close']
-			if openHour[0,1] == "0"
-				openHour = openHour[1..-1]
-			end
-			if closeHour[0,1] == "0"
-				closeHour = closeHour[1..-1]
-			end			
-		@browser.select_list(:name => "_ctl0:ddOpen#{theday}").select openHour
-		@browser.select_list(:name => "_ctl0:ddClose#{theday}").select closeHour
-end
-
-@browser.button(:name => '_ctl0:cmdEdit').click
-
-Watir::Wait.until { @browser.link(:id => '_ctl0_hlBusinessDashboard').exists? }
-
-@browser.button(:name => 'cmdDescription').click
-
-@browser.text_field(:name => 'txtBody').set data['desc']
-
-@browser.button(:id => 'cmdEdit').click
-
-Watir::Wait.until { @browser.link(:id => '_ctl0_hlBusinessDashboard').exists? }
-
-@browser.button(:name => 'cmdAdd').click
-
-@browser.text_field(:name => 'txtBusinessName').when_present.set data['name']
-@browser.text_field(:name => 'txtType').set data['category1']
+@browser.text_field(:name => 'txtBusinessName').set data['name']
+@browser.text_field(:name => 'txtType').set data['category']
 @browser.text_field(:name => '_ctl1:txtPhone1').set data['phone']
-
-@browser.text_field(:name => '_ctl1:txtTollFree').set data['tollfree']
 @browser.text_field(:name => '_ctl1:txtFax').set data['fax']
 @browser.text_field(:name => '_ctl1:txtEmail').set data['email']
-@browser.text_field(:name => '_ctl0:txtAddress1').set data['address']
-@browser.text_field(:name => '_ctl0:txtAddress2').set data['address2']
-
+@browser.text_field(:name => '_ctl0:txtAddress1').set data['address_full']
 @browser.text_field(:name => '_ctl0:txtCity').set data['city']
-@browser.select_list(:name => '_ctl0:cboState').select data['state_name']
+@browser.select_list(:name => '_ctl0:cboState').option(:value, data['state']).select
 @browser.text_field(:name => '_ctl0:txtZip').set data['zip']
 
-@browser.button(:name => 'cmdAdd').click
-
-Watir::Wait.until { @browser.link(:id => '_ctl0_hlBusinessDashboard').exists? }
-
-@browser.button(:name => 'cmdPaymentOptions').click
-
+@browser.button(:name, "cmdAdd").click
+sleep 2
+Watir::Wait::until{@browser.text.include? "Business Name:"}
+@browser.button(:name, "cmdDescription").click
+sleep 2
+Watir::Wait::until{@browser.text.include? "Description of Services"}
+@browser.textarea(:name, 'txtBody').set data['desc']
+@browser.button(:name, "cmdEdit").click
+sleep 2
+Watir::Wait::until{@browser.text.include? "Sun"}
+@browser.button(:name, 'cmdBusinessHours').click
+sleep 2
+Watir::Wait::until{@browser.text.include? "Business Hours"}
+days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
+days.each do |day|
+	if data["#{day}"] == true	
+		open=data["#{day}_open"].downcase.gsub("a"," a").gsub("p"," p")[1..-1]
+		close=data["#{day}_close"].downcase.gsub("a"," a").gsub("p"," p")[1..-1]
+		day=day.capitalize
+		@browser.select_list(:name => "_ctl0:ddOpen#{day}").select open
+		@browser.select_list(:name => "_ctl0:ddClose#{day}").select close
+	end	
+end
+@browser.button(:name => '_ctl0:cmdEdit').click
+sleep 2
+Watir::Wait::until{@browser.text.include? "Payment Options"}
+@browser.button(:name, 'cmdPaymentOptions').click
+sleep 2
+Watir::Wait::until{@browser.text.include? "Payment Options"}
 payments = data[ 'payments' ]
 payments.each do |pay|
 	@browser.checkbox(:id => pay).set
 end
 
 @browser.button(:name => '_ctl0:cmdEdit').click
-
-Watir::Wait.until { @browser.link(:id => '_ctl0_hlBusinessDashboard').exists? }
-
-puts("Business update success!")
-
+Watir::Wait::until{@browser.link(:id => '_ctl0_hlBusinessDashboard').exists?}
 true

@@ -50,7 +50,6 @@ def solve_captcha2
 end
 
 def enter_captcha2( data )
-
 	capSolved = false
 	count = 1
 	until capSolved or count > 5 do

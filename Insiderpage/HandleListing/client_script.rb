@@ -19,6 +19,8 @@ def add_listing(data)
   	sleep 15
   	#Watir::Wait.until { @browser.link(:text => 'Write a Review').exists? }
   	true if claim_business(data)
+  else 
+    return true
   end
   	#Watir::Wait.until(10) { @browser.text_field(:id => 'business_name').exists? }
   	#@browser.text_area(:id, 'business_merchant_attributes_bio').set data['business_description']

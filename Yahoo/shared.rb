@@ -23,7 +23,7 @@ end
 def retry_captcha(data)
   capSolved = false
   count = 1
-  until capSolved or count > 5 do
+  until capSolved or count > 15 do
     captcha_text = solve_captcha
     @browser.text_field( :id => 'captchaV5Answer' ).set captcha_text
     @browser.button( :id => 'VerifyCollectBtn' ).click  # if @browser.button( :id => 'IAgreeBtn' ).exist?
@@ -55,7 +55,7 @@ end
 def retry_captcha2(data)
   capSolved = false
   count = 1
-  until capSolved or count > 5 do
+  until capSolved or count > 15 do
     captcha_text = solve_captcha2
     @browser.text_field( :id => 'captchaV5Answer' ).set captcha_text
     @browser.checkbox( :id => 'atc' ).click

@@ -1,8 +1,12 @@
 # Launch url
 url = 'https://www.getfave.com'
 @browser.goto url
+#Verify if the page is loaded successfully.
+30.times{break if (begin @browser.link(:text, "Log In/Join").present? rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1}
 
 sign_in data
+30.times{break if (begin @browser.button(:name, "commit").present? rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1}
+
 #~ throw("Login unsuccessful") if @sign_in.exist?
 
 # Check for login error
@@ -22,7 +26,7 @@ if @browser.text.include? 'Please correct the errors and try again.'
 end
 
 sleep 4
-Watir::Wait.until { @browser.text.include? "You must check your email to activate your account before continuing." }
+30.times{break if (begin @browser.link(:text, "Log In/Join").present? rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1}
 
 self.save_account("Getfave", {:email => data['email'], :password => data['password']})
 	puts "Signup successful. Verifying email to continue"

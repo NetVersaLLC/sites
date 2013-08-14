@@ -59,7 +59,7 @@ url = "http://mojopages.com/biz/find?areaCode=#{area}&exchange=#{prefix}&phoneNu
 	#loads user page
 	sleep(2)
 	Watir::Wait::until do @browser.text.include? 'Welcome' end
-	self.save_account("Mojopage", {:email => business['email'], :password => business['password']})
+	self.save_account("Mojopages", {:email => business['email'], :password => business['password']})
 	#now that we are signed up we need to go back and actually claim the business, since it skips that step when we go to sign up.
 	@browser.goto("http://www.mojopages.com/biz/signup")
 	end

@@ -1,6 +1,6 @@
 data = {}
  seed = rand( 1000 ).to_s()
-catty						= Mojopage.where(:business_id => business.id).first
+catty						= Mojopages.where(:business_id => business.id).first
 data[ 'phone_area' ] 		= business.local_phone.split("-")[0]
 data[ 'phone_prefix' ] 		= business.local_phone.split("-")[1]
 data[ 'phone_suffix' ] 		= business.local_phone.split("-")[2]
@@ -25,7 +25,7 @@ data[ 'citystate' ] 		= data[ 'city' ] + ', ' + data[ 'stateabreviation' ]
 data[ 'url' ] 				= business.company_website
 data[ 'tagline' ] 			= business.tag_line[0..110]
 data[ 'description' ] 		= business.business_description[0..799]
-data[ 'password' ] 			= Mojopage.make_password
+data[ 'password' ] 			= Mojopages.make_password
 data[ 'category' ] 			= catty.mojopages_category.name.downcase
 data[ 'gender' ] 			= business.contact_gender
 data

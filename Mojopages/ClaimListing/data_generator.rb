@@ -20,7 +20,7 @@ data[ 'citystate' ] = data[ 'city' ] + ', ' + data[ 'stateabreviation' ]
 data[ 'url' ] = business.company_website
 data[ 'tagline' ] = business.category1 + ' ' + business.category2 + ' ' + business.category3 + ' ' + business.category4 + ' ' + business.category5
 data[ 'description' ] = business.business_description
-data[ 'password' ] = Mojopage.make_password
+data[ 'password' ] = Mojopages.make_password
 data[ 'category' ] = business.category1
 data[ 'gender' ] = "Male"#business.contact_gender
 data

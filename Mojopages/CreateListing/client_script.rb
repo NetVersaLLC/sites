@@ -49,7 +49,7 @@ def add_business ( data )
 	end
 	puts(data['email'])
 	puts(data['password'])
-	self.save_account("Mojopage", {:email => data['email'], :password => data['password']})
+	self.save_account("Mojopages", {:email => data['email'], :password => data['password']})
 	
 
 	#Wait until the Choose Category Screen loads

@@ -28,4 +28,5 @@ Watir::Wait.until {@browser.text_field(:name => 'name').exists? }
 @browser.text_field(:name => 'businessMetaDescription').set data['description']
 @browser.button(:text => 'Submit').click
 
+sleep 10
 true

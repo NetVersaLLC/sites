@@ -1,7 +1,7 @@
 sign_in(data)
 @browser.goto('http://www.localizedbiz.com/add.php')
 
-@browser.text_field(:id => 'location_name').set data['business']
+@browser.text_field(:id => 'location_name').when_present.set data['business']
 @browser.text_field(:name => 'address1').set data['address']
 @browser.text_field(:name => 'city').set data['city']
 @browser.select_list(:name => 'state').select data['state']
@@ -14,7 +14,10 @@ sign_in(data)
 @browser.text_field(:name => 'url').set data['website']
 sleep(50)
 @browser.select_list(:name => 'biz_cat1').select data['category1']
-sleep(1) #Wait for second list to load
+#Wait for sub category to load
+ 
+30.times{break if (begin @browser.select_list(:name => 'biz_cat2').options.length > 1 rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1}
+ 
 @browser.select_list(:name => 'biz_cat2').select data['category2']
 @browser.textarea(:name => 'keywords').set data['keywords']
 @browser.text_field(:name => 'tagline').set data['tagline']
@@ -28,7 +31,6 @@ end
 
 @browser.button(:name => 'submit').click
 
-sleep 2
-Watir::Wait.until { @browser.text.include? "Listing Successfully Added" }
+30.times{break if (begin @browser.text.include?("Listing Successfully Added")  rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1} 
 
 true

@@ -1,7 +1,6 @@
 @browser.goto(data['url'])
 
-sleep 2
-Watir::Wait.until { @browser.text.include? "Your membership is now confirmed" }
+30.times{break if (begin @browser.text.include?("Your membership is now confirmed") rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1}
 
 puts("Account verified")
 if @chained

@@ -12,7 +12,7 @@ sign_in(data)
 @browser.text_field(:name => 'email').set data['email']
 
 @browser.text_field(:name => 'url').set data['website']
-sleep(50)
+sleep(5)
 @browser.select_list(:name => 'biz_cat1').select data['category1']
 #Wait for sub category to load
  
@@ -26,7 +26,7 @@ sleep(50)
 unless self.logo.nil? 
   @browser.file_field(:name => 'new_image').set self.logo
 else
-  @browser.file_field(:name => 'new_image').set self.images.first unless self.images.nil?
+  @browser.file_field(:name => 'new_image').set self.images.first unless self.images.empty?
 end
 
 @browser.button(:name => 'submit').click

@@ -24,7 +24,7 @@ raise Exception, 'Website URL should be provided.' unless data['website']
 unless self.logo.nil? 
   @browser.file_field(:name => 'new_image').set self.logo
 else
-  @browser.file_field(:name => 'new_image').set self.images.first unless self.images.nil?
+  @browser.file_field(:name => 'new_image').set self.images.first unless self.images.empty?
 end
 
 @browser.button( :name => 'submit').click

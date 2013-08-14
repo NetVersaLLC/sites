@@ -27,4 +27,9 @@ Watir::Wait::until {@browser.text.include? "Account Settings"}
 sleep 2
 Watir::Wait::until {@browser.text.include? "My Favorites"}
 
+
+if @chained
+	self.start("Tupalo/AddListing")
+end
+
 true

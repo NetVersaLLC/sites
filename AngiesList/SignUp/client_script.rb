@@ -1,3 +1,6 @@
+class RegistrationFailure < StandardError
+end
+
 @browser.goto( 'https://business.angieslist.com/Registration/Registration.aspx' )
 
 @browser.execute_script("javascript:__doPostBack('ctl00$ContentPlaceHolderMainContent$SimpleRegistrationWizard$SelectCompanyControl$AddCompanyButton','')")
@@ -43,10 +46,15 @@ begin
 	@browser.text_field(:id,/SPAPasswordConfirm/).set data[ 'password' ]
 	@browser.image(:alt,'Submit').click 
 
-	sleep 2
-	Watir::Wait.until(15) { @browser.text.include? 'Thank you for registering!' }
-
-rescue Watir::Wait::TimeoutError
+	#sleep 2
+	#Watir::Wait.until(15) { @browser.text.include? 'Thank you for registering!' }
+	30.times { break if (begin @browser.text.include? 'Thank you for registering!' rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1 }
+	if @browser.text.include? 'Thank you for registering!'
+		#Continue
+	else
+		raise RegistrationFailure, "Error in Registering Account"
+	end
+rescue RegistrationFailure
 	if retries > 0
 		@browser.div(:id => /AccountValidationSummary/i).ul.lis.each do |validerror|
 			puts(validerror.text)
@@ -61,7 +69,7 @@ rescue Watir::Wait::TimeoutError
 	else
 		throw "Account creation failed."
 	end
-rescue Exception => e
+rescue StandardError => e
 	puts(e.inspect)
 end
 

@@ -5,6 +5,9 @@
     @browser.text_field( :id => 'ctl00_SignIn_UserName').set data['email']
     @browser.text_field( :id => 'ctl00_SignIn_Password').set data['password']
     @browser.button( :id => 'ctl00_SignIn_GoButton').click
+    if @browser.url.include? "ErrorCode=500"
+    	raise "AngiesList Error in Processing Login"
+    end
     
 	  #@browser.image(:alt,'Access your profile').click
 	    #if @browser.div(:class,'Profile-Edit-Alert').exist?
@@ -14,7 +17,8 @@
 
 	    begin
 	    @browser.goto("https://business.angieslist.com/MyAccount/CompanyInformation/Default.aspx")
-	    Watir::Wait.until { @browser.text.include? "Company Profile" }
+	    #Watir::Wait.until { @browser.text.include? "Company Profile" }
+	    30.times { break if (begin @browser.text.include? "Company Profile" rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1 }
 	    @browser.link(:id, /EditServiceAreaDescriptionButton/).click
 	    loading_wait() #Detects if page is loading
 	    @browser.textarea(:id, /ServiceAreaDescriptionTextBox/).set data['description']

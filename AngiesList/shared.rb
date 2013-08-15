@@ -10,6 +10,9 @@ def loading_wait()
 	    	sleep(1)
 	    end
 	else
-		sleep(2)
+		5.times { break if (begin @browser.div(:class, /UpdateProgress/).visible? rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1 }
+		until not @browser.div(:class, /UpdateProgress/).visible?
+			sleep(1)
+		end
 	end
 end

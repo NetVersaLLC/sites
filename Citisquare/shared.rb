@@ -3,14 +3,16 @@ def login(data)
   @browser.text_field(:name => 'pass').set data['password'] 
   @browser.button(:value => 'Log In').click
 
-  #check for validation error
+  #Page load check
+  30.times{ break if @browser.status == "Done"; sleep 1}
 
-  sleep 3
-  Watir::Wait.until{ @browser.link(:text => 'My Account').exists? or @browser.text.include? 'Sorry, unrecognized username or password'}
-
+  #Check for confirmation...
   if @browser.text.include? 'Sorry, unrecognized username or password'
     puts "User name doesn't exist. Creating a new one"
     sign_up data
+  elsif  @browser.text.include? "You are not authorized to access this page."
+    puts "Authorization denied."
+    true    
   else
     puts "User name is valid"
   end
@@ -43,8 +45,7 @@ def fill_listing_form(data)
   @browser.text_field(:name => 'phonenumber').set data['phone_suffix']
   @browser.text_field(:name => 'specials').set data['specials']
   @browser.select_list(:name => 'top_cat').select data['category']
-  # Watir::Wait.until { @browser.select_list(:name => 'inet_cat').option(:text => "#{data['sub_category']}").exist? }
-  sleep(3)
+  30.times{break if (begin @browser.select_list(:name, "inet_cat").present? rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1}
   @browser.select_list(:name => 'inet_cat').select data['sub_category']
   @browser.checkbox(:name => 'termsChoice').click
 end
@@ -54,6 +55,7 @@ def claim_business(data)
   login data
   @browser.checkbox(:name => 'termsChoice').set
   @browser.button(:value => 'Upgrade Business').click
+  30.times{ break if @browser.status == "Done"; sleep 1}
   @confirmation = @browser.div(:id => 'landingWelcome')
   @confirmation_msg = 'Welcome to your business dashboard'
   

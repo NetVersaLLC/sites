@@ -2,10 +2,10 @@
 url = 'https://www.getfave.com'
 @browser.goto url
 #Verify if the page is loaded successfully.
-30.times{break if (begin @browser.link(:text, "Log In/Join").present? rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1}
+30.times{ break if @browser.status == "Done"; sleep 1}
 
 sign_in data
-30.times{break if (begin @browser.button(:name, "commit").present? rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1}
+30.times{ break if @browser.status == "Done"; sleep 1}
 
 #~ throw("Login unsuccessful") if @sign_in.exist?
 
@@ -21,19 +21,18 @@ if @login_error.exist?
 	@browser.button(:value,'Join Us').click
 end
 
-if @browser.text.include? 'Please correct the errors and try again.'
-	throw "There is an error while creating the account"
-end
+30.times{ break if @browser.status == "Done"; sleep 1}
 
-sleep 4
-30.times{break if (begin @browser.link(:text, "Log In/Join").present? rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1}
-
-self.save_account("Getfave", {:email => data['email'], :password => data['password']})
+if @browser.text.include? 'Please correct the errors and try again.' 
+	throw "There is an error while creating the account"	
+elsif @browser.label(:class, "error").present?
+	puts "Email already registered."
+	true
+else
+	self.save_account("Getfave", {:email => data['email'], :password => data['password']})
 	puts "Signup successful. Verifying email to continue"
-
-	
-if @chained
-  self.start("Getfave/Verify")
+	if @chained
+  		self.start("Getfave/Verify")
+	end
+	true
 end
-
-true

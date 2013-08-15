@@ -81,4 +81,5 @@ if @browser.text.include? "Thank you for your submission!"
 	true
 elsif @browser.text.include? "Click here to go back"
 	puts "IP has been blocked"
+	true
 end

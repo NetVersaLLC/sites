@@ -10,6 +10,10 @@ login data
 30.times{break if @browser.status == "Done"; sleep 1}
 
 # @browser.link(:text => /#{data['business']}/).click if @browser.div(:id => 'ownedMenuHome').exist?
+if @browser.element(:css, "li a").present?	
+	@browser.element(:css, "div#ownedMenuHome ul li a").click
+end
+
 @browser.link(:text => 'Edit').click
 
 puts "Updating address information"
@@ -40,7 +44,7 @@ puts "Updating phone information"
 puts "Updating category information"
 @browser.link(:text => 'Category').click
 @browser.select_list(:name => 'top_cat').select data['category']
-sleep(3)
+@browser.select_list(:name => 'inet_cat').option.wait_until_present
 @browser.select_list(:name => 'inet_cat').select data['sub_category']
 @browser.button(:text => 'Save').click
 

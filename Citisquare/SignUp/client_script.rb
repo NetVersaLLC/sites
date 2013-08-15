@@ -19,7 +19,7 @@ end
 url = 'http://my.citysquares.com/search'
 @browser.goto url
 
-30.times{break if (begin @browser.button(:name, "op").present? rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1}
+30.times{ break if @browser.status == "Done"; sleep 1}
 
 @browser.text_field(:name => 'b_standardname').set data['business'] 
 @browser.text_field(:name => 'b_zip').set data['zip'] 
@@ -47,16 +47,12 @@ else
   @confirmation = @browser.div(:id => 'landingWelcome')
   @confirmation_msg = "Welcome to your business dashboard #{data['first_name']}"
   
-30.times{break if (begin @browser.text.present?("Welcome to your business dashboard #{data['first_name']}") rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1}
+30.times{ break if @browser.status == "Done"; sleep 1}
 
   #Check for successful registration
   if @confirmation.exist? && @confirmation.text.include?(@confirmation_msg)
-    puts "Business successfully registered"
+      puts "Business successfully registered"
+      self.start("Citisquare/ClaimListing", 4320)
   end
-end
-
-if @chained
-  self.start("Citisquare/ClaimListing", 4320)
-end
-
 true
+end

@@ -2,14 +2,15 @@
 # Launch url
 url = 'http://citysquares.com/user/login'
 @browser.goto url
+30.times{break if @browser.status == "Done"; sleep 1}
 
 login data
 
 @browser.link(:text => 'My Businesses').click
+30.times{break if @browser.status == "Done"; sleep 1}
 
 # @browser.link(:text => /#{data['business']}/).click if @browser.div(:id => 'ownedMenuHome').exist?
 @browser.link(:text => 'Edit').click
-
 
 puts "Updating address information"
 @browser.text_field(:name => 'standardname').set data['business']
@@ -25,8 +26,7 @@ puts "Updating address information"
 @browser.select_list(:name => 'state').select data['state']
 @browser.text_field(:name => 'zip').set data['zip']
 @browser.button(:text => 'Save').click
-
-Watir::Wait.until { @browser.text.include? "has been updated. Click here to view your profile." }
+30.times{break if @browser.status == "Done"; sleep 1}
 
 puts "Updating phone information"
 @browser.link(:text => 'Phone Numbers').click
@@ -35,7 +35,7 @@ puts "Updating phone information"
 @browser.text_field(:name => 'phonenumber').set data['phone_suffix']
 @browser.button(:text => 'Save').click
 
-Watir::Wait.until { @browser.text.include? "has been updated. Click here to view your profile." }
+30.times{break if @browser.status == "Done"; sleep 1}
 
 puts "Updating category information"
 @browser.link(:text => 'Category').click
@@ -44,6 +44,6 @@ sleep(3)
 @browser.select_list(:name => 'inet_cat').select data['sub_category']
 @browser.button(:text => 'Save').click
 
-Watir::Wait.until { @browser.text.include? "has been updated. Click here to view your profile." }
+30.times{break if @browser.status == "Done"; sleep 1}
 
 true

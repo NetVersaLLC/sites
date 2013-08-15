@@ -2,8 +2,7 @@ def add_business( data )
 #adds the business, begins by clicking the "add this number" link
 	
 	@browser.link( :text, 'add this number' ).click
-	Watir::Wait::until do @browser.text_field( :id, 'listingForm:disp').exists? end
-
+	30.times{ break if @browser.status == "Done"; sleep 1}	
 	#fill out the form with client data
 	@browser.text_field( :id, 'listingForm:disp').set data[ 'business' ]
 	@browser.text_field( :id, 'listingForm:StrAdr').set data[ 'streetnumber' ]
@@ -19,9 +18,8 @@ def add_business( data )
 	@browser.button( :id, 'listingForm:addTest2' ).fire_event("onClick")
 	
 	#wait until category text field loads
-	sleep 2#Bug fix 54811800
-	Watir::Wait::until do @browser.text_field( :id, 'listingForm:newSic1').exists? end
-	
+	30.times{ break if @browser.status == "Done"; sleep 1}
+
 	#focus the field so we can get the javascript happy
 	@browser.text_field( :id, 'listingForm:newSic1').focus
 	@browser.text_field( :id, 'listingForm:newSic1').set data[ 'categoryKeyword' ]
@@ -32,15 +30,9 @@ def add_business( data )
 	@browser.button( :value, 'Add new').click
 	sleep(3)
 	@browser.link( :text, 'Save').click
-	
-	if @browser.text.include? 'Thank you for updating our directory. Updates take effect within 3 business days.'
-		puts('Business added successfully')
-	end
 
-
+	30.times{ break if @browser.status == "Done"; sleep 1}
 	true
-
-
 end
 
 
@@ -49,21 +41,22 @@ def main( data )
 	@browser.goto('http://www.ziplocal.com/olc/lookup.faces')
 
 	#wait for page to load
-	Watir::Wait::until do @browser.text.include? 'Enter 10 digit phone number' end
-	
+	30.times{ break if @browser.status == "Done"; sleep 1}
+		
 	#enter the phone number
 	@browser.text_field( :id, 'lookupForm:tel').set data[ 'phone' ]
 	@browser.link( :id, 'lookupForm:submit').click
 	
-	#@browser.goto('')
-
 	#wait until the next page loads
-	Watir::Wait::until do @browser.text.include? 'We did not find the listings for phone number' or
-		@browser.text.include? 'We found the following listing(s) for phone number' end	
-
-
-		add_business( data )
-true
+	30.times{ break if @browser.status == "Done"; sleep 1}
+	
+	if @browser.text.include? 'Click on the listing you want to update.'
+		puts ("Business already added. Business name is as bellow")
+		puts @browser.element(:css, "td.col_left_align a").text
+	else
+		add_business(data)		
+	end
+	true
 end
 
 main( data )

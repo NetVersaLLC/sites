@@ -6,5 +6,6 @@ data[ 'email' ] = business.bings.first.email
 data[ 'business_email' ] = business.bings.first.email
 data[ 'business' ] = business.business_name
 data[ 'website' ] = business.company_website
-data[ 'categoryKeyword' ] = business.category1 + ' ' + business.category2 + ' ' + business.category3 + ' ' + business.category4 + ' ' + business.category5
+catty 			= Ziplocal.where(:business_id => business.id).first
+data[ 'categoryKeyword' ] = catty.ziplocal_category.name
 data

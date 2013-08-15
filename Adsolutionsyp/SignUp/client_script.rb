@@ -70,7 +70,7 @@ Watir::Wait.until {@browser.text.include? "Your Free Listing Details"}
 =end
 
 if @chained
-	self.start("Adsolutionsyp/Verify")
+	self.start("Adsolutionsyp/Notify")
 end
 
 true

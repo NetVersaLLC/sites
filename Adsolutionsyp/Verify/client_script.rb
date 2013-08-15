@@ -12,7 +12,8 @@ begin
 	@browser.link(:id => 'verifyStartPhoneLink').click
 
 	thecode = @browser.div(:xpath => '//*[@id="calingDiv"]/div').text
-	if PhoneVerify.enter_code(thecode)
+	if PhoneVerify.send_code("adsolutionsyp", thecode)
+		30.times{break if not @browser.div(:xpath => '//*[@id="calingDiv"]/div').exists?; sleep 5}
 		true
 	else
 		throw("Phone verify failed")

@@ -46,7 +46,7 @@ end
 
 
 if @chained
-	self.start("Twitter/SendTweet")
+	self.start("Twitter/UpdateListing")
 end
 
 true

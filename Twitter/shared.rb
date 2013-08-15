@@ -62,9 +62,10 @@ def sign_in(data)
 	@browser.h1(:text => 'Sign in to Twitter').click
 	sleep 2
 	@browser.send_keys :tab
-	@browser.send_keys data['username'].split("")
+	@browser.send_keys data['username']
 	@browser.send_keys :tab
-	@browser.send_keys data['password'].split("")
+	@browser.send_keys :tab
+	@browser.send_keys data['password']
 	@browser.send_keys :enter
 	sleep 2
 	Watir::Wait.until { @browser.div(:id => 'tweet-box-mini-home-profile').exists?}

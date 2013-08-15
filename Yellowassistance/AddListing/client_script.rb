@@ -19,7 +19,9 @@ sleep(3)
 @browser.text_field( :id => 'txtZip').set data['zip']
 
 @browser.text_field( :id => 'txtBusPhone').set data['phone'].gsub("-","")
-@browser.text_field( :id => 'txtTollFree').set data['tollfree'].gsub("-","")
+if not data['tollfree'].nil?
+	@browser.text_field( :id => 'txtTollFree').set data['tollfree'].gsub("-","")
+end
 @browser.text_field( :id => 'txtBusEmail').set data['email']
 @browser.text_field( :id => 'txtWebsite').set data['website']
 

@@ -90,9 +90,7 @@ puts("Business SingUp Success!")
 if @chained
   self.start("Kudzu/Verify")
 end
-if @chained
-	self.start("Kudzu/AddListing")
-end
+
 true
 
 #Basic profile details updated!

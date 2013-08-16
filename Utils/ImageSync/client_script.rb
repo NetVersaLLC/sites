@@ -4,6 +4,11 @@ i = 0
 directory_name = "#{ENV['USERPROFILE']}\\citation\\#{$bid}\\images"
 Dir.mkdir(directory_name) unless File.exists?(directory_name)
 
+Dir.open(directory_name).each do |file|
+  next if file =~ /^\./
+  File.unlink "#{directory_name}\\#{file}"
+end
+
 images.each do |image|
   i = i + 1
   if image =~ /\.(png|jpe?g)/i

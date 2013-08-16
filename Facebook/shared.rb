@@ -90,7 +90,7 @@ def login(data)
 end
 
 def create_page(data)
-  @browser.link(:text => 'Create a Page').click
+  @browser.link(:text => 'Create a Page').when_present.click
   @browser.div(:text => 'Local Business or Place').when_present.click
   @browser.select_list(:id=> 'category').select data[ 'profile_category' ]
   @browser.text_field(:name => 'page_name').set data[ 'business' ]

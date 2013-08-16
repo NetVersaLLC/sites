@@ -7,7 +7,7 @@ def create_profile( data )
 	@browser.select_list(:id, 'month').select data['month']
 	@browser.select_list(:id, 'day').select data['day']
 	@browser.select_list(:id, 'year').select data['year']
-	if data['gender'] == "Male" or "Unknown"
+	if data['gender'] == "Male" or data['gender'] == "Unknown"
 		@browser.radio(:name => 'sex', :value => "2").set
 	else
 		@browser.radio(:name => 'sex', :value => "1").set

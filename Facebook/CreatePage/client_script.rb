@@ -39,6 +39,7 @@ def create_list(data)
       @browser.link(:title => "Remove").click
     end
     sleep 4
+    @browser.text_field(:id => 'u_0_2').click
     @browser.text_field(:id => 'u_0_2').set data[ 'category' ]
     sleep 4
     #@browser.send_keys :down
@@ -65,11 +66,17 @@ begin
   @browser.button(:value=>'Save Info').click
   sleep(3)
   if @browser.text.include? "Web address is not available. Please try another one."
-    puts("Website not available. Nullifying...")
-    website_unavailable = true
-    @browser.refresh # Cannot edit the data properly without refresh, FB bug?
-    retry
+    raise "Website not available"
   end
+rescue
+	puts("Website not available. Nullifying...")
+    website_unavailable = true
+    @browser.text_field(:class=> 'inputtext', :name=> 'website[]').click
+    @browser.text_field(:class=> 'inputtext', :name=> 'website[]').set ""
+    @browser.text_field(:class=> /uiTextareaNoResize uiTextareaAutogrow/).click
+    #@browser.refresh # Cannot edit the data properly without refresh, FB bug?
+    @browser.button(:value=>'Save Info').click
+	retry
 end
   
   logo = self.logo

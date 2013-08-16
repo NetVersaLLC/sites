@@ -1,7 +1,13 @@
+#require 'rest-client'
+#require 'nokogiri'
 
-p1 = data['phone'].split("-")[0]
-p2 = data['phone'].split("-")[1]
-p3 = data['phone'].split("-")[2]
+#data = {}
+#data['business']  = "Lets Fly Cheaper"
+#data['phone'] = "8002400461"
+
+p1 = data['phone'][0,3]
+p2 = data['phone'][3,3]
+p3 = data['phone'][6,4]
 
 url = "http://ebusinesspages.com/(#{p1})#{p2}-#{p3}.tel"
 
@@ -30,5 +36,5 @@ thelist.each do |item|
   break
   
 end
-
+#puts businessFound
 [true, businessFound]

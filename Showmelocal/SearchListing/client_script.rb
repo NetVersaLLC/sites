@@ -1,16 +1,26 @@
+#require 'nokogiri'
+#require 'rest-client'
+#require 'awesome_print'
 
-
-# COPY AND PASTE THE CONTENTS OF SearchListing/client_script.rb here
-
-name=data['name']
+#data = {}
+#data['business'] = "Glendale Foot & Ankle Podiatry Center"
+#data['state_short']	= "CA"
+name=data['business']
 city=data['city']
-url="http://www.showmelocal.com/local_search.aspx?q=#{name}&s=ga&c=#{city}"
+name=CGI.escape name
+
+url= "http://www.showmelocal.com/local_search.aspx?q=#{name}&s=#{data['state_short'].downcase}&c=#{city.downcase}"
+ap url
 businessFound = {}
 businessFound['status'] = :unlisted
-name=data['name'].gsub("+"," ")
+
 nok = Nokogiri::HTML(RestClient.get url)
-nok.css("table#dgBusiness").each do |bi|   
-        if (bi.css("div.h a").text) =~ /#{name}/i                                 
+
+nok.css("div.serachresult").each do |bi|
+
+
+#	ap bi.css("div.h a").text + " ---- " + data['business']
+        if (bi.css("div.h a").text) =~ /#{data['business']}/i                                 
             businessFound['listed_name']    = bi.css("div.h a").text
             businessFound['listed_url']     = "http://www.showmelocal.com/"+ bi.css("div.h a").attr("href")
             businessFound['listed_address'] = bi.css("div.address").text
@@ -24,6 +34,6 @@ end
 #######
 ###
 
-
+#ap businessFound
 
 [true, businessFound]

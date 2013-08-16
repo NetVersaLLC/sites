@@ -1,11 +1,20 @@
+#require 'nokogiri'
+#require 'rest-client'
+#require 'awesome_print'
+
+#data = {}
+#data['business']      = "Precision Roofing"
+#data['city']          = "Saint Charles"
+#data['state_short']   = "MO"
+
 data[ 'businessfixed' ]      = data['business'].gsub(" ","+").gsub(",","")
 data['city']                   = data['city'].gsub(" ", "+")
 
 businessFound = {}
-results = Nokogiri::HTML(open("http://www.google.com/custom?q=#{data['businessfixed']}+#{data['city']}++#{data['state']}&client=rbi-cse&cof=FORID:10%3BAH:left%3BCX:HotFrog%2520US%2520Custom%2520Search%2520Engine%3BL:http://www.google.com/intl/en/images/logos/custom_search_logo_sm.gif%3BLH:30%3BLP:1%3BVLC:%23551a8b%3BDIV:%23cccccc%3B&cx=015071188996636028084:ihs3t9hzgq8&channel=hotfrog"))
+results = Nokogiri::HTML(RestClient.get "http://www.google.com/custom?q=#{data['businessfixed']}+#{data['city']}++#{data['state']}&client=rbi-cse&cof=FORID:10%3BAH:left%3BCX:HotFrog%2520US%2520Custom%2520Search%2520Engine%3BL:http://www.google.com/intl/en/images/logos/custom_search_logo_sm.gif%3BLH:30%3BLP:1%3BVLC:%23551a8b%3BDIV:%23cccccc%3B&cx=015071188996636028084:ihs3t9hzgq8&channel=hotfrog" )
 resultshref = results.css(' a').map { |link| link['href']} #Compile results
 firstlink = resultshref[1] #Grab first result
-page = Nokogiri::HTML(open(firstlink)) #Open first result
+page = Nokogiri::HTML(RestClient.get firstlink ) #Open first result
 puts("Grabbed link: " + firstlink)
 if page.at_css('h1.company-heading') then #Check type of result returned
   puts("Result Type 1")
@@ -32,7 +41,7 @@ elsif page.xpath("//a[text()='#{data['businesses']}']") # Does the business exis
   fsublink = page.at_xpath("//a[text()='#{data['business']}']/@href").to_s #Grab the href
   puts("Listed Url: " + fsublink)
   businessFound['listed_url'] = fsublink
-  factual = Nokogiri::HTML(open(fsublink)) #Open grabbed href in Nokogiri
+  factual = Nokogiri::HTML(RestClient.get fsublink ) #Open grabbed href in Nokogiri
   if factual.at_xpath('//*[@id="content"]/div[2]/div[3]/p').text.length == 0 then #Check for Claim
     puts("Business is claimed")
     businessFound['status'] = :claimed
@@ -45,9 +54,11 @@ elsif page.xpath("//a[text()='#{data['businesses']}']") # Does the business exis
   businessFound['listed_address'] = factual.at_xpath('//*[@id="content"]/div[2]/div[4]/text()[1]').text
   puts("Listed Phone: " + factual.at_xpath('//*[@id="content"]/div[2]/div[4]/text()[2]').text)
   businessFound['listed_phone'] = factual.at_xpath('//*[@id="content"]/div[2]/div[4]/text()[2]').text
+  businessFound['listed_name'] = factual.css("h1.company-heading").text
 else
   puts("Busines is unlisted")
   businessFound['status'] = :unlisted
 end
 
+#ap businessFound
 [true, businessFound]

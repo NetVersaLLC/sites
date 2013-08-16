@@ -1,3 +1,7 @@
+#require 'rest-client'
+#require 'nokogiri'
+#require 'awesome_print'
+
 phone = data['phone']
 name = data['business']
 zip = data['zip']
@@ -12,9 +16,10 @@ nok.xpath("//input[@name='__RequestVerificationToken']").each do |token|
 
 end
 
-nok.xpath("//input[@name='traceId']").each do |token|
+nok.xpath("//input[@name='TraceId']").each do |token|
   trace_id = token.attr('value')
 end
+
 headers = html.headers
 cookie = headers[:set_cookie]
 
@@ -49,17 +54,29 @@ rheaders = {
   "User-Agent" => "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.72 Safari/537.36",
   "X-Requested-With" => "XMLHttpRequest"
 }
+ 
+
+#ap url
+#ap params
+#ap rheaders
+
 
 #puts params
 
 resp = RestClient.post url,params,rheaders
+
+#puts resp
+
 resNok = Nokogiri::HTML(resp)
 
 businessListed = {}
 businessListed['status'] = :unlisted
 
+
 if result = resNok.xpath("//a[@title='#{name}']")
 
+  #puts result
+ 
   businessListed['listed_url'] = result.attr("href").text
   businessListed['listed_phone'] = phone
   businessListed['listed_name'] = result.text
@@ -83,4 +100,5 @@ if result = resNok.xpath("//a[@title='#{name}']")
 end
 
 #puts resp
+#puts businessListed
 [true, businessListed]

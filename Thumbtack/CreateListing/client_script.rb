@@ -3,7 +3,7 @@ sign_in(data)
 
 @browser.text_field(:name => 'sav_business_name').when_present.set data['business']
 @browser.text_field(:name => 'phone_number').set data['phone']
-@browser.text_field(:name => 'website').set data['website']
+# @browser.text_field(:name => 'website').set data['website']
 
 data['descriptionfixed'] = data['description']
 data['descriptionfixed'] = "#{data['descriptionfixed']}\n#{data['description']}" while data['descriptionfixed'].length < 200
@@ -20,9 +20,13 @@ data['descriptionfixed'] = "#{data['descriptionfixed']}\n#{data['description']}"
 @browser.link(:text => /List my services/).click
 
 # Check for Error
+30.times { break if @browser.status == "Done"; sleep 1 }
 if @browser.div(:class,'form-error').visible?
   throw "Validation Fails : #{@browser.div(:class,'form-error').text}"
 end
+# if @browser.div(:class => 'status status-error').visible?
+#   throw "Validation Fails : #{ @browser.div(:class => 'status status-error').text }"
+# end
 sleep 2
 Watir::Wait.until { @browser.text.include? "Connect Your Facebook Account" }
 @browser.link(:text => /Skip this step/).click

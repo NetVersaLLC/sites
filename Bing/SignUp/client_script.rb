@@ -130,7 +130,7 @@ puts data['password']
 enter_captcha
 
     Watir::Wait.until { @browser.text.include? "Account summary" }
-    self.save_account('Bing',  {:email => data['email'],:password => data['password']})
+    self.save_account('Bing',  {:email => data['email'],:password => data['password'],:secret_answer => data['secret_answer']})
 
 true
 

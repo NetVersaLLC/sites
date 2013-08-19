@@ -13,5 +13,5 @@ data[ 'birth_day' ]         = business.birthday.day
 data[ 'birth_year' ]        = business.birthday.year
 data[ 'gender' ]            = business.contact_gender
 data[ 'zip' ]               = business.zip
-data[ 'alt_email' ]         = Faker::Name.name.gsub(" ", "") + seed +"@gmail.com"
+data[ 'alt_email' ]         = User.where(:id => business.user_id).first.email#Faker::Name.name.gsub(" ", "") + seed +"@gmail.com"
 data

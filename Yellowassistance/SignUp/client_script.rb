@@ -20,7 +20,7 @@ Watir::Wait::until { @browser.text.include? "Thank You, Here's how your informat
 sleep 2
 Watir::Wait::until { @browser.text.include? "Check your e-mail now!" }
 
-RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['username'], 'account[password]' => data['password'], 'account[secret_answer]' => data['secret_answer'], 'model' => 'Yellowassistance'
+RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['email'], 'account[password]' => data['password'], 'account[secret_answer]' => data['secret_answer'], 'model' => 'Yellowassistance'
 
 if @chained
   self.start("Yellowassistance/Verify")

@@ -133,4 +133,3 @@ enter_captcha
     self.save_account('Bing',  {:email => data['email'],:password => data['password'],:secret_answer => data['secret_answer']})
 
 true
-

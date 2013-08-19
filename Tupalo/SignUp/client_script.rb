@@ -8,7 +8,7 @@ url="http://tupalo.com/en/accounts/sign_up"
 sleep 2 
 Watir::Wait::until {@browser.text.include? "My Favorites"}
 
-self.save_account("Tupalo", {:username => data[ 'username' ], :password => data[ 'password' ], :email => data[ 'email' ]})
+self.save_account("Tupalo", {:username => data[ 'email' ], :password => data[ 'password' ], :email => data[ 'email' ]})
 
 if @chained
 	self.start("Tupalo/Verify")

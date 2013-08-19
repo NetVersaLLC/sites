@@ -1,0 +1,19 @@
+data = {}
+data['firstname']				= business.contact_first_name
+data['lastname']				= business.contact_last_name
+data['phone']					= business.local_phone
+data['altphone']				= business.alternate_phone
+data['mobilephone']				= business.mobile_phone
+data['tollfree']				= business.toll_free_phone
+data['fax']						= business.fax_number
+data['email']					= business.bings.first.email
+data['business']				= business.business_name
+data['address']					= business.address
+data['city']					= business.city
+data['state']					= business.state
+data['country']					= "United States"
+data['zipcode']					= business.zip
+data['companywebsite']			= business.company_website
+data['tagline']					= business.tag_line
+data['description']				= business.business_description
+data

@@ -24,4 +24,14 @@ rescue
 	data['rootcat'] 		= ""
 end
 
+if data['rootcat'] == 'root'
+  data['rootcat'] = ""
+end
+if data['parent'] == 'root'
+  data['parent'] = ""
+end
+if data['category'] == 'root'
+  data['category'] = ""
+end
+
 data

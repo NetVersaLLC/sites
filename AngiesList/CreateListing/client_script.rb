@@ -23,6 +23,7 @@
 	    loading_wait()
 	    @browser.text_field(:id => /EditControl_WebsiteTextBox/).set data[ 'business_website' ] 
 	    @browser.button(:id => 'ctl00_ContentPlaceHolderMainContent_ProfileControl_ContactControl_ContactEditControl_SaveButton').when_present.click
+	    loading_wait()
 	    @browser.link(:id, /EditServiceAreaDescriptionButton/).when_present.click
 	    loading_wait() #Detects if page is loading
 	    @browser.textarea(:id, /ServiceAreaDescriptionTextBox/).set data['description']
@@ -80,14 +81,17 @@
 		loading_wait()
 		@browser.button(:id, 'ctl00_ContentPlaceHolderMainContent_ProfileControl_LicenseDetailControl_LicenseDetailEditSection_SaveButton').click
 		loading_wait()
-		rescue
+		rescue StandardError => e
+			puts(e.inspect)
 			if retries == 0
-				puts("Failed after five retries.")
+				puts("Failed after three retries.")
 			end
 			puts("Something went wrong! Retrying. #{retries} attempts remaining.")
-			retry
 			retries -= 1
+			retry
 		end
+		puts "Waiting..."
+		input = gets
 		if @browser.text.include? "Profile 100% Complete" then 
 			puts("Profile successfully created")
 			true

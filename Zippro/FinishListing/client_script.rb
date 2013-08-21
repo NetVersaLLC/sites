@@ -65,10 +65,10 @@ sleep(2)
 	@browser.radio(:id => 'specify').set
 	  hours = data['hours']
 
-  hours.each_pair do | bmo, finn |
+  hours.each_pair do | the_day, the_hour |
 
-    daay = bmo[0..2]
-    if finn.to_s == "closed"
+    daay = the_day[0..2]
+    if the_hour.to_s == "closed"
 
     	if daay == 'mon' then
     		@browser.checkbox( :id => 'hr_close_1').set
@@ -100,13 +100,17 @@ sleep(2)
 
     else
 
-        openHour = finn['open']
-        closeHour = finn['close']
+        openHour = the_hour['open']
+        closeHour = the_hour['close']
         if openHour[0,1] == "0"
           openHour = openHour[1..-1].upcase.gsub(".","")
+        else
+        	openHour = openHour.upcase.gsub(".","")
         end
         if closeHour[0,1] == "0"
           closeHour = closeHour[1..-1].upcase.gsub(".","")
+        else
+        	closeHour = closeHour.upcase.gsub(".","")
         end     
 
         if daay == 'mon' then

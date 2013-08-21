@@ -28,7 +28,6 @@ if not data['logo'] == nil then
 else
 	puts("No Logo Found")
 end
-input = gets
 #End Updating Logo
 
 if imagetrue == true then
@@ -173,7 +172,7 @@ Watir::Wait.until { @browser.text.include? 'Hours of Operation have been saved.'
 	end
 
 	data['payments'].each do |pay|
-		@browser.checkbox(:name => pay).click
+		@browser.checkbox(:name => pay).set
 	end
 	
 	@browser.button(:id => 'btnSubPayDesc').click

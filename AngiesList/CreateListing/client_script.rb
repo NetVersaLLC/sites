@@ -19,7 +19,11 @@
 	    @browser.goto("https://business.angieslist.com/MyAccount/CompanyInformation/Default.aspx")
 	    #Watir::Wait.until { @browser.text.include? "Company Profile" }
 	    30.times { break if (begin @browser.text.include? "Company Profile" rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1 }
-	    @browser.link(:id, /EditServiceAreaDescriptionButton/).click
+	    @browser.link(:id => /EditCompanyInfoButton/).when_present.click
+	    loading_wait()
+	    @browser.text_field(:id => /EditControl_WebsiteTextBox/).set data[ 'business_website' ] 
+	    @browser.button(:id => 'ctl00_ContentPlaceHolderMainContent_ProfileControl_ContactControl_ContactEditControl_SaveButton').when_present.click
+	    @browser.link(:id, /EditServiceAreaDescriptionButton/).when_present.click
 	    loading_wait() #Detects if page is loading
 	    @browser.textarea(:id, /ServiceAreaDescriptionTextBox/).set data['description']
 	    @browser.button(:id, 'ctl00_ContentPlaceHolderMainContent_ProfileControl_ServiceAreaControl_ServiceAreaEditControl_ServiceAreaDescriptionSaveButton').click

@@ -3,6 +3,7 @@ def photo_upload_pop(data)
   require 'rautomation'
   #update logo
   @browser.div(:class => 'G8iV4').when_present.click
+  @browser.div(:class => /o7Daxc g-s-Sa-Cr/).when_present.click
   @browser.div(:text => 'Select a photo from your computer').when_present.click
   data['logo'] = self.logo
   if data['logo'] > 0
@@ -34,7 +35,7 @@ end
 
 #Create new business
 def create_business( data )
-	
+
   puts 'Business is not found - Creating business listing'
   @browser.goto "https://plus.google.com/pages/create"
   
@@ -77,8 +78,8 @@ def create_business( data )
   end
   
   if @browser.wait_until {@browser.div(:class=> 'iph-dialog-dismiss-container').exist? }
-	@browser.button(:value => 'Next').click until @browser.button(:value => 'Next').exist? == false
-	@browser.button(:value => 'Done').click
+@browser.button(:value => 'Next').click until @browser.button(:value => 'Next').exist? == false
+@browser.button(:value => 'Done').click
   end
 
   #edit busienss information
@@ -88,7 +89,7 @@ def create_business( data )
   if @browser.text_field(:id => 'Passwd').exist?
     @browser.text_field(:id => 'Passwd').set data['pass'] if @browser.text_field(:id => 'Passwd').exist?
     @browser.button(:value, "Sign in").click
-    sleep(3) 
+    sleep(3)
   end
 
   # Update Address
@@ -120,9 +121,9 @@ def create_business( data )
 
   #Verify Business
   if @browser.span(:text=> 'Verify').exist?
-    @browser.span(:text=> 'Verify').click
+    @browser.span(:text=> 'Verify').when_present.click
   elsif @browser.div(:text => "Verify now").exist?
-    @browser.div(:text => "Verify now").click
+    @browser.div(:text => "Verify now").when_present.click
   end
 
   verify_business()

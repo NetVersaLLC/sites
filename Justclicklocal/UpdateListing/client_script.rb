@@ -33,9 +33,10 @@ end
 @browser.text_field( :id => 'year_established').set data['year_established']
 
 if data['24hours'] == true
-	@browser.radio( :id => 'hours_1').click
+	@browser.radio( :id => 'hours_1').set
 else
 	
+@browser.radio(:id, 'hours_2').set
 
 hours = data[ 'hours' ]
 hours.each_with_index do |hour, day|
@@ -67,6 +68,14 @@ end
 
 end
 
-@browser.button( :name => 'NextButton').click
-	sleep 10
-	true
+@browser.checkbox(:id, 'language-English').click #USA Customers, right?
+
+@browser.button( :name => 'NextButton').when_present.click
+
+@browser.wait()
+if @browser.wait_until {@browser.text.include? "Thank you. Your listing has been updated." }
+  puts("Business listing updated successfully")
+  true
+else
+  throw("Business listing didn't update successfully")
+end

@@ -11,10 +11,10 @@
 @browser.text_field( :name => 'fax').set data['fax']
 @browser.text_field( :name => 'email').set data['email']
 @browser.text_field( :name => 'url').set data['website']
-@browser.text_field( :name => 'descr').set data['description']
-@browser.text_field( :name => 'keywords').set data['keywords']
+@browser.textarea( :name => 'descr').set data['description']
+@browser.textarea( :name => 'keywords').set data['keywords']
 @browser.text_field( :name => 'contactname').set data['fullname']
-@browser.text_field( :name => 'company').set data['fullname']
+@browser.text_field( :name => 'company').set data['business']
 @browser.text_field( :name => 'contactphone').set data['phone']
 @browser.text_field( :name => 'contactemail').set data['email']
 

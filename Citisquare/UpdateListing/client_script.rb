@@ -42,11 +42,12 @@ puts "Updating phone information"
 30.times{break if @browser.status == "Done"; sleep 1}
 
 puts "Updating category information"
-@browser.link(:text => 'Category').click
+@browser.link(:text => 'Category').when_present.click
 @browser.select_list(:name => 'top_cat').select data['category']
+sleep(3)
 @browser.select_list(:name => 'inet_cat').option.wait_until_present
-@browser.select_list(:name => 'inet_cat').select data['sub_category']
-@browser.button(:text => 'Save').click
+@browser.select_list(:name => 'inet_cat').when_present.select data['sub_category']
+@browser.button(:text => 'Save').when_present.click
 
 30.times{break if @browser.status == "Done"; sleep 1}
 

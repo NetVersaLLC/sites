@@ -1,6 +1,6 @@
 agent = Proxy.mechanize
-agent.verify_mode = OpenSSL::SSL::VERIFY_NONE
 agent.user_agent_alias = 'Mac Safari'
+agent.http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 agent.get('https://biz.yelp.com/signup')
 
 businessFound = {}

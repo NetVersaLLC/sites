@@ -1,6 +1,8 @@
 #Written by Kazyyk, 7/28/13
 data['businessfixed'] = data['business'].gsub(" ","+").gsub(",","%2C").gsub("&","%26").gsub("'","%27")
 
+businessFound = {}
+
 url = "https://www.facebook.com/search.php?q=#{data['businessfixed']}"
 page = Nokogiri::HTML(RestClient.get(url, :ssl_verify_mode => OpenSSL::SSL::VERIFY_NONE))
 found = false

@@ -30,26 +30,36 @@ sleep(2)
 	
 	end
 end
+30.times{ break if @browser.status == "Done"; sleep 1}
 
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtZip').set data['zip']
 
 @browser.link( :id => 'ctl00_ContentPlaceHolder1_cmdStep1Next').click
 
+30.times{ break if @browser.status == "Done"; sleep 1}
+
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtPhone').when_present.set data[ 'phone' ]
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtFax').set data[ 'fax' ]
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtBusinessEmail').set data[ 'email' ]
-@browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtFax').set data[ 'fax' ]
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtUrl').set data[ 'website' ]
 
 @browser.link( :id => 'ctl00_ContentPlaceHolder1_cmdStep2Next').click
+
+30.times{ break if @browser.status == "Done"; sleep 1}
 
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtBusinessDesc').when_present.set data['description']
 
 @browser.link( :id => 'ctl00_ContentPlaceHolder1_cmdStep3Next').click
 
+30.times{ break if @browser.status == "Done"; sleep 1}
+
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtBusinessKeywords').set data['keywords']
+lkey=data['city'] + ", " + data ['state'] + ", " + data ['country']
+@browser.textarea( :name => 'ctl00$ContentPlaceHolder1$txtLocationKeywords').set lkey
 
 @browser.link( :id => 'ctl00_ContentPlaceHolder1_cmdStep4Next').click
+
+30.times{ break if @browser.status == "Done"; sleep 1}
 
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtFName' ).when_present.set data['fname']
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtLName' ).set data['lname']
@@ -58,9 +68,10 @@ end
 @browser.select_list( :id => 'ctl00_ContentPlaceHolder1_cboJobFunction' ).select data['position']
 
 @browser.link( :id => 'ctl00_ContentPlaceHolder1_cmdClaim').click
-sleep 2
-Watir::Wait.until {@browser.text.include? 'Almost there......Now check your email'}
 
+30.times{ break if @browser.status == "Done"; sleep 1}
+
+Watir::Wait.until {@browser.text.include? 'Almost there......Now check your email'}
 
 RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['email'], 'model' => 'Expressbusinessdirectory'
 	if @chained

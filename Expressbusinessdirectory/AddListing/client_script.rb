@@ -30,7 +30,6 @@ sleep(2)
 	
 	end
 end
-30.times{ break if @browser.status == "Done"; sleep 1}
 
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtZip').set data['zip']
 
@@ -54,7 +53,7 @@ end
 30.times{ break if @browser.status == "Done"; sleep 1}
 
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtBusinessKeywords').set data['keywords']
-lkey=data['city'] + ", " + data ['state'] + ", " + data ['country']
+lkey = data['city'] + ", " + data ['state'] + ", " + data ['country']
 @browser.textarea( :name => 'ctl00$ContentPlaceHolder1$txtLocationKeywords').set lkey
 
 @browser.link( :id => 'ctl00_ContentPlaceHolder1_cmdStep4Next').click
@@ -71,8 +70,7 @@ lkey=data['city'] + ", " + data ['state'] + ", " + data ['country']
 
 30.times{ break if @browser.status == "Done"; sleep 1}
 
-Watir::Wait.until {@browser.text.include? 'Almost there......Now check your email'}
-
+sleep 500
 RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['email'], 'model' => 'Expressbusinessdirectory'
 	if @chained
 		self.start("Expressbusinessdirectory/Verify")

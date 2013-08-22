@@ -4,11 +4,10 @@
 
 @browser.link( :id => 'ctl00_ContentPlaceHolder1_cmdLogin').click
 
-sleep 2
-@browser.link( :text => "#{data[ 'business' ]}").when_present.click
+30.times { break if (begin @browser.link( :text => "#{data[ 'business' ]}").present? rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1 }
+@browser.link( :text => "#{data[ 'business' ]}").click
 
-sleep 2
-Watir::Wait.until {@browser.link(:id => 'ctl00_hypEditBusiness').exists?}
+30.times { break if (begin @browser.link(:id => 'ctl00_hypEditBusiness').exists? rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1 }
 
 @browser.link(:id => 'ctl00_hypEditBusiness').click
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtAddress1').set data['address']
@@ -28,10 +27,12 @@ sleep(2)
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtBusinessDesc').when_present.set data['description']
 
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtBusinessKeywords').set data['keywords']
+lkey = data ['city'] + ", " + data ['state'] + ", " + data ['country']
+@browser.textarea( :name => 'ctl00$ContentPlaceHolder1$txtLocationKeywords').set lkey
+
 @browser.link(:id => 'ctl00_ContentPlaceHolder1_cmdSave').click
 
-sleep 2
-Watir::Wait.until { @browser.text.include? "Your Business Profile is" }
+30.times{ break if @browser.status == "Done"; sleep 1}
 
 true
 

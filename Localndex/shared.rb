@@ -1,6 +1,11 @@
 def solve_captcha
   image = "#{ENV['USERPROFILE']}\\citation\\localndex_captcha.png"
-  obj = @browser.img( :xpath, '//*[@id="ctl00_ContentPlaceHolder1_imgCaptcha"]' )
+  
+  if @browser.img( :xpath, '//*[@id="ctl00_ContentPlaceHolder1_imgCaptcha"]' ).present?
+	obj = @browser.img( :xpath, '//*[@id="ctl00_ContentPlaceHolder1_imgCaptcha"]' )
+  else	
+	obj = @browser.img( :xpath, '//*[@src="frmCaptchaImg.aspx"]' )
+  end
   puts "CAPTCHA source: #{obj.src}"
   puts "CAPTCHA width: #{obj.width}"
   obj.save image
@@ -9,7 +14,6 @@ def solve_captcha
 end
 
 def enter_captcha( data )
-
 	capSolved = false
 	count = 1
 	until capSolved or count > 5 do
@@ -17,9 +21,12 @@ def enter_captcha( data )
 		#if @browser.text_field(:id => 'ctl00_ContentPlaceHolder1_txtPassword').exists?
 			#@browser.text_field(:id => 'ctl00_ContentPlaceHolder1_txtPassword').set data['password']
 		#end
-		@browser.text_field( :id, 'ctl00_ContentPlaceHolder1_txtSecurity' ).set captcha_code
-		@browser.button( :type => 'submit' ).click
-		
+		if @browser.text_field( :id, 'ctl00_ContentPlaceHolder1_txtSecurity' ).present?
+			@browser.text_field( :id, 'ctl00_ContentPlaceHolder1_txtSecurity' ).set captcha_code
+		else
+			@browser.text_field( :id, 'ctl00_MainContentPlaceHolder_txtSecurity' ).set captcha_code			
+		end
+			@browser.button( :type => 'submit' ).click			
 		if not @browser.text.include? "Wrong match!"
 			capSolved = true
 		end	  

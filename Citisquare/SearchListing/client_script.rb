@@ -1,37 +1,41 @@
-resp = RestClient.post 'http://my.citysquares.com/add_search', {
-  'b_standardname'  => data['business'],
-  'b_zip'           => data['zip']
-}
-#puts resp.headers
-
-nok = Nokogiri::HTML resp
-
-
-businessListed = {}
-businessListed['status'] = :unlisted
-
-
-nok.css('div#bizData').each do |listing|
-
-  listing.xpath("//a[1]").each do |link|
-    
-    if link.text =~ /#{data['business']}/i
-      businessListed['status'] = :claimed
-      businessListed['listed_url'] = link.attr("href")
-
-      resp2 = RestClient.get(businessListed['listed_url'])
-      nok2 = Nokogiri::HTML(resp2)
-
-      businessListed['listed_phone'] = nok2.css("div#bizPhone").text
-      businessListed['listed_address'] = nok2.css("span.street-address").text + ", " + nok2.css("span.locality").text + ", " + nok2.css("span.region").text + ", " + nok2.css("span.postal-code").text
-      businessListed['listed_name'] = data['business']
-
-      break
-    end
-
-  end
-  #businessListed['listed_url'] = listing.xpath("//a").attr("href")
-
+name=data['business'].gsub(" ","%20").gsub("'","%27")
+url= "http://citysquares.com/s/business?t=#{name}"
+businessFound = {}
+businessFound['status'] = :unlisted
+name=data['business'].gsub("%20"," ").gsub("%27","'")
+nok = Nokogiri::HTML(RestClient.get url)
+nok.css("div#cs-biz-listing").each do |bi|
+        if (bi.css("ul li#1.free a.name").text) =~ /#{name}/i
+            businessFound['listed_name'] = bi.css("ul li#1.free a.name").text            
+            businessFound['listed_url'] = bi.css("ul li#1.free a.name").attr("href")			
+            url=businessFound['listed_url']
+            subpage = Nokogiri::HTML(RestClient.get "#{url}")
+            if subpage.css("h1.fn.org").text =~ /#{name}/i
+                businessFound['status'] = :claimed
+            else
+                businessFound['status'] = :listed
+            end
+			phone=subpage.css("div#bizInfo div#bizData.rating div#bizPhone.phone").text
+            businessFound['listed_phone'] = phone.gsub("(","").gsub(") ","-")
+			address = subpage.css("span.address.adr span.street-address").text + " " + subpage.css("span.locality").text + " " + subpage.css("span.region").text + " " + subpage.css("span.postal-code").text
+			businessFound['listed_address'] = address
+            break
+		elsif (bi.css("ul li#1.paid a#businessName.name").text) =~ /#{name}/i
+			businessFound['listed_name'] = bi.css("ul li#1.paid a#businessName.name").text
+			businessFound['listed_url'] = bi.css("ul li#1.paid a#businessName.name").attr("href").value			
+			url=businessFound['listed_url']
+			subpage = Nokogiri::HTML(RestClient.get "#{url}")			
+			if subpage.css("h1.fn.org").text =~ /#{name}/i
+                businessFound['status'] = :claimed
+            else
+                businessFound['status'] = :listed
+            end
+			phone=subpage.css("span.phone.tel").text
+            businessFound['listed_phone'] = phone.gsub("(","").gsub(") ","-")
+			address = subpage.css("span.address.adr span.street-address").text + " " + subpage.css("span.locality").text + " " + subpage.css("span.region").text + " " + subpage.css("span.postal-code").text
+			businessFound['listed_address'] = address
+            break			
+        end
 end
-
-[true, businessListed]
+[true, businessFound]
+puts(businessFound)

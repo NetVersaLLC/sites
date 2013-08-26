@@ -7,5 +7,5 @@ data[ 'phone' ]			= business.local_phone
 data[ 'tollfree' ]		= business.toll_free_phone
 data[ 'email' ]			= business.bings.first.email
 data['website']			= business.company_website
-data['zip']			= business.zip
+data['zip']				= business.zip
 data

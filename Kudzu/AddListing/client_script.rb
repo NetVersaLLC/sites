@@ -20,34 +20,20 @@ languages_spoken = {
 }
 
 # Create your profile
-url = 'https://register.kudzu.com/login.do'
-@browser.goto(url)
-
-# Fill Create Your Login page
-  # Watir::Wait::until @browser.text.include "Create Your Login" or assert that
-  # Watir::Wait::until do @browser.text.include? "agree to the terms below" end
+@browser.goto('https://register.kudzu.com/login.do')
+30.times{ break if @browser.status == "Done"; sleep 1}
 @browser.text_field( :name => 'username' ).set data[ 'userName' ]
 @browser.text_field( :name => 'password' ).set data[ 'pass' ]
 @browser.button( :name, 'login' ).click
-
-url = 'https://register.kudzu.com/location.do'
-
-@browser.goto(url)
-
+@browser.goto('https://register.kudzu.com/location.do')
+30.times{ break if @browser.status == "Done"; sleep 1}
 data[ 'paymentTypes' ].each { |item|
   @browser.checkbox( :value => payment_types[ item ] ).set
 }
 data[ 'languagesSpoken' ].each { |item|
   @browser.checkbox( :value => languages_spoken[ item ] ).set
 }
-
 @browser.text_field( :name => 'yearEstablished' ).set data[ 'yearEstablished' ]
 @browser.button( :name, 'nextButton' ).click
-
-
-sleep 2
-Watir::Wait::until{ @browser.text.include? "Manage Locations and Hours"}
-if @chained
-	self.start("Kudzu/Verify")
-end
+30.times{ break if @browser.status == "Done"; sleep 1}
 true

@@ -21,18 +21,17 @@ languages_spoken = {
 
 sign_in(data)
 
-Watir::Wait::until { @browser.text.include? "My Dashboard" }
+30.times{ break if @browser.status == "Done"; sleep 1}
 
 @browser.link( :text => /Business Account Contact/).click
 
-#Code added by Coin starts below.
-#The prefix need to be modified as per the list of the table...As there is no miss all the miss are missing...
 prefix=data[ 'prefix' ]
 if prefix == 'Miss.'
 	prefix = "Ms."
+elsif not prefix.nil?
+	prefix = "Select Title"	
 end
 @browser.select_list( :name, 'prefix' ).select prefix
-#Code addition/update by Coin ends here.
 
 @browser.text_field( :name => 'firstName' ).set data[ 'firstName' ]
 @browser.text_field( :name => 'lastName' ).set data[ 'lastName' ]
@@ -65,12 +64,14 @@ data[ 'languagesSpoken' ].each { |item|
 @browser.text_field( :name => 'yearEstablished' ).set data[ 'yearEstablished' ]
 @browser.button( :name, 'nextButton' ).click
 
-if Watir::Wait::until { @browser.text.include? "Edit or delete your additional locations here. Your changes will be published on Kudzu.com within 24 hours." }
+30.times { break if (begin @browser.text.include? "Edit or delete your additional locations here. Your changes will be published on Kudzu.com within 24 hours." or @browser.text.include? "An exact location for" rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1 }
+
+if ( @browser.text.include? "Edit or delete your additional locations here. Your changes will be published on Kudzu.com within 24 hours." )
 	@browser.button(:name => /editButton/i).click
-	puts("The Business Update successfull!")	
-elsif Watir::Wait::until { @browser.text.include? "An exact location for" }
+	puts("Business update successful!")	
+elsif ( @browser.text.include? "An exact location for" )
 	@browser.button(:name, 'nextButton').click
-	Watir::Wait::until { @browser.text.include? "Edit or delete your additional locations here." }
-	puts("The Business Update successfull!")	
+	30.times{ break if @browser.status == "Done"; sleep 1}
+	puts("Business update successful!")	
 end	
 true

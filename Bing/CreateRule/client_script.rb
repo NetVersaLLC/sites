@@ -29,4 +29,3 @@ if @chained
 end
 
 true
-

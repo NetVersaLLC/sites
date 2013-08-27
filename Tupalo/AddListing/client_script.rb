@@ -3,21 +3,18 @@
 url="http://tupalo.com/en/accounts/sign_in"
 @browser.goto(url)
 
-sleep 2
-Watir::Wait::until {@browser.text.include? "Login"}
+30.times{ break if @browser.status == "Done"; sleep 1}
 
 @browser.text_field(:id => "account_email").set data ['email']
 @browser.text_field(:id => "account_password").set data['password']
 @browser.button(:id => "spot_submit").click
 
-sleep 5
-Watir::Wait::until {@browser.text.include? "My Favorites"}
-
+30.times{ break if @browser.status == "Done"; sleep 1}
 
 #Navigate to the add business url.
 @browser.goto "http://tupalo.com/en/spots/new"
-sleep 2
-Watir::Wait::until {@browser.text.include? "Add a Spot"}
+
+30.times{ break if @browser.status == "Done"; sleep 1}
 
 @browser.text_field(:id => "spot_name").set data['business'] #Enter business name
 @browser.select_list.option(:text => data['category1']).select#Select the category from the drop down list.
@@ -53,9 +50,7 @@ end
 @browser.text_field(:id => 'spot_city_and_country').send_keys data['citystatecountry']#Select the city
 @browser.send_keys :enter
 
-sleep 5
-Watir::Wait::until {@browser.text.include? "Category:"}
-
+30.times{ break if @browser.status == "Done"; sleep 1}
 if @chained
   self.start("Tupalo/ClaimListing")
 end

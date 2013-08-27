@@ -47,7 +47,10 @@ end
 
 @browser.text_field(:id => 'spot_city_and_country').clear
 @browser.text_field(:id => 'spot_city_and_country').fire_event("onclick")
-@browser.text_field(:id => 'spot_city_and_country').send_keys data['citystatecountry']#Select the city
+#data=data['city']+", "+data['state'] #include this line to be more closer to the actual location.
+@browser.text_field(:id => 'spot_city_and_country').send_keys data['city']#Select the city
+sleep 10 #Let the list populate.
+@browser.send_keys :tab
 @browser.send_keys :enter
 
 30.times{ break if @browser.status == "Done"; sleep 1}

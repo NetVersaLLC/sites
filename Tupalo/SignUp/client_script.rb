@@ -5,8 +5,7 @@ url="http://tupalo.com/en/accounts/sign_up"
 @browser.text_field(:id => /account_email/).set data['email']
 @browser.button(:name => /commit/).click
 
-sleep 2 
-Watir::Wait::until {@browser.text.include? "My Favorites"}
+30.times{ break if @browser.status == "Done"; sleep 1}
 
 self.save_account("Tupalo", {:username => data[ 'email' ], :password => data[ 'password' ], :email => data[ 'email' ]})
 

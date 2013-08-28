@@ -12,18 +12,15 @@ search_form.city = data['city']
 results = agent.submit(search_form)
 if results.search('strong')[3].text == data['business'] then
   puts("Business is listed")
-  businessFound['status'] = :listed
-  address = results.search('td')[31].text + results.search('td')[32].text
-  puts(address)
-  businessFound['listed_address'] = address
-  phone = results.search('td')[34].text
-  puts(phone)
-  businessFound['listed_phone'] = phone
+  businessFound['status'] = :claimed
+  businessFound['listed_address'] = results.search('td')[31].text + results.search('td')[32].text.strip
+  businessFound['listed_phone'] = results.search('td')[34].text
 else
   puts("Business is unlisted")
   businessFound['status'] = :unlisted
 end
 
+[true, businessFound]
 =begin
 @browser.text_field(:id => 'kword').set data['last_name'] #data['business']
 @browser.text_field(:id => 'city').set data['city']
@@ -47,5 +44,3 @@ else
   end  
 end
 =end
-
-[true, businessFound]

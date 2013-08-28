@@ -6,9 +6,9 @@ sign_in( data )
 sleep(3)
 @browser.text_field( :name, 'name').set data['business_name']
 @browser.select_list( :id, 'country').select data['country']
-sleep(1)
+sleep(3)
 @browser.select_list( :id, 'region').select data['state_name']
-sleep(1)
+sleep(3)
 @browser.select_list( :id, 'city').option(:text => /#{data['city']}/i).click
 @browser.text_field( :name, 'address').set data['address']
 @browser.text_field( :name, 'zip').set data['zip']
@@ -56,7 +56,11 @@ data[ 'payment_methods' ].each{ | method |
 @browser.button( :value => /Submit Business/).click
 
 sleep 2
-Watir::Wait.until { @browser.text.include? "Congratulations" }
+if Watir::Wait.until { @browser.text.include? "Congratulations" } ==true
+  puts "Initial registration is sucessfull"
+else
+  raise Error "Initial registration is unsucessfull"
+end
 
 if @chained
 	self.start("Ibegin/Notify")

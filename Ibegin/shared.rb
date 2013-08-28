@@ -33,8 +33,9 @@ def loop_cats(data)
 	catarray = data['category1'].split(" ")
 	wordcount = catarray.length
 	count = 0
-	
-	while wordcount > count
+	cat_found = false
+
+	while wordcount > count && cat_found != true
 		@browser.window( :title, "Categories Selector | iBegin").when_present.use do
 			query = catarray[count]
 			@browser.text_field( :id, 'id_q').set query
@@ -42,7 +43,7 @@ def loop_cats(data)
 			sleep 5
 			if @browser.link(:text => /#{query}/i).exists?
 				@browser.link(:text => /#{query}/i).click
-				break
+				cat_found =true
 			end
 			count+=1
 		end

@@ -14,6 +14,16 @@ data[ 'role' ] = 			'owner'
 data[ 'name_title' ] = 			business.contact_prefix
 data[ 'first_name' ] = 			business.contact_first_name
 data[ 'last_name' ] = 			business.contact_last_name
-data[ 'password' ] = 			Yahoo.make_password
+data[ 'password' ] = 			Yahoo.make_password[0..13]
 data[ 'reason_for_info_update'] = ''
+
+data['cash'] = business.accepts_cash ? true : false
+data['check'] = business.accepts_checks ? true : false
+data['mastercard'] = business.accepts_mastercard ? true : false
+data['visa'] = business.accepts_visa ? true : false
+data['discover'] = business.accepts_discover ? true : false
+data['diners'] = business.accepts_diners ? true : false
+data['amex'] = business.accepts_amex ? true : false
+data['paypal'] = business.accepts_paypal ? true : false
+data['bitcoin'] = business.accepts_bitcoin ? true : false
 data

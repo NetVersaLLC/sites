@@ -1,29 +1,21 @@
-#search for business
-def search_business(data)
-  @browser.text_field( :id => 'Name' ).set data[ 'business' ]
-  @browser.text_field( :id => 'Ort' ).set data[ 'city' ]
-  @browser.button(:id =>'ctl00_submit').click
+businessFound = {}
 
-  # Check for business
-  $businessFound = [:unlisted]
-  page = Nokogiri::HTML(@browser.html)
+url = "http://www.cylex-usa.com/s?q=#{CGI.escape(data['business'])}&c=#{CGI.escape(data['city'])}&p=1"
+page = Nokogiri::HTML(RestClient.get(url))
 
-  page.css('a').each do |link|
-    if link.text == data['business']
-	@browser.link(:text=> data['business']).click
-	if @browser.window(:title, /#{data['business']}/).use do 
-	  if @browser.link(:text => 'Edit this entry').exist?
-	    $businessFound = [:listed,:claimed]
-	  else
-	    $businessFound = [:listed,:unclaimed]
-          end
-        end
-    end
+page.css('a').each do |link|
+  if link.text == data['business']
+    businessFound['status'] = :listed
+    business_page = Nokogiri::HTML(RestClient.get(link['href']))
+
+    businessFound['listed_address'] = business_page.css("address").text
+    businessFound['listed_url'] = business_page.css('a.url').text
+    businessFound['listed_phone'] = business_page.xpath("//span[@itemprop='telephone']").text
+    businessFound['listed_name'] = business_page.css("h2.firmaname").text
+    break
+  else
+    businessFound['status'] = :unlisted
   end
-  end
-  return [true, $businessFound]
 end
 
-# Main steps
-@browser.goto( "http://www.cylex-usa.com/" )
-search_business(data)
+[true, businessFound]

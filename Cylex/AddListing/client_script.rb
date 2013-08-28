@@ -1,61 +1,63 @@
 def search_result(data)
-
-  @browser.text_field(:name => /companyname/).set data[ 'business' ]
-  @browser.text_field(:name => /city/).set data[ 'city' ]
-  @browser.text_field(:name => /website/).set data[ 'website' ]
-  @browser.button(:value=> 'Check name').click
-  @browser.wait()
+  @browser.text_field(:name => /companyname/).set data['business']
+  @browser.text_field(:name => /city/).set data['city']
+  @browser.text_field(:name => /website/).set data['website']
+  @browser.button(:value => 'Check name').click
+  # @browser.wait()
+  30.times { break if @browser.status == "Done"; sleep 1 }
 end
 
 def add_new_business(data)
   @browser.link(:text => 'Add Company').click
-  @browser.text_field(:name => /companyname/).set data[ 'business' ]
-  @browser.text_field(:name => /companypass1/).set data[ 'password' ]
-  @browser.text_field(:name => /companypass2/).set data[ 'password' ]
-  @browser.text_field(:name => /companystreet/).set data[ 'address' ]
-  @browser.text_field(:name => /companycity/).set data[ 'city' ]
+  @browser.text_field(:name => /companyname/).set data['business']
+  @browser.text_field(:name => /companypass1/).set data['password']
+  @browser.text_field(:name => /companypass2/).set data['password']
+  @browser.text_field(:name => /companystreet/).set data['address']
+  @browser.text_field(:name => /companycity/).set data['city']
   sleep(4)
   @browser.link(:xpath => '//*[@id="ctl00_bodyadmin"]/ul[2]/li/a').when_present.click
-  @browser.text_field(:name => /postnr/).set data[ 'zip' ]
-  @browser.text_field(:name => /companymail/).set data[ 'email' ]
-  @browser.text_field(:name => /companyphone/).set data[ 'phone' ]
+  @browser.text_field(:name => /postnr/).set data['zip']
+  @browser.text_field(:name => /companymail/).set data['email']
+  @browser.text_field(:name => /companyphone/).set data['phone']
   @browser.checkbox(:name => /cbaccept/).set
 
-  #Enter Captcha Code
-  enter_captcha(data) 
-  #Check for error
-  #@error_msg = @browser.span(:class => 'message error no-margin')
-  #if @error_msg.exist?
-  #  puts "Showing error message saying #{@error_msg.text}"
-  #end
-
-  #Step 2
-  @browser.text_field(:name => /tb_keywords/).when_present.set data[ 'keywords' ]
-  @browser.text_field(:name => /tb_shortdesc/).set data[ 'business_description' ]
+  # Enter Captcha Code
+  enter_captcha(data)
+  # Check for error
+  # error_msg = @browser.span(:class => 'message error no-margin')
+  # if @error_msg.exist?
+  #   puts "Showing error message saying #{@error_msg.text}"
+  # end
+  # Step 2
+  @browser.textarea(:name => /tb_keywords/).when_present.set data['keywords']
+  @browser.textarea(:name => /tb_shortdesc/).set data['business_description']
   @browser.button(:value => 'Save').click
-
   
-  #Check for confirmation
-  @success_text ="Thank you very much for the registration of your company profile in our business directory."
-  
-  if @browser.span(:id => /registered_infotext/).text.include?(@success_text)
-    puts "Initial Business registration is successful"
-    RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data[ 'username' ], 'account[password]' => data['password'], 'model' => 'Cylex'
-    return true
-  else
+  # Check for confirmation
+  unless @browser.span(:id => /lb_profstatus/).text.include? "Profile complete:"
     throw "Initial Business registration is Unsuccessful"
   end
+
+  puts "Initial Business registration is successful"
+  RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'Cylex'
+
+  # Filling rest of information.
+  @browser.send_keys :f5
+
+  fill_map_routing data
+  fill_payment_methods data
+  return true
 end
 
 def search_company(data)
   @business_found = false
   
-  if @browser.table(:id=> /companynamechecking_gv_companies/).exist?
+  if @browser.table(:id => /companynamechecking_gv_companies/).exist?
     @table = @browser.table(:id => /companynamechecking_gv_companies/)
     @table.rows.each do |row|
-      if row[1].text == data[ 'business' ]
+      if row[1].text == data['business']
         puts "Claiming the business"
-row.link(:text => 'This is my company').click
+        row.link(:text => 'This is my company').click
         @business_found = true
         break
       end
@@ -65,17 +67,17 @@ row.link(:text => 'This is my company').click
 end
 
 def claim_business(data)
-  @browser.radio(:value => "#{data[ 'role' ]}").set
-  @browser.text_field(:name => /companyname/).set data[ 'business' ]
-  @browser.text_field(:name => /companystreet/).set data[ 'address' ]
-  @browser.text_field(:name => /companycity/).set data[ 'city' ]
-  @browser.text_field(:name => /postnr/).set data[ 'zip' ]
-  @browser.select_list(:name => /state2/).select data[ 'state' ]
-  @browser.text_field(:name => /companyphone/).set data[ 'phone' ]
-  @browser.text_field(:name => /companyweb/).set data[ 'website' ]
-  @browser.text_field(:name => /companymail/).set data[ 'email' ]
-  @browser.text_field(:name => /tb_keywords/).set data[ 'keywords' ]
-  @browser.text_field(:name => /tb_shortdesc/).set data[ 'business_description' ]
+  @browser.radio(:value => "#{data['role']}").set
+  @browser.text_field(:name => /companyname/).set data['business']
+  @browser.text_field(:name => /companystreet/).set data['address']
+  @browser.text_field(:name => /companycity/).set data['city']
+  @browser.text_field(:name => /postnr/).set data['zip']
+  @browser.select_list(:name => /state2/).select data['state']
+  @browser.text_field(:name => /companyphone/).set data['phone']
+  @browser.text_field(:name => /companyweb/).set data['website']
+  @browser.text_field(:name => /companymail/).set data['email']
+  @browser.text_field(:name => /tb_keywords/).set data['keywords']
+  @browser.text_field(:name => /tb_shortdesc/).set data['business_description']
   rolewise_info_update(data)
   @browser.text_field(:name => /captchaTb/).set captcha
   @browser.button(:value => 'Save changes').click
@@ -91,22 +93,22 @@ def claim_business(data)
 end
 
 def rolewise_info_update(data)
-  if data[ 'role' ] == 'owner'
-    @browser.text_field(:id => /tb_complain/).set data[ 'reason_for_info_update']
-    @browser.select_list(:name => /ddltitle/).select data[ 'name_title' ]
-    @browser.text_field(:id => /owner_firstname/).set data[ 'first_name']
-    @browser.text_field(:id => /owner_surname/).set data[ 'last_name']
-    @browser.text_field(:id => /ddldept/).set data[ 'department']
-    @browser.text_field(:id => /owner_email/).set data[ 'email']
-  elsif data[ 'role' ] == 'visitor'
-    @browser.text_field(:id => /tb_complain/).set data[ 'reason_for_info_update']
-    @browser.text_field(:id => /owner_firstname/).set data[ 'first_name']
-    @browser.text_field(:id => /owner_surname/).set data[ 'last_name']
+  if data['role'] == 'owner'
+    @browser.text_field(:id => /tb_complain/).set data['reason_for_info_update']
+    @browser.select_list(:name => /ddltitle/).select data['name_title']
+    @browser.text_field(:id => /owner_firstname/).set data['first_name']
+    @browser.text_field(:id => /owner_surname/).set data['last_name']
+    @browser.text_field(:id => /ddldept/).set data['department']
+    @browser.text_field(:id => /owner_email/).set data['email']
+  elsif data['role'] == 'visitor'
+    @browser.text_field(:id => /tb_complain/).set data['reason_for_info_update']
+    @browser.text_field(:id => /owner_firstname/).set data['first_name']
+    @browser.text_field(:id => /owner_surname/).set data['last_name']
   end
 end
     
-#~ #Main Steps
-#~ # Launch browser
+# Main Steps
+# Launch browser
 @url = 'http://admin.cylex-usa.com/firma_default.aspx?step=0&d=cylex-usa.com'
 @browser.goto(@url)
 

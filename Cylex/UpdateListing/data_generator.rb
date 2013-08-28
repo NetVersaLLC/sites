@@ -1,0 +1,29 @@
+data = {}
+data['phone'] = business.local_phone
+data['username'] = business.bings.first.email.split("@")[0] + 9.to_s
+data['email'] = business.bings.first.email 
+data['business'] = business.business_name
+data['address'] = business.address + ' ' + business.address2
+data['city'] = business.city
+data['state'] = business.state 
+data['zip'] = business.zip
+data['business_description'] = business.business_description
+data['keywords'] = business.category1 + ', ' + business.category2 + ', ' + business.category3 + ', ' + business.category4 + ', ' + business.category5
+data['website'] = business.company_website
+data['role'] = 'owner'
+data['name_title'] = business.contact_prefix
+data['first_name'] = business.contact_first_name
+data['last_name'] = business.contact_last_name
+data['password'] = business.cylexes.first.password
+data['reason_for_info_update'] = ''
+
+data['cash'] = business.accepts_cash ? true : false
+data['check'] = business.accepts_checks ? true : false
+data['mastercard'] = business.accepts_mastercard ? true : false
+data['visa'] = business.accepts_visa ? true : false
+data['discover'] = business.accepts_discover ? true : false
+data['diners'] = business.accepts_diners ? true : false
+data['amex'] = business.accepts_amex ? true : false
+data['paypal'] = business.accepts_paypal ? true : false
+data['bitcoin'] = business.accepts_bitcoin ? true : false
+data

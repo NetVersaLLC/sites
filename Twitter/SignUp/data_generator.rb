@@ -6,4 +6,5 @@ data['fullname']	= data['fname']+" "+data['lname']
 data['email']		= business.bings.first.email
 data['username']	= business.business_name.gsub(/[^0-9A-Za-z]/, '')
 data['password']	= Yahoo.make_password
+data['website'] 	= business.company_website
 data

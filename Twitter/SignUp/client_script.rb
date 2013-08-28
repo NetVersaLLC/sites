@@ -69,6 +69,13 @@ end
 
 self.save_account("Twitter", {:username => data['username'], :password => data['password'], :twitter_page => 'http://twitter.com/'+data['username']})
 
+@browser.goto("https://twitter.com/settings/profile")
+
+@browser.text_field(:id, "user_url").when_present.set data['website']
+@browser.button(:id, "settings_save").click
+
+Watir::Wait.until { @browser.text.include? "Thanks, your settings have been saved." }
+
 if @chained
 	self.start("Twitter/Verify")
 end

@@ -1,4 +1,25 @@
 url = "http://www.thumbtack.com/search?pagenum=1&keyword=#{CGI.escape(data['business'])}&location=#{data['zip']}"
+#ap url
+page = Nokogiri::HTML(RestClient.get(url))
+
+
+if not page.xpath("//span[text()='#{data['businesses']}']") # Does a link of the business name exist?
+  businessFound['status'] = :unlisted
+else
+  biz_href = page.css("div.profile-right a").map { |test| test['href'] }
+  businessFound['status'] = :claimed
+  businessFound['listed_name'] = data['business'] # Won't find business if name mismatches anyway
+  businessFound['listed_url'] = "http://www.thumbtack.com" + biz_href[0]
+end
+
+#ap businessFound
+[true, businessFound]
+
+
+
+
+=begin
+url = "http://www.thumbtack.com/search?pagenum=1&keyword=#{CGI.escape(data['business'])}&location=#{data['zip']}"
 puts url
 businessFound = {}
 page = Nokogiri::HTML(RestClient.get(url))
@@ -22,3 +43,4 @@ else
 end
 
 [true, businessFound]
+=end

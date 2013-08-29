@@ -10,4 +10,5 @@ data[ 'email' ]			          = business.bings.first.email
 data[ 'website' ]	          	= business.company_website
 data['username']			= business.ebusinesspages.first.username
 data['password']			= business.ebusinesspages.first.password
+data['business_description'] = business.business_description
 data

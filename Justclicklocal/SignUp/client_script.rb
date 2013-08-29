@@ -8,7 +8,7 @@
 
 @browser.button( :value => 'Log in').click
 
-sleep(10)
+30.times { break if (begin @browser.text.include? "Welcome Back #{data['email']}" rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1 }
 
 self.save_account("Justclicklocal", {:email => data['email'], :password => data['password']})
 

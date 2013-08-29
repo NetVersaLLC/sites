@@ -21,10 +21,12 @@
 
 description = data['description']
 if description.length < 349
-	description = description + " " + description
+	until description.length >= 350
+		description << " "
+	end
 end
 
-@browser.textarea(:name => 'descr').set data['description']
+@browser.textarea(:name => 'descr').set description#data['description']
 @browser.checkbox(:name => 'agree').set
 
 @browser.button(:value => 'Add profile').click

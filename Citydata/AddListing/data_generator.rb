@@ -17,5 +17,5 @@ data['ccaccepted']	= if business.accepts_mastercard or business.accepts_visa or 
 data['employees']	= 'skipped'
 data['password']	= Yahoo.make_password
 data['category']	= catty.citydata_category.name
-data['description']	= business.status_message+" "+business.tag_line + " " + business.business_description + " \n " + data['hours'] + business.company_website.to_s
+data['description']	= business.business_description#business.status_message+" "+business.tag_line + " " + business.business_description + " \n " + data['hours'] + business.company_website.to_s
 data

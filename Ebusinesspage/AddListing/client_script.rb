@@ -16,7 +16,8 @@ begin
     @browser.text_field( :id => 'sCatKey').set data['category1']
     @browser.button( :id => 'CatButton').click
     sleep(2)
-    @browser.link( :text => /#{data['category1']}/i).when_present.click
+	30.times { break if (begin @browser.link(:text => "#{data['category1']}").present? rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1 }
+    @browser.link(:text => "#{data['category1']}").click #Replaced back slash with double quotes otherwise it will fail for this category "Auto Machine Shop Equip, Supls (Whol)"
     sleep(1)
   end
   @browser.button( :id => 'CoButton').click
@@ -27,15 +28,16 @@ begin
     throw "Initial Business registration is unsuccessful"
   end
 
-  # Edit Description
+  # Edit Description  
   @browser.link(:id => 'bEditDescriptionButton').when_present.click
   @browser.textarea(:id => 'sdescription').when_present.set data['business_description']
   @browser.button(:value => 'Submit').click
-
-  # Edit Logo
+  # Edit Logo  
   data['logo'] = self.logo
   @browser.span(:id => 'LogoText').when_present.click
-  @browser.file_field(:id => 'filUpload').when_present.set data['logo']
+  if not data['logo'].nil?
+		@browser.file_field(:id => 'filUpload').when_present.set data['logo']	
+  end
   sleep(3)
 
 rescue Timeout::Error  => e

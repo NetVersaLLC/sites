@@ -1,0 +1,30 @@
+data = {}
+
+#data[ 'phone' ] = 					business.local_phone
+data[ 'phone' ] =					rand(100...999).to_s + "-" + rand(100...999).to_s + "-" + rand(1000...9999).to_s
+data[ 'keywords'] = 				business.keywords
+#data[ 'username' ] = 				'Forth_Record_recreate_coca_cola'
+data[ 'username' ] = 				business.bizzspot.first.username
+data[ 'email' ] = 					business.bizzspot.first.email 
+#data[ 'email' ] = 					"Cowan_age_cia@inbox.com"
+data[ 'business' ] = 				business.business_name
+data[ 'address' ] = 				business.address + ' ' + business.address2
+data[ 'city' ] = 					business.city
+data[ 'state' ] = 					business.state 
+data[ 'zip' ] = 					business.zip
+data[ 'business_description'] = 	business.business_description
+data[ 'website'] = 					business.company_website
+data[ 'role' ] = 					'owner'
+data[ 'name_title' ] = 				business.contact_prefix
+data[ 'first_name' ] = 				business.contact_first_name
+data[ 'last_name' ] = 				business.contact_last_name
+data[ 'password' ] = 				business.bizzspot.first.password#Yahoo.make_password
+data[ 'reason_for_info_update'] = 	''
+data[ 'paymentTypes' ] 			= 	[ :masterCard, :cash, :check, :visa ]
+data['category'] = 					business.category1
+data['monday'] =					business.monday_open    + "-" +		business.monday_close
+data['tuesday'] =					business.tuesday_open   + "-" + 	business.tuesday_close
+data['wednesday'] =					business.wednesday_open + "-" + 	business.wednesday_close
+data['thursday'] =					business.thursday_open  + "-" + 	business.thursday_close
+data['friday'] =					business.friday_open 	+ "-" + 	business.friday_close
+data

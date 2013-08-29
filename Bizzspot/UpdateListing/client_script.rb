@@ -23,12 +23,6 @@ def add_business(data)
   @browser.text_field(:id=> /profile_thursday_hours/).set data['thursday']
   @browser.text_field(:id=> /profile_friday_hours/).set data['friday']
   @browser.link( :text => /Payment Methods/i).click
-  
-  ##################
-  #data[ 'paymentTypes' ].each { |item|
-  #@browser.checkbox( :name => profile_payment_method_list_[ item ] ).set
-  #}
-  #################
   @browser.checkbox(:value => /Mastercard/).set
   @browser.checkbox(:value => /Cash/).set
   @browser.checkbox(:value => /Check/).set
@@ -40,9 +34,7 @@ def add_business(data)
   if Watir::Wait::until { @browser.text.include? "Save successful!" }
     puts "Business update successful"
     self.save_account("bizzspot", {:username => data[ 'username' ], :password => data[ 'password' ], :email => data[ 'email' ]})
-    #RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data[ 'email' ], 'account[password]' => data['password'], 'model' => 'Bizzspot'
-    #self.save_account("Bizzspot", {:username => data[ 'username' ], :email => data[ 'email' ]})    
-    return true
+    true
   else
     throw "Mislleneous problems."
   end    

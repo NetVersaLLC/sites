@@ -29,9 +29,13 @@ def add_business(data)
     self.save_account("Bizzspot", {:username => data[ 'username' ], :password => data[ 'password' ], :email => data[ 'email' ]})    
     return true
   else
-    throw "Mislleneous problems."
+    throw "Miscellaneous problems."
   end    
 end
     
 #~ #Main Steps
 add_business(data)
+if @chained
+	self.start("Bizzspot/Verify")
+end
+true

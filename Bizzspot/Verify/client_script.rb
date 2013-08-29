@@ -4,5 +4,5 @@ url = data[ 'link' ]
 @browser.button(:name => /commit/).click
 if Watir::Wait::until { @browser.text.include? 'Password successfully updated' }
 	puts('Profile confirmed!')
-	return true
+	true
 end

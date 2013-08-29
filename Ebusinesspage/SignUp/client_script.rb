@@ -1,6 +1,6 @@
 @browser.goto('http://ebusinesspages.com/')
 
-if @browser.link(:text => 'Log Out').exists
+if @browser.link(:text => 'Log Out').exists?
 	@browser.link(:text => 'Log Out').click
 	30.times { break if (begin @browser.link(:text => 'Register').exists? rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1 }
 end

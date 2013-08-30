@@ -1,5 +1,5 @@
 data = {}
-data[ 'email' ]					= business.showmelocals.first.email
+data[ 'email' ]					= business.bings.first.email
 data[ 'password' ]				= business.showmelocals.first.password
 data[ 'desc' ]					= business.business_description
 catty                   		= Showmelocal.where(:business_id => business.id).first
@@ -24,5 +24,5 @@ days.each do |day|
 data["#{day}"]					= business.send("#{day}_enabled".to_sym)
 data["#{day}_open"]				= business.send("#{day}_open".to_sym)
 data["#{day}_close"]			= business.send("#{day}_close".to_sym)
-end 
+end
 data

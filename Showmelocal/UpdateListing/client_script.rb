@@ -13,7 +13,7 @@ sleep 2
 Watir::Wait::until{@browser.text.include? "Business Information"}
 
 @browser.text_field(:name => 'txtBusinessName').set data['name']
-@browser.text_field(:name => 'txtType').set data['keyword']
+@browser.text_field(:name => 'txtType').set data['keywords']
 @browser.text_field(:name => '_ctl1:txtPhone1').set data['phone']
 @browser.text_field(:name => '_ctl1:txtFax').set data['fax']
 @browser.text_field(:name => '_ctl1:txtEmail').set data['email']
@@ -30,24 +30,29 @@ Watir::Wait::until{@browser.text.include? "Description of Services"}
 @browser.textarea(:name, 'txtBody').set data['desc']
 @browser.button(:name, "cmdEdit").click
 sleep 2
-Watir::Wait::until{@browser.text.include? "Sun"}
+#Watir::Wait::until{@browser.text.include? "Sun"}
+30.times{ break if @browser.status == "Done"; sleep 1}
 @browser.button(:name, 'cmdBusinessHours').click
 sleep 2
 Watir::Wait::until{@browser.text.include? "Business Hours"}
 days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
 days.each do |day|
-	if data["#{day}"] == true	
-		if data["#{day}_open"].chars.first=="0"					#using the opne class to make the code more readable
-			open=data["#{day}_open"][1..-1]			
+	if data["#{day}"] == true
+		if data["#{day}_open"].chars.first=="0"
+			open=data["#{day}_open"].slice(1..-1)
 		end
 		if data["#{day}_close"].chars.first=="0"
-			close=data["#{day}_close"][1..-1]
+			close=data["#{day}_close"].slice(1..-1)
 		end
-		open=data["#{day}_open"].downcase.gsub("a"," a").gsub("p"," p")
-		close=data["#{day}_close"].downcase.gsub("a"," a").gsub("p"," p")
+		open=open.downcase.gsub("a"," a").gsub("p"," p")
+		close=close.downcase.gsub("a"," a").gsub("p"," p")
 		day=day.capitalize
 		@browser.select_list(:name => "_ctl0:ddOpen#{day}").select open
 		@browser.select_list(:name => "_ctl0:ddClose#{day}").select close
+	else
+		day=day.capitalize
+		@browser.select_list(:name => "_ctl0:ddOpen#{day}").select "Closed"
+		@browser.select_list(:name => "_ctl0:ddClose#{day}").select "Closed"
 	end	
 end
 @browser.button(:name => '_ctl0:cmdEdit').click

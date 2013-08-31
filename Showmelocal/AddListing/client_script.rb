@@ -1,18 +1,14 @@
 @browser.goto( 'https://www.showmelocal.com/Login.aspx' )
-sleep 2
-Watir::Wait::until {@browser.text.include? "we don't post anything on your profile"}
+
 30.times{ break if @browser.status == "Done"; sleep 1}
 
 @browser.text_field( :id => '_ctl0_txtUserName').set data[ 'email' ]
 @browser.text_field( :id => '_ctl0_txtPassword').set data[ 'password' ]
 @browser.button(:name => '_ctl0:cmdLogin').click
 
-sleep 2
-Watir::Wait::until{@browser.text.include? "No Recent Activity"}
 30.times{ break if @browser.status == "Done"; sleep 1}
 @browser.link(:text, "Add a Business").click
 
-sleep 2
 30.times{ break if @browser.status == "Done"; sleep 1}
 Watir::Wait::until{@browser.text.include? "Email"}
 
@@ -31,8 +27,9 @@ end
 @browser.text_field(:name => '_ctl0:txtAddress2').set data[ 'address2' ]
 @browser.text_field(:name => '_ctl0:txtZip').set data[ 'zip' ]
 enter_captcha( data )
-@browser.button(:name, "cmdSave").click
 
-sleep 2
 30.times{ break if @browser.status == "Done"; sleep 1}
+	if @chained
+		self.start("Showmelocal/UpdateListing")
+	end
 true

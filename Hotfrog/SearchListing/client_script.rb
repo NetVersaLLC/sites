@@ -28,7 +28,7 @@ if page.at_css('h1.company-heading') then #Check type of result returned
     #puts("Incorrect Business Name, assuming unlisted")
     businessFound['status'] = :unlisted
   end
-elsif page.xpath("//a[text()='#{data['businesses']}']") # Does the business exist on the page?
+elsif page.xpath("//a[text()='#{data['business']}']") # Does the business exist on the page?
   begin
     #puts("Result Type 2")
     fsublink = page.at_xpath("//a[text()='#{data['business']}']/@href").to_s #Grab the href

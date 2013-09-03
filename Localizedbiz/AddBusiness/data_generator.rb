@@ -4,7 +4,7 @@ catty = Localizedbiz.where(:business_id => business.id).first
 data['category1'] = catty.localizedbiz_category.parent.nil? ? nil : catty.localizedbiz_category.parent.name.gsub("\n", "")
 data['category2'] = catty.localizedbiz_category.nil? ? nil : catty.localizedbiz_category.name.gsub("\n", "")
 
-data['username']  = business.localizedbizs.first.username[0..14]
+data['username']  = business.localizedbizs.first.username
 data['password']  = business.localizedbizs.first.password#xqPe2Sg82LuTHbk
 data['state']     = business.state_name
 data['city']      = business.city

@@ -27,7 +27,7 @@ search_results.css("div.listing-content").each do |result|
 		business_found['listed_name'] 		= result.css("a.url").text
 		business_found['listed_url'] 		= sub_url.text
 		business_found['listed_address'] 	= sub_page.css("span.listing-address").text.gsub(/\n/, " ").strip
-		business_found['listed_phone'] 		= sub_page.css("p.phone").text.delete(/\n/).strip
+		business_found['listed_phone'] 		= sub_page.css("p.phone").text.gsub(/\n/, " ").strip
 		# Only way to "claim" the business is to pay them money.
 		business_found['status'] 			= :claimed
 		break

@@ -6,27 +6,28 @@ puts(data[ 'category1' ])
 @browser.link( :text => /#{data['state']}/).click
 @browser.link( :text => /#{data['cityState']}/).click	
 @browser.link( :title => 'Login').click
+30.times { break if @browser.status == "Done"; sleep 1 }
+
 @browser.text_field( :name => 'email').set data['email']
 @browser.text_field( :name => 'pw').set data['password']
-sleep(2)
 @browser.link( :text => "Sign Me In").click
-sleep(2)
-@browser.link( :title => 'Add Business').click
-sleep(2)
-@browser.link( :xpath => '//*[@id="mainpage"]/table[1]/tbody/tr[5]/td/table/tbody/tr[1]/td[1]/table/tbody/tr[2]/td/a[3]').click
-sleep(2)
-@browser.text_field( :id => 'subfolder_name').set data['siteName']
+30.times { break if @browser.status == "Done"; sleep 1 }
 
-sleep(3)
+@browser.link( :title => 'Add Business').click
+30.times { break if @browser.status == "Done"; sleep 1 }
+
+@browser.link( :xpath => '//*[@id="mainpage"]/table[1]/tbody/tr[5]/td/table/tbody/tr[1]/td[1]/table/tbody/tr[2]/td/a[3]').click
+30.times { break if @browser.status == "Done"; sleep 1 }
+
+@browser.text_field( :id => 'subfolder_name').set data['siteName']
 @browser.link( :title => 'GET STARTED!').click
 if @browser.alert.exists?
 	@browser.alert.ok
 end
+30.times { break if @browser.status == "Done"; sleep 1 }
 
-@browser.text_field( :name => 'businessname').when_present.set data['business']
-
+@browser.text_field( :name =>  'businessname').when_present.set data['business']
 @browser.text_field( :name => 'contact').set data['fulleName']
-
 @browser.text_field( :name => 'address1').set data['address']
 @browser.text_field( :name => 'address2').set data['address2']
 @browser.text_field( :name => 'city').set data['city']
@@ -39,15 +40,19 @@ end
 @browser.text_field( :name => 'email').set data['email']
 @browser.checkbox( :name => 'agree').click
 @browser.button( :value => /Next/).click
-sleep(3)
+30.times { break if @browser.status == "Done"; sleep 1 }
+
 @browser.text_field( :id => 'searchCategories').set data['category1']
+sleep 5
 @browser.select_list( :id => 'SelectList').option( :index => 0).click
 @browser.img( :title => 'Add to List').click
-sleep(2)
+30.times { break if @browser.status == "Done"; sleep 1 }
+
 @browser.button( :value => /Next/, :index => 1).click
-sleep(3)
+30.times { break if @browser.status == "Done"; sleep 1 }
+
 @browser.button( :value => /Next/, :index => 2).click
-sleep(3)
+30.times { break if @browser.status == "Done"; sleep 1 }
 
 payments = data[ 'payments' ]
 payments.each do |payment|

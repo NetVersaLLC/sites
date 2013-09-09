@@ -35,6 +35,7 @@ sleep 2
 @browser.button(:name, 'cmdBusinessHours').click
 sleep 2
 Watir::Wait::until{@browser.text.include? "Business Hours"}
+@browser.radio(:id, "_ctl0_rbOpenOptions_2").set
 days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
 days.each do |day|
 	if data["#{day}"] == true
@@ -68,4 +69,17 @@ end
 
 @browser.button(:name => '_ctl0:cmdEdit').click
 Watir::Wait::until{@browser.link(:id => '_ctl0_hlBusinessDashboard').exists?}
+
+@browser.link(:text => 'dashboard').click
+30.times{ break if @browser.status == "Done"; sleep 1}
+@browser.link(:text => "Add Photo +").click
+30.times{ break if @browser.status == "Done"; sleep 1}
+#Adding image upload
+unless self.logo.nil?	
+	@browser.file_field(:id, 'txtUpload').set self.logo
+	@browser.button(:value, "Upload").click
+else
+	@browser.file_field(:id, 'txtUpload').set self.images.first unless self.images.empty?
+end
+30.times{ break if @browser.status == "Done"; sleep 1}
 true

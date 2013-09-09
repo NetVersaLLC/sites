@@ -1,35 +1,43 @@
 #Update the business listing
-url="http://tupalo.com/en/accounts/sign_in"
-@browser.goto(url)
+@browser.goto("http://tupalo.com/en/accounts/sign_in")
 
-sleep 2
-Watir::Wait::until {@browser.text.include? "Login"}
-
+30.times{ break if @browser.status == "Done"; sleep 1}
 
 @browser.text_field(:id => "account_email").set data ['email']
 @browser.text_field(:id => "account_password").set data['password']
 @browser.button(:id => "spot_submit").click
 
-sleep 2
-Watir::Wait::until {@browser.text.include? "My Favorites"}#Login successfull
+30.times{ break if @browser.status == "Done"; sleep 1}#Login successful
 
 @browser.goto("http://tupalo.com/en/user/settings/profile")
 
-sleep 5
-Watir::Wait::until {@browser.text.include? "Account Settings"}#At the profile 
+30.times{ break if @browser.status == "Done"; sleep 1}#At the profile 
 
 @browser.text_field(:id => "user_first_name").set data['first_name']
 @browser.text_field(:id => "user_last_name").set data['last_name']
-@browser.button(:name => "commit").click 
+#Adding image upload
+unless self.logo.nil? 
+	@browser.file_field(:id, 'user_avatar').set self.logo
+else
+	@browser.file_field(:id, 'user_avatar').set self.images.first unless self.images.empty?
+end
 
-sleep 2
-Watir::Wait::until {@browser.text.include? "Account Settings"}#At the profile 
+30.times{ break if @browser.status == "Done"; sleep 1}#Pause for image upload.
 
-@browser.goto("http://tupalo.com/en/b/dashboard")
-sleep 2
-Watir::Wait::until {@browser.text.include? "Statistics per month"}#At the Dashboard
+@browser.button(:name => "commit").click
+
+30.times{ break if @browser.status == "Done"; sleep 1}
+
+@browser.a(:id => "topLogo").click
+
+30.times{ break if @browser.status == "Done"; sleep 1}
+
+@browser.goto("tupalo.com/en/b/dashboard/")
+
+30.times{ break if @browser.status == "Done"; sleep 1}
 
 @browser.a(:text => "Edit Spot").click
+
 sleep 2
 Watir::Wait::until {@browser.text.include? "Basic"}#At the profile editing page
 
@@ -45,8 +53,9 @@ end
 @browser.text_field(:id => 'spot_city_and_country').clear
 @browser.text_field(:id => 'spot_city_and_country').fire_event("onclick")
 @browser.text_field(:id => 'spot_city_and_country').send_keys data['citystatecountry']#Select the city
+sleep 10
+@browser.send_keys :tab
 @browser.button(:name => /commit/).click
 sleep 2
 Watir::Wait::until {@browser.text.include? "Basic"}#At the profile editing page
-
 true

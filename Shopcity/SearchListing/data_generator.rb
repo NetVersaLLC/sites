@@ -60,11 +60,12 @@ state_abbr = {
   'WI' => 'Wisconsin',
   'WY' => 'Wyoming'
 }
-
+ 
 data[ 'country' ]		= "United States"
-data[ 'state' ]			= state_abbr.[](business['state_short'])
-data[ 'city' ]			= business['city']
+# data[ 'state' ]			= state_abbr.[](business.state)
+data[ 'state' ]     = business.state
+data[ 'city' ]			= business.city
 data[ 'citystate' ]		= data['city'] + ", " + data['state']
-data[ 'business' ]		= business['business']
+data[ 'business' ]		= business.business_name
 data
 

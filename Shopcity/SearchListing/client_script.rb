@@ -1,13 +1,3 @@
-require 'mechanize'
-
-data = {}
-data[ 'country' ]   = "United States"
-data[ 'state' ]     = "Il"
-data[ 'city' ]      = "Chicago"
-data[ 'citystate' ]   = data['city'] + ", " + data['state']
-data[ 'business' ]    = "Leoni Motor Exp"
-data
-
 businessFound = {}
 
 url = "http://www.shopcity.com/map/mapnav_locations.cfm?region=1001&state=#{CGI.escape(data['state'])}"
@@ -41,7 +31,5 @@ next if item.text =~ /report mistake/
     break
   end
 end
-
-puts businessFound.inspect
 
 [true, businessFound]

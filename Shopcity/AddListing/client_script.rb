@@ -1,18 +1,4 @@
-puts(data[ 'category1' ])
-
-@browser.goto("http://www.shopcity.com/map/mapnav_locations.cfm?")
-
-@browser.link( :text => /#{data['country']}/).click
-@browser.link( :text => /#{data['state']}/).click
-@browser.link( :text => /#{data['cityState']}/).click	
-@browser.link( :title => 'Login').click
-30.times { break if @browser.status == "Done"; sleep 1 }
-
-@browser.text_field( :name => 'email').set data['email']
-@browser.text_field( :name => 'pw').set data['password']
-@browser.link( :text => "Sign Me In").click
-30.times { break if @browser.status == "Done"; sleep 1 }
-
+sign_in data
 @browser.link( :title => 'Add Business').click
 30.times { break if @browser.status == "Done"; sleep 1 }
 
@@ -26,47 +12,32 @@ if @browser.alert.exists?
 end
 30.times { break if @browser.status == "Done"; sleep 1 }
 
-@browser.text_field( :name =>  'businessname').when_present.set data['business']
-@browser.text_field( :name => 'contact').set data['fulleName']
-@browser.text_field( :name => 'address1').set data['address']
-@browser.text_field( :name => 'address2').set data['address2']
-@browser.text_field( :name => 'city').set data['city']
-@browser.text_field( :name => 'province').set data['state_name']
-@browser.text_field( :name => 'country').set data['country']
-@browser.text_field( :name => 'postal').set data['zip']
-@browser.text_field( :name => 'phone').set data['phone']
-@browser.text_field( :name => 'fax').set data['fax']
-@browser.text_field( :name => 'tollfree').set data['tollfree']
-@browser.text_field( :name => 'email').set data['email']
+fill_contact_info data
 @browser.checkbox( :name => 'agree').click
 @browser.button( :value => /Next/).click
 30.times { break if @browser.status == "Done"; sleep 1 }
 
-@browser.text_field( :id => 'searchCategories').set data['category1']
-sleep 5
-@browser.select_list( :id => 'SelectList').option( :index => 0).click
-@browser.img( :title => 'Add to List').click
-30.times { break if @browser.status == "Done"; sleep 1 }
-
+fill_categories data
 @browser.button( :value => /Next/, :index => 1).click
 30.times { break if @browser.status == "Done"; sleep 1 }
 
 @browser.button( :value => /Next/, :index => 2).click
 30.times { break if @browser.status == "Done"; sleep 1 }
 
-payments = data[ 'payments' ]
-payments.each do |payment|
-	@browser.checkbox( :id => payment).click
-end
+fill_payment_methods data
 @browser.button( :value => /Next/, :index => 3).click
+30.times { break if @browser.status == "Done"; sleep 1 }
 
-sleep(3)
-
-@browser.text_field( :name => 'sitetitle').set data['business']
+fill_titles data
 @browser.button( :value => /Next/, :index => 4).click
-sleep(3)
+30.times { break if @browser.status == "Done"; sleep 1 }
+
+fill_logo data
 @browser.button( :value => /Next/, :index => 5).click
-sleep(3)
+30.times { break if @browser.status == "Done"; sleep 1 }
+
 @browser.button( :value => /Finish/).click
+30.times { break if @browser.status == "Done"; sleep 1 }
+Watir::Wait.until { @browser.text.include? "What's New at #{data['business']}" }
 
 true

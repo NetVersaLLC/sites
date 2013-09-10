@@ -1,4 +1,6 @@
 data = {}
+catty = Shopcity.where(:business_id => business.id).first
+data[ 'category1' ]          = catty.shopcity_category.name
 data[ 'email' ]			= business.shopcities.first.username
 data[ 'password' ]		= business.shopcities.first.password
 data[ 'state' ]			= business.state_name

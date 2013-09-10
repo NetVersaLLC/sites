@@ -1,5 +1,7 @@
 @url = 'https://www.thumbtack.com/register'
   @browser.goto(@url)
+
+  30.times{ break if @browser.status == "Done"; sleep 1}
   
 @browser.text_field(:id => 'usr_first_name').set data['first_name']
 @browser.text_field(:id => 'usr_last_name').set data['last_name']

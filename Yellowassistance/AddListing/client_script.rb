@@ -77,6 +77,8 @@ end
 
 @browser.button( :id => 'btnSubmit').click
 
+30.times{ break if @browser.status == "Done"; sleep 1} #Waiting for the page to load.
+
 if @browser.text.include? "Thank you for your submission!"
 	true
 elsif @browser.text.include? "Click here to go back"

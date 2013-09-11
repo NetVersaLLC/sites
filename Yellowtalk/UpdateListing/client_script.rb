@@ -1,20 +1,19 @@
-
-    
 def Login_new_bussiness(data)    
   @url = 'http://yellowtalk.com/login_page.php'
   @browser.goto(@url)
+  30.times{ break if @browser.status == "Done"; sleep 1}
   @browser.text_field(:name => /username/).when_present.set data[ 'username' ]
   @browser.text_field(:name => /passwd/).set data[ 'password' ]
   @browser.button(:value => 'Log In').click
+  30.times{ break if @browser.status == "Done"; sleep 1}
 end
 
 def Update_Profile_Listing(data)
   @url = 'http://yellowtalk.com/mybusiness.php'
   @browser.goto(@url)
+  30.times{ break if @browser.status == "Done"; sleep 1}
   @browser.link(:text=>'Edit this listing').when_present.click
-  #@browser.text_field(:name => /passwd/).set data[ 'password' ]
-  #Nearest Big City...
-  
+  30.times{ break if @browser.status == "Done"; sleep 1}
 
   @browser.select_list(:name => "category[0]").when_present.select data[ 'category' ]
   #@browser.select_list(:name => /category[1]/).select data[ 'keywords' ]
@@ -28,18 +27,16 @@ def Update_Profile_Listing(data)
   @browser.select_list(:name => /state/).select data[ 'state' ]
   @browser.text_field(:name => /zip/).set data[ 'zip' ]
   @browser.text_field(:name => /phone/).set data[ 'phone' ]
+  @browser.text_field(:name => /fax/).set data [ 'fax' ]
+  @browser.text_field(:name => /email/).set data [ 'email' ]
   @browser.button(:value => 'Update My Listing Now!').click
   
-  #Check for confirmation
-  # file origin.rb
-
-  #Below is the text the is included in the browser when the registration is successfull.
+  30.times{ break if @browser.status == "Done"; sleep 1}
   Watir::Wait.until { @browser.text.include? 'Free Listings...' }
   @confirmation_msg ="Free Listings..."
 
   if @browser.text.include? @confirmation_msg
-    puts "Business hs been updated successfully."
-    RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data[ 'email' ],'model' => 'Yellowtalk'
+    puts "Business listing updated."    
     true
     else
     throw "Job failed!"

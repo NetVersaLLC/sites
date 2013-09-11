@@ -1,5 +1,5 @@
 def add_new_business(data)
-  #Added the username as it is the first one in the list...
+  #Added the user name as it is the first one in the list...
   @browser.text_field(:name => /ownerusername/).when_present.set data[ 'username' ]
   @browser.text_field(:name => /ownerpassword/).set data[ 'password' ]
   @browser.text_field(:name => /ownerusername_c/).set data[ 'username' ]
@@ -17,30 +17,30 @@ def add_new_business(data)
   @browser.select_list(:name => /state/).select data[ 'state' ]
   @browser.text_field(:name => /zip/).set data[ 'zip' ]
   @browser.text_field(:name => /phone/).set data[ 'phone' ]
+  @browser.text_field(:name => /fax/).set data [ 'fax' ]
+  @browser.text_field(:name => /email/).set data [ 'email' ]  
   @browser.button(:value => 'Add My Listing Now!').click
 
   
   #Check for confirmation
  
-  #Below is the text the is included in the browser when the registration is successfull.
+  #Below is the text that is included in the browser when the registration is successful.
   sleep 2
   Watir::Wait.until { @browser.text.include? 'Thank you for submitting your listing.' }
   @success_text ="Thank you for submitting your listing."
 
 
 
-  if @browser.text.include? @success_text
-    puts "Business has been claimed successful"
-    RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data[ 'email' ], 'account[password]' => data['password'], 'account[username]' => data['username'], 'model' => 'Yellowtalk'
-    #self.save_account("yellowtalk", {:username => data[ 'username' ], :password => data[ 'password' ], :email => data[ 'email' ]})
+  if @browser.text.include? @success_text    
+    self.save_account("Yellowtalk", {:username => data[ 'username' ], :password => data[ 'password' ], :email => data[ 'email' ]})
     return true
   else
-    throw "Business has not been claimed successful"
+    throw "Due to some difficulty we where not able to add the business, please contact the support."
   end  
 end
     
 #~ #Main Steps
 @url = 'http://yellowtalk.com/businessFreeAdd.php'
 @browser.goto(@url)
-
+30.times{ break if @browser.status == "Done"; sleep 1}
 add_new_business(data)

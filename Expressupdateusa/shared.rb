@@ -46,7 +46,7 @@ def enter_captcha( data )
     puts("5")
 sleep(5)
 puts("6")
-		if not @browser.text.include? "Check the Captcha"
+		unless @browser.text.include? "Check the Captcha" or @browser.text.include? "Passwords must match"
     puts("7")
 			capSolved = true
 		end

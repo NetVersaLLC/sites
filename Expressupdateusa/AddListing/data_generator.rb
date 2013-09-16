@@ -6,11 +6,11 @@ data = {}
     data[ 'business_email' ] = business.expressupdateusas.first.email
 
     data[ 'business_name' ] = business.business_name
-    data[ 'business_state' ] = business.state_name
+    data[ 'business_state' ] = business.state
     data[ 'business_suite' ] = seed # <= 5 characters
     data[ 'business_city' ] = business.city
     data[ 'business_zip' ] = business.zip
-    data[ 'business_address' ] =  business.address + ' '+business.address2#seed + ' main street'
+    data[ 'business_address' ] =  business.address + ' ' +business.address2#seed + ' main street'
     data[ 'business_phone' ] = business.local_phone
     data[ 'business_fax' ] = business.fax_number
     data[ 'business_tollfree' ] = business.toll_free_phone
@@ -45,5 +45,8 @@ data = {}
     data[ 'personal_url' ]  = business.company_website.gsub( "www.", "").gsub("http://","")
     data[ 'personal_title' ]  = 'Owner'
     data[ 'personal_phone' ] = business.local_phone
+
+    catty = Expressupdateusa.where(:business_id => business.id).first
+    data[ 'business_category'] = catty.expressupdateusa_category.name.gsub("\n", "")
 
 data

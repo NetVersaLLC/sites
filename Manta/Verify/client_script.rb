@@ -1,5 +1,3 @@
-
-
 @browser.goto('http://www.manta.com/profile/my-companies/select?add_driver=home-getstarted')
 @browser.text_field( :name => 'email').set data['username']
 @browser.text_field( :name => 'password').set data['password']
@@ -28,4 +26,7 @@ puts(number)
 puts(verifyCode)
 code = PhoneVerify.enter_code(number, verifyCode)
 
-true
+if @chained
+	self.start("Manta/FinishListing")
+	true
+end

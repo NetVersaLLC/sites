@@ -1,54 +1,34 @@
-def search_the_business( data )
+# Retry Count
+retries = 5
 
-  # A) Going to home page and locating iframe with search elements - didn't work
-  # @browser.goto( 'http://expressupdateusa.com/' )
-  # def search_frame; @browser.frame( :src, 'https://listings.expressupdateusa.com/dashboard/searchentry?p=CheckListing:GetStarted' ) end
-  # search_frame.locate
-
-  # B) Opening the IFRAME directly - worked incorrectly - it returned not all search results
-  # @browser.goto( 'https://listings.expressupdateusa.com/dashboard/searchentry?p=CheckListing:GetStarted' )
-
-  # C) Sending url request with busines name in it
-  # search_url = 'http://listings.expressupdateusa.com/Search/Results?CompanyNameFilter=' + data[ 'business_name' ] # &State=CA
-  # @browser.goto( search_url )
-
-  puts 'Searching for a business: ' + data[ 'business_name' ]
-  @browser.goto( 'http://listings.expressupdateusa.com/Search' )
-  @browser.text_field( :id, 'CompanyNameFilter' ).set data[ 'business_name' ]
-  state = data[ 'business_state' ]
-  @browser.select_list( :id, 'State' ).select state if not state.nil?
-  @browser.button( :class, 'SearchButton' ).click
-
-  def verify_link; @browser.link( :id, 'verifyLink' ) end
-  Watir::Wait::until do @browser.text.include? 'Search Results' or verify_link.exists? end
-  
-  if @browser.text.include? 'No listings found'
-
-    if @chained
-	  self.start("Expressupdateusa/AddListing")
-    end
-    true
-    
+# Main Script
+begin
+  @browser.goto("http://www.expressupdate.com/search")
+  @browser.text_field(:id, "query").when_present.set data['business']
+  @browser.text_field(:id, "query").send_keys :enter
+  Watir::Wait.until { @browser.text.include? "Here’s what we found. Please identify your business in the list below." or @browser.text.include? "Don't see your business?" }
+  if @browser.span(:class => "subhead-link", :text => "#{data['business']}").exists? and @browser.span(:class => "subhead-link", :text => "#{data['business']}").parent.text.include? "(#{data['phone'][0]}) #{data['phone'][1]}-#{data['phone'][2]}"
+   puts "Pre-existing listing found, proceeding to ClaimListing..."
+   claimurl = @browser.span(:class => "subhead-link", :text => "#{data['business']}").parent.href
+   self.save_account("Expressupdateusa", { :claimurl => claimurl })
+   self.start("Expressupdateusa/Notify")
+   true
   else
-
-    if not verify_link.exists?
-      @browser.link( :text, 'View Full Listing' ).click
+    if retries < 5
+      self.start("Expressupdateusa/SignUp")
+      true
     else
-      # do nothing
+      raise "Retrying again, just to make sure." # Sometimes to search doesn't return results properly (note: rescues shouldn't normally be used to handle flow)
     end
-
-    @business_page_url = @browser.url()
-    @browser.link( :id, "verifyLink").click
-
-    if @browser.text.include? "Thank You!"
-	        puts("Business verified1")
-		    true
-    end
-
-
+ end
+rescue => e
+  unless retries == 0
+    puts "Error caught while searching for business. Error: #{e.inspect}"
+    puts "Retrying in two seconds. #{retries} attempts remaining."
+    sleep 2
+    retries -= 1
+    retry
+  else
+    raise "Error while searching for business could not be resolved. Error: #{e.inspect}"
   end
-
 end
-sign_in( data )
-search_the_business( data )
-

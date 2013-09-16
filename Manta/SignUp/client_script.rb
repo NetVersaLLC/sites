@@ -43,20 +43,20 @@ Watir::Wait.until { @browser.text_field( :id, 'member-firstname').exists? }
   @browser.checkbox( :id, 'over-quota' ).clear
   @browser.link(:class, 'btn-join btn-continue').click
 
-  RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'Manta'
-  sleep(5)
+  self.save_account("Manta", { :email => data['email'], :password => data['password']})
+  puts data['email']
+  puts data['password']
 
-  @modal_box = @browser.div(:class => 'ui-dialog ui-widget ui-widget-content ui-corner-all ui-front manta-dialog-fancy fancy-overlay-border get-verified-overlay get-verified-overlay-v2 ui-draggable')
-  @browser.wait_until{@modal_box.exist?}
-  notify_text = @modal_box.div(:class => 'verify-overlay-copy').text
-  # Close modal
-  @modal_box.link(:text => 'Close').click
-  
-  @browser.text_field(:id=>'product-selector-autocomplete').when_present.set data['category']
-  @browser.text_field(:id=>'product-selector-autocomplete').send_keys :down
-  @browser.text_field(:id=>'product-selector-autocomplete').send_keys :enter
-  @browser.div(:id => 'product-selector-suggested').li(:text => data['category']).when_present.click
-  @browser.button(:class => 'ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only').click
+  @browser.link(:text, /Continue to my profile/).when_present.click
+  @browser.link(:text, /I'll do it later/).when_present.click
+  # TODO - Products not yet supported
+  #@browser.text_field(:id, "product-selector-autocomplete").when_present.set data['product']
+  #@browser.text_field(:id, "product-selector-autocomplete").send_keys :enter
+  #@browser.li(:class => "user", :text => data['category']).when_present.click
+  @browser.span(:class => "ui-button-text", :text => "Done").when_present.click
+  if @chained
+    self.start("Manta/Verify")
+  end
 end
 
 def main( data )

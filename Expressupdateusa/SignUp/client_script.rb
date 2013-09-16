@@ -5,10 +5,7 @@ def sign_up( data )
   # assert url starts with 'https://listings.expressupdateusa.com/Account/Register'
   puts 'Signing up with email: ' + data[ 'personal_email' ]
 
-  @browser.text_field( :id, 'Email' ).set data[ 'personal_email' ]
-  @browser.text_field( :id, 'Password' ).set data[ 'personal_password' ]
-  @browser.text_field( :id, 'ConfirmPassword' ).set data[ 'personal_password' ]
-
+  @browser.text_field( :id, 'Email' ).set data[ 'personal_email' ] # Password entered during Captcha
   @browser.text_field( :id, 'Phone' ).set data[ 'business_phone' ]
   @browser.text_field( :id, 'BusinessName' ).set data[ 'business_name' ]
   @browser.text_field( :id, 'FirstName' ).set data[ 'personal_firstname' ]
@@ -21,7 +18,7 @@ enter_captcha( data )
 
   # If no return URl then 'Thank You for Registering with Express Update. An activation email sent!'
 
-RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['personal_email'], 'account[personal_password]' => data['password'], 'model' => 'Expressupdateusa'
+self.save_account("Expressupdateusa", { :email => data['personal_email'], :password => data['password']})
 
 
 if @chained

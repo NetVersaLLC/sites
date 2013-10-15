@@ -9,7 +9,7 @@ end
 
 url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=#{latlon}&radius=50000&keyword=#{CGI.escape(data['business'])}&sensor=false&key=#{api_key}"
 
-res = RestClient.get  url
+res = RestClient.get url
 results = JSON.parse(res)
 
 businessFound = {

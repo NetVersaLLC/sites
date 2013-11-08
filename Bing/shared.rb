@@ -1,5 +1,4 @@
 #require 'gp_requires'
-require '../shared.rb'
 
 def retryable(options = {}, &block)
   opts = { :tries => 1, :on => Exception }.merge(options)

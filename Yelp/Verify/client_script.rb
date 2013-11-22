@@ -10,8 +10,12 @@ link = data['link']
 
 @browser.goto(link)
 
-Watir::Wait::until do
-  @browser.text.include? "Thanks for Submitting your Business to Yelp"
+if link.nil?
+	self.start("Yelp/Verify", 1440)
+else
+	Watir::Wait::until do
+ 		@browser.text.include? "Thanks for Submitting your Business to Yelp"
+	end
 end
 
 true

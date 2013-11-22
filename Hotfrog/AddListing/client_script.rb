@@ -51,6 +51,7 @@ end
 # Launch browser
 
 begin
+@browser = Watir::Browser.new :firefox
 @url = 'http://www.hotfrog.com/AddYourBusinessSingle.aspx'
 @browser.goto(@url)
 #@browser.link(:text => 'Add your business').click
@@ -63,6 +64,12 @@ end
 
 if @chained == true
   self.start("Hotfrog/Verify")
+end
+
+at_exit
+  unless @browser.nil?
+    @browser.close
+  end
 end
 
 true

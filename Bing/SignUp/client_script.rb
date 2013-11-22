@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit do
+  unless @browser.nil?
+    @browser.close
+  end
+end
+
 if data['gender'] == "Unknown" then data['gender'] = "Male" end
 puts data
 

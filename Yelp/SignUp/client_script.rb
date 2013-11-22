@@ -1,3 +1,11 @@
+@browser = Watir::Browser.new :firefox
+
+at_exit do
+    unless @browser.nil?
+        @browser.close
+    end
+end
+
 retries = 3
 begin
     @browser.goto("https://biz.yelp.com")

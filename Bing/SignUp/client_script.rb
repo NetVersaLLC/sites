@@ -1,11 +1,12 @@
-<<<<<<< Updated upstream
 @browser = Watir::Browser.new :firefox
-at_exit do
+
+at_exit {
   unless @browser.nil?
     @browser.close
   end
-end
-=======
+}
+
+
 # Temporary methods from Shared.rb
 
 def solve_captcha2
@@ -71,16 +72,6 @@ def enter_captcha
 end
 
 # End Temporary Methods from Shared.rb
-
-@browser = Watir::Browser.new :firefox
-
-at_exit {
-  unless @browser.nil?
-    @browser.close
-  end
-}
-
->>>>>>> Stashed changes
 
 if data['gender'] == "Unknown" then data['gender'] = "Male" end
 puts data

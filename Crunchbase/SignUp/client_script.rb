@@ -1,54 +1,87 @@
-require 'rubygems'
-require 'watir'
+@browser = Watir::Browser.new :firefox
+at_exit do
+  unless @browser.nil?
+    @browser.close
+  end
+end
 
-def solve_captcha
-  image = "#{ENV['USERPROFILE']}\\citation\\crunchbase_captcha.png"
-  obj = @browser.image( :xpath, '/html/body/div[6]/div[2]/div/form/table/tbody/tr[11]/td/div/div/table/tbody/tr[2]/td[2]/div/img' )
+# Temporary methods from Shared.rb
+
+def solve_captcha2
+  begin
+  image = "#{ENV['USERPROFILE']}\citation\bing1_captcha.png"
+  obj = @browser.img( :xpath, '//div/table/tbody/tr/td/img[1]' )
   puts "CAPTCHA source: #{obj.src}"
   puts "CAPTCHA width: #{obj.width}"
   obj.save image
 
-  CAPTCHA.solve image, :manual
+    return CAPTCHA.solve image, :manual
+  rescue Exception => e
+    puts(e.inspect)
+  end
 end
 
 def enter_captcha
+  captcharetries = 5
+  capSolved = false
+ until capSolved == true
+    captcha_code = solve_captcha2  
+    @browser.execute_script("
+      function getRealId(partialid){
+        var re= new RegExp(partialid,'g')
+        var el = document.getElementsByTagName('*');
+        for(var i=0;i<el.length;i++){
+          if(el[i].id.match(re)){
+            return el[i].id;
+            break;
+          }
+        }
+      }
+      
+      _d.getElementById(getRealId('wlspispSolutionElement')).value = '#{captcha_code}';
 
-    capSolved = false
-    count = 1
-    until capSolved or count > 5 do
-        captcha_code = solve_captcha
-        @browser.text_field( :id, 'recaptcha_response_field').set captcha_code
-        @browser.button(:name => 'commit').click
-        sleep(2)    
-        if not @browser.text.include? "Error with reCAPTCHA!"
-            capSolved = true
-        end
-    count+=1
-    end
+      ")
+      sleep(5)
 
-    if capSolved == true
-        true
+      @browser.execute_script('
+        jQuery("#SignUpForm").submit()
+      ')
+
+      sleep 15
+
+    if @browser.url =~ /https:\/\/account.live.com\/summarypage.aspx/i
+      capSolved = true
     else
-        throw("Captcha was not solved")
+      captcharetries -= 1
     end
+    if capSolved == true
+      break
+    end
+
+  end
+
+  if capSolved == true
+    return true
+  else
+    throw "Captcha could not be solved"
+  end
 end
+
+# End Temporary Methods from Shared.rb
 
 def goto_signup_page
     puts 'Loading Signup Page for Crunchbase'
     @browser.goto('http://www.crunchbase.com/account/signup')
 end
 
-@browser = Watir::Browser.new
-#@browser.goto('http://www.crunchbase.com/account/signup')
 goto_signup_page
 
-@browser.text_field(:id => 'user_name').set "data['name']"
-@browser.text_field(:id => 'user_username').set "data['username']"
-@browser.text_field(:id => 'user_password').set "data['password']"
-@browser.text_field(:id => 'user_password_confirmation').set "data['password']"
-@browser.text_field(:id => 'user_email_address').set "data['email']"
+@browser.text_field(:id => 'user_name').set data['name']
+@browser.text_field(:id => 'user_username').set data['username']
+@browser.text_field(:id => 'user_password').set data['password']
+@browser.text_field(:id => 'user_password_confirmation').set data['password']
+@browser.text_field(:id => 'user_email_address').set data['email']
 
-solve_captcha
 enter_captcha
 @browser.button(:name => 'commit').click
 browser.link(:href => 'http://www.crunchbase.com/account/confirmation').click

@@ -20,7 +20,8 @@ data['birth_year']    = business.contact_birthday.split("/")[2]
 data['twitter_page']  = business.twitters.first.nil? ? '' : business.twitters.first.twitter_page
 
 catty = Foursquare.where(:business_id => business.id).first
-data['category']      = catty.foursquare_category.name
-data['category_top']  = catty.foursquare_category.parent.name
+catty = FoursquareCategory.find(catty.category_id)
+data['category']      = catty.name
+data['category_top']  = catty.parent.name
 
 data

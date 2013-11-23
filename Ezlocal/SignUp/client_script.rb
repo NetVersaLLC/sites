@@ -1,3 +1,9 @@
+@browser = Watir::Browser.new :firefox
+at_exit do
+	unless @browser.nil?
+		@browser.close
+	end
+end
 @browser.goto("https://secure.ezlocal.com/newbusiness/default.aspx")
 #@browser.text_field(:id =>"tPhone1").set data['phone_area_code']
 #@browser.text_field(:id => "tPhone2").set data['phone_prefix']

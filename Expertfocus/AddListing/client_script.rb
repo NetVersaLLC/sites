@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit do
+	unless @browser.nil?
+		@browser.close
+	end
+end
+
 @browser.goto('http://exportfocus.com/free-business-directory-listing1.php')
 
 @browser.text_field( :name => 'field1').set data['business']
@@ -13,5 +20,7 @@
 @browser.text_field( :name => 'mesg').set data['description']
 @browser.text_field( :name => 'field7').set data['fullname']
 @browser.button( :name => 'submit').click
+
+self.save_account("Expertfocus", { :email => data['email'], :password => data['password']})
 
 true

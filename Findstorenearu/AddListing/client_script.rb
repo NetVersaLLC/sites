@@ -1,3 +1,9 @@
+@browser = Watir::Browser.new :firefox
+at_exit do
+	unless @browser.nil?
+		@browser.close
+	end
+end
 @browser.goto( "http://www.findstorenearu.com/index.html#store" )
 
 @browser.text_field( :id => 'fina').set data[ 'firstname' ]

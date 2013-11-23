@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit do
+	unless @browser.nil?
+		@browser.close
+	end
+end
+
 @browser.goto 'https://foursquare.com/venue/claim'
 
 #@browser.goto(url)

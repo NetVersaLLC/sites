@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit do
+	unless @browser.nil?
+		@browser.close
+	end
+end
+
 #Enter your email address to register
 url="http://tupalo.com/en/accounts/sign_up"
 @browser.goto(url)

@@ -1,7 +1,7 @@
 data = {}
 data[ 'personal_firstname' ] 		= business.contact_first_name
 data[ 'personal_lastname' ] 		= business.contact_last_name
-data[ 'personal_name' ] 		= data[ 'personal_firstname' ] + ' ' + data[ 'personal_lastname' ]
+data[ 'personal_name' ] 		= [data['personal_firstname'],data['personal_lastname']].join ' '
 data[ 'personal_connection' ]  		= 'Owner'
 data[ 'personal_email' ]  		= business.bings.first.email
 data[ 'personal_password' ]  		= business.bings.first.password

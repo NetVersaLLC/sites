@@ -1,3 +1,9 @@
+@browser = Watir::Browser.new :firefox
+at_exit do
+	unless @browser.nil?
+		@browser.close
+	end
+end
 @browser.goto 'http://www.city-data.com/profiles/add'
 
 

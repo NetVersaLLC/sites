@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit do
+  unless @browser.nil?
+    @browser.close
+  end
+end
+
 @url = 'https://www.staylocal.org/node/add/business-listing'
 @browser.goto(@url)
 

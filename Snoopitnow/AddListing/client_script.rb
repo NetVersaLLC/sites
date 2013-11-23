@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit do
+	unless @browser.nil?
+		@browser.close
+	end
+end
+
 @browser.goto 'http://www.snoopitnow.com/Create-new-item.html'
 
 @browser.text_field(:id => 'field_entry_name').set data['business']

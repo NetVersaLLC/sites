@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit do
+	unless @browser.nil?
+		@browser.close
+	end
+end
+
 sign_in(data)
 sleep 2
 @browser.goto 'https://foursquare.com/add_venue?'

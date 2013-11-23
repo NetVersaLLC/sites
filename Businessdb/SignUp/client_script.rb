@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit do
+	unless @browser.nil?
+		@browser.close
+	end
+end
+
 @browser.goto 'http://www.businessdb.com/sign-up'
 @browser.text_field(:name => 'password_again').set data['password']
 @browser.text_field(:name => 'password').set data['password']

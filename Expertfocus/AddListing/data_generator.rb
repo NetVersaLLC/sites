@@ -1,6 +1,7 @@
 data = {}
 catty = Expertfocus.where(:business_id => business.id).first
-data[ 'category1' ]            = catty.expertfocus_category.name.gsub("\n", "")
+catty = ExpertfocusCategory.find(catty.category_id)
+data[ 'category1' ]            = catty.name.gsub("\n", "")
 seed = rand(100..1000).to_s
 data[ 'username' ]		= business.bings.first.email[0..14]
 data[ 'fname' ]			= business.contact_first_name

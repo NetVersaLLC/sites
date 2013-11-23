@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit do
+  unless @browser.nil?
+    @browser.close
+  end
+end
+
 def sign_up(data)
   @browser.link(:text => 'Sign Up Now').click
   sleep 2

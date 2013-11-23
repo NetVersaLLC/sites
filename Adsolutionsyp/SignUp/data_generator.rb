@@ -2,6 +2,7 @@ data = {}
 seed = rand(10000).to_s
 
 catty = Adsolutionsyp.where(:business_id => business.id).first
+catty = AdsolutionsypCategory.find(catty.category_id)
 data['category']			= catty.adsolutionsyp_category.name
 
 data['phone']				= business.local_phone.gsub("-","")

@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit do
+  unless @browser.nil?
+    @browser.close
+  end
+end
+
 # Maybe refactor to a single array of keys
 @minimum_stay_nights = { 'LessThanThree' => 'minstay_1', 'MoreThanThree' => 'minstay_2' } # (not including holidays)
 @security = { 'OnSite' => 'security_1', 'None' => 'security_2' }

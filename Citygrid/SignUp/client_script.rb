@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit do
+  unless @browser.nil?
+    @browser.close
+  end
+end
+
 # Search for the business
 def claim_business(data)
   # Claim the business

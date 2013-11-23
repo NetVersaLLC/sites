@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit do
+  unless @browser.nil?
+    @browser.close
+  end
+end
+
 @url = 'https://www.thumbtack.com/register'
   @browser.goto(@url)
 

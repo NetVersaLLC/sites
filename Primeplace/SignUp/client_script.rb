@@ -1,3 +1,44 @@
+@browser = Watir::Browser.new :firefox
+at_exit {
+	unless @browser.nil?
+		@browser.close
+	end
+}
+
+# Start temp copy from shared.rb
+
+def solve_captcha
+  image = "#{ENV['USERPROFILE']}\\citation\\primeplace_captcha.png"
+  obj = @browser.img( :xpath, '//*[@id="captchaImage"]' )
+  puts "CAPTCHA source: #{obj.src}"
+  puts "CAPTCHA width: #{obj.width}"
+  obj.save image
+
+  CAPTCHA.solve image, :manual
+end
+
+def enter_captcha( data )
+	capSolved = false
+	count = 1
+	until capSolved or count > 5 do
+		captcha_code = solve_captcha	
+		@browser.text_field( :id, 'captcha').set captcha_code
+		@browser.button( :id => 'submit').click	
+		sleep(2)
+		if not @browser.text.include? "The characters did not match the image. Please try again."
+			capSolved = true
+		end
+	count+=1
+	end
+	if capSolved == true
+		true
+	else
+		throw("Captcha was not solved")
+	end
+end
+
+# End temp copy from shared.rb
+
 @browser.goto( 'https://account.nokia.com/acct/register?serviceId=PrimePlaces' ) 
 @browser.text_field( :id => 'email').set data['email']
 @browser.text_field( :id => 'newPassword').set data['password']

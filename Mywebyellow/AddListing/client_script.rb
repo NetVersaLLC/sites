@@ -1,6 +1,54 @@
+@browser = Watir::Browser.new :firefox
+at_exit {
+	unless @browser.nil?
+		@browser.close
+	end
+}
+
+def solve_captcha
+  image = "#{ENV['USERPROFILE']}\\citation\\mywebyellow_captcha.png"
+  obj = @browser.image( :id, /Captcha01_img/ )
+  puts "CAPTCHA source: #{obj.src}"
+  puts "CAPTCHA width: #{obj.width}"
+  obj.save image
+
+  CAPTCHA.solve image, :manual
+end
+
+
+def enter_captcha( data )
+	capSolved = false
+	count = 1
+	until capSolved or count > 5 do
+		captcha_code = solve_captcha
+		@browser.text_field( :id, /CaptchaEntry/ ).set captcha_code
+		@browser.button( :id, 'ctl00_ContentPlaceHolder01_imgSubmit').click
+
+		30.times{ break if @browser.status == "Done"; sleep 1}
+		
+		if not @browser.text.include? "The characters you entered for the Captcha image are invalid."
+			capSolved = true
+		end
+		
+	count+=1	
+	end
+	if capSolved == true
+		Watir::Wait.until { @browser.text.include? "Your information has been submitted" }
+		true
+	else
+		throw("Captcha was not solved")
+	end
+end
+
+
+#TODO: Rewrite this so that it's cleaner
 @browser.goto('http://www.mywebyellow.com/AddListing.aspx')
 @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldContactName').set data['pe_name']
-@browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldContactPhone').set data['pe_phone']
+unless data['pe_phone'].nil?
+	@browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldContactPhone').set data['pe_phone']
+else
+	@browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldContactPhone').set data['bu_phone']
+end
 @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldContactEmail').set data['bu_email']
 @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldContactBestTime').set data['bt_call']
 @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldContactComments').set data['comment']
@@ -32,8 +80,10 @@ sleep(1)
 data[ 'payments' ].each{ | pay |
     @browser.checkbox( :id => pay ).click
   }
-  
-@browser.file_field(:name,"ctl00$ContentPlaceHolder01$fldLogoNew").set data['logo_path']
+
+unless self.logo.nil?  
+	@browser.file_field(:name,"ctl00$ContentPlaceHolder01$fldLogoNew").set self.logo
+end
 sleep (1)
 @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldLinkURL').set data['url']
 @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldLinkMenu').set data['menu']
@@ -45,9 +95,4 @@ sleep (1)
 @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldLinkTwitter').set data['twitter']
 sleep(1)
 
-@browser.button( :id, 'ctl00_ContentPlaceHolder01_imgSubmit').click
-
-sleep (2)
-Watir::Wait.until { @browser.text.include? "Thank you for your submission. A customer service representative will call you to verify this information." }
-
-true
+enter_captcha(data)

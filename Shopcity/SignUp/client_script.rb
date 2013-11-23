@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit {
+	unless @browser.nil?
+		@browser.close
+	end
+}
+
 @browser.goto("http://www.shopcity.com/map/mapnav_locations.cfm?")
 
 @browser.link( :text => /#{data['country']}/).click

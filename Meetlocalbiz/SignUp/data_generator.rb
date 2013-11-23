@@ -1,7 +1,8 @@
 data = {}
 seed = rand(100000).to_s
-catty = Meetlocalbiz.where(:business_id => business.id).first 
-data['category']			= catty.meetlocalbiz_category.name
+catty = Meetlocalbiz.where(:business_id => business.id).first
+catty = MeetlocalbizCategory.find(catty.category_id)
+data['category']			= catty.name
 data['firstname']			= business.contact_first_name
 data['lastname']			= business.contact_last_name
 data['business']			= business.business_name

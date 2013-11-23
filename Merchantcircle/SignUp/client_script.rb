@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit {
+	unless @browser.nil?
+		@browser.close
+	end
+}
+
 @browser.goto("http://www.merchantcircle.com/signup?utm_medium=signup")
 @browser.text_field(:id, "name").set data['name']
 @browser.text_field(:id, "telephone").set data['phone']
@@ -8,24 +15,29 @@
 @browser.text_field(:id, "email").set data['email']
 @browser.text_field(:id, "email2").set data['email']
 @browser.text_field(:id, "password").set data['password']
-@browser.checkbox(:id, "offers").click
-@browser.checkbox(:id, "tos_agree").click
-@browser.button(:value, "Submit").click
+@browser.checkbox(:id, "offers").clear
+@browser.send_keys :tab
+@browser.send_keys :space
+# Wouldn't check for some reason
+#@browser.checkbox(:id, "tos_agree").set
+@browser.button(:value, "Claim This Business Listing").click
 
 RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'Merchantcircle'
 
 
 #@browser.button(:value, "Finished").click
-@browser.link(:text, "No, Thanks").click
-@browser.link(:text, "No, thanks").click
-@browser.link(:text, "Continue").click
+@browser.link(:text, "No, Thanks").when_present.click
+@browser.link(:text, "No, thanks").when_present.click
+@browser.link(:text, "Continue").when_present.click
 @browser.link(:href, "http://www.merchantcircle.com/merchant/edit").click
 @browser.text_field( :id, "description").when_present.set data[ 'description' ]
-@browser.text_field( :id, "fax").set data[ 'fax' ]
+sleep 9999999
 @browser.text_field( :id, "tollfree").set data[ 'tollfree' ]
 @browser.text_field( :id, "url").set data[ 'website' ]
 @browser.text_field( :id, "tags").set data[ 'keywords']
 @browser.button( :name, "updateListing").click
+
+Watir::Wait.until { @browser.text.include? "Your business listing has been updated." }
 
 if @chained
   self.start("Merchantcircle/Verify")

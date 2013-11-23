@@ -1,5 +1,6 @@
 data = {}
 catty                       = Shopinusa.where(:business_id => business.id).first
+catty 						= ShopinusaCategory.find(catty.category_id)
 
 data[ 'username' ]		= business.bings.first.email[0..14]
 data[ 'password' ]		= Yahoo.make_password

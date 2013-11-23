@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit {
+	unless @browser.nil?
+		@browser.close
+	end
+}
+
 @browser.goto 'http://meetlocalbiz.com/join/biz/plan/'
 
 @browser.text_field(:id => 'name_first').set data['firstname']

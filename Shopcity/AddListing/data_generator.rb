@@ -1,6 +1,8 @@
 data = {}
 catty = Shopcity.where(:business_id => business.id).first
-data[ 'category1' ]          = catty.shopcity_category.name
+catty = ShopcityCategory.find(catty.category_id)
+
+data[ 'category1' ]          = catty.name
 
 seed = rand(100..1000).to_s
 data[ 'country' ]		= "United States"

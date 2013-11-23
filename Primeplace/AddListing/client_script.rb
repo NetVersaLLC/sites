@@ -1,3 +1,21 @@
+@browser = Watir::Browser.new :firefox
+at_exit {
+	unless @browser.nil?
+		@browser.close
+	end
+}
+
+# Temp copy from shared.rb
+
+def sign_in( data )
+@browser.goto( 'https://account.nokia.com/' )
+@browser.text_field( :id => 'username').set data['username']
+@browser.text_field( :id => 'password').set data['password']
+@browser.button( :id => 'loginsubmit').click
+end
+
+# End temp copy from shared.rb
+
 sign_in(data)
 
 @browser.goto( 'http://primeplace.nokia.com/place/create' )

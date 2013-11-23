@@ -4,7 +4,8 @@ data[ 'password' ]		= business.primeplaces.first.password
 data[ 'fname' ]			= business.contact_first_name
 data[ 'lname' ]			= business.contact_last_name
 data[ 'fullname' ]		= data[ 'fname' ] + ' ' + data[ 'lname' ]
-primey = Primeplace.where(:business_id => business.id).first
+primey 					= Primeplace.where(:business_id => business.id).first
+primey 					= PrimeplaceCategory.find(primey.category_id)
 data[ 'category1' ]          = primey.primeplace_category.parent.name
 data[ 'category2' ]          = primey.primeplace_category.name
 data[ 'state_name' ]		= business.state_name

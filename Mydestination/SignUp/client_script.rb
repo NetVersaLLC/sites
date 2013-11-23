@@ -1,4 +1,9 @@
-p data
+@browser = Watir::Browser.new :firefox
+at_exit {
+  unless @browser.nil?
+    @browser.close
+  end
+}
 def add_business(data)
   @browser.div(:id => 'footer').when_present.link(:text => 'Add Your Business').click
   @browser.text_field(:name => 'contactName').set data[ 'full_name' ]	

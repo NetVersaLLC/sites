@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit {
+	unless @browser.nil?
+		@browser.close
+	end
+}
+
 @browser.goto('http://mycitybusiness.net/addbusiness.php')
 
 @browser.text_field( :name => 'company').set data['business']

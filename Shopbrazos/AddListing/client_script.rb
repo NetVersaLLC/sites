@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit {
+	unless @browser.nil?
+		@browser.close
+	end
+}
+
 @browser.goto('http://bryan.shopbrazos.com/add/business/')
 
 @browser.text_field( :name => 'frmFirstName').set data['fname']

@@ -1,3 +1,45 @@
+@browser = Watir::Browser.new :firefox
+at_exit do
+	unless @browser.nil?
+		@browser.close
+	end
+end
+
+#BEGIN CAPTCHA
+def solve_captcha( obj )
+  image = ["#{ENV['USERPROFILE']}",'\citation\site_captcha.png'].join
+  puts "CAPTCHA source: #{obj.src}"
+  puts "CAPTCHA width: #{obj.width}"
+  obj.save image
+
+  CAPTCHA.solve image, :manual
+end
+
+def enter_captcha( button, field, image, successTrigger, failureTrigger=nil )
+  capSolved = false
+  count = 1
+  until capSolved or count > 5 do
+    captcha_code = solve_captcha(image)
+    field.set captcha_code
+    button.click
+
+    30.times{ break if @browser.status == "Done"; sleep 1}
+    
+    unless failureTrigger.nil? or @browser.text.include? failureTrigger
+      capSolved = true
+    end
+    
+  count+=1  
+  end
+  if capSolved == true
+    Watir::Wait.until { @browser.text.include? successTrigger }
+    true
+  else
+    throw("Captcha was not solved")
+  end
+end
+#END CAPTCHA
+
 @browser.goto("https://twitter.com/signup")
 puts("1")
 retries = 5
@@ -33,7 +75,13 @@ begin
 
 
 	if @browser.text.include? "Are you human?"
-		retry_captcha
+		button = @browser.div(:class=>"sign-up-box").text_field(:class=>"submit")
+		field = @brower.text_field(:id=>"recaptcha_response_field")
+		image = @browser.div(:id=>"recaptcha_image").image
+		field.click
+		@browser.execute_script "$('#recaptcha_response_field').val(#{solve_captcha(image)})"
+		button.click
+		enter_captcha(button,field,image,"Preview")
 		if @browser.text.include? "Join Twitter today."
 			raise "Captcha code invalid"
 		end

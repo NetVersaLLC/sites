@@ -1,6 +1,6 @@
-#Method for update listing
-
-def update_business(data)  
+def update_business(data)
+  tries ||= 5
+  @browser.goto('http://www.yellowbrowser.com/update_Listings.php')
   @browser.text_field( :name => /visitor/).set data['full_name']
   @browser.text_field( :name => 'visitormail').set data[ 'email' ]
   @browser.text_field( :name => 'phone').set data[ 'phone' ]
@@ -16,17 +16,64 @@ def update_business(data)
   @browser.select_list( :name => 'attn').select "Listing Update Request"
   @browser.text_field(:name => 'fact').set data['reason_for_update']
 
-  enter_captcha( data )
-  @browser.button(:name => 'Submit').click
+  button = @browser.button(:name=>"Submit")
+  field = @browser.text_field(:id=>"captcha")
+  image = @browser.image(:id=>"phoca-captcha")
+  enter_captcha(button,field,image,"has been received")
+rescue => e
+  if (tries -= 1) > 0
+    puts "Yellowbrowser/UpdateListing failed. Retrying #{tries} more times."
+    puts "Details: #{e.message}"
+    sleep 2
+    retry
+  else
+    puts "Yellowbrowser/UpdateListing failed. Out of retries. Quitting."
+    raise e
+  end
+else
+  puts "Yellowbrowser/UpdateListing successful!"
+  true
+end
 
-  if @browser.text.include? "Your Listing Update Request has been received successfully..."
-    puts "Listing Update is successfully"
-    else
-      throw ("Initial Registration is unsuccessfull")
+@browser = Watir::Browser.new :firefox
+at_exit do
+  unless @browser.nil?
+    @browser.close
   end
 end
 
-#Main update steps
-@url = 'http://www.yellowbrowser.com/update_Listings.php'
-@browser.goto(@url)
+#BEGIN CAPTCHA
+def solve_captcha( obj )
+  image = ["#{ENV['USERPROFILE']}",'\citation\site_captcha.png'].join
+  puts "CAPTCHA source: #{obj.src}"
+  puts "CAPTCHA width: #{obj.width}"
+  obj.save image
+
+  CAPTCHA.solve image, :manual
+end
+
+
+def enter_captcha( button, field, image, successTrigger, failureTrigger=nil )
+  capSolved = false
+  count = 1
+  until capSolved or count > 5 do
+    captcha_code = solve_captcha(image)
+    field.set captcha_code
+    button.click
+    
+    if failureTrigger.nil? or not @browser.text.include? failureTrigger
+      capSolved = true
+    end
+    
+  count+=1  
+  end
+  if capSolved == true
+    Watir::Wait.until { @browser.text.include? successTrigger }
+    true
+  else
+    throw("Captcha was not solved")
+  end
+end
+#END CAPTCHA
+
 update_business(data)

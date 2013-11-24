@@ -9,7 +9,7 @@ data[ 'state' ] =	 			business.state
 data[ 'zip' ] =	 				business.zip
 data[ 'business_description']  = business.business_description
 catty = Staylocal.where(:business_id => business.id).first
-catty = StayLocalCategory.find(catty.category_id)
+catty = StaylocalCategory.find(catty.category_id)
 data[ 'category' ] =			 catty.staylocal_category.name
 data[ 'website'] =			 	business.company_website
 data[ 'role' ] = 				'owner'

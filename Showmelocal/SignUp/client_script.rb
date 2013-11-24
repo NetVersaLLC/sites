@@ -5,76 +5,74 @@ at_exit do
 	end
 end
 
-# Temporary methods from Shared.rb
-
-def solve_captcha2
-  begin
-  image = "#{ENV['USERPROFILE']}\citation\bing1_captcha.png"
-  obj = @browser.img( :xpath, '//div/table/tbody/tr/td/img[1]' )
+#BEGIN CAPTCHA
+def solve_captcha( obj )
+  image = ["#{ENV['USERPROFILE']}",'\citation\site_captcha.png'].join
   puts "CAPTCHA source: #{obj.src}"
   puts "CAPTCHA width: #{obj.width}"
   obj.save image
 
-    return CAPTCHA.solve image, :manual
-  rescue Exception => e
-    puts(e.inspect)
-  end
+  CAPTCHA.solve image, :manual
 end
 
-def enter_captcha
-  captcharetries = 5
+
+def enter_captcha( button, field, image, successTrigger, failureTrigger=nil )
   capSolved = false
- until capSolved == true
-	  captcha_code = solve_captcha2	
-    @browser.execute_script("
-      function getRealId(partialid){
-        var re= new RegExp(partialid,'g')
-        var el = document.getElementsByTagName('*');
-        for(var i=0;i<el.length;i++){
-          if(el[i].id.match(re)){
-            return el[i].id;
-            break;
-          }
-        }
-      }
-      
-      _d.getElementById(getRealId('wlspispSolutionElement')).value = '#{captcha_code}';
+  count = 1
+  until capSolved or count > 5 do
+    captcha_code = solve_captcha(image)
+    field.set captcha_code
+    button.click
 
-      ")
-      sleep(5)
-
-      @browser.execute_script('
-        jQuery("#SignUpForm").submit()
-      ')
-
-      sleep 15
-
-    if @browser.url =~ /https:\/\/account.live.com\/summarypage.aspx/i
+    30.times{ break if @browser.status == "Done"; sleep 1}
+    
+    unless failureTrigger.nil? or @browser.text.include? failureTrigger
       capSolved = true
-    else
-      captcharetries -= 1
     end
-    if capSolved == true
-      break
-    end
-
+    
+  count+=1  
   end
-
   if capSolved == true
-    return true
+    Watir::Wait.until { @browser.text.include? successTrigger }
+    true
   else
-    throw "Captcha could not be solved"
+    throw("Captcha was not solved")
+  end
+end
+#END CAPTCHA
+
+def try_captcha(successTrigger)
+  5.times do |n|
+    begin
+      button = @browser.button(:id=>"cmdSave")
+      field = @browser.text_field(:id=>"txtWordVerification")
+      image = @browser.image(:id=>"imgWVI")
+      enter_captcha(button,field,image,successTrigger)
+    rescue
+      if n<4
+        puts "Captcha failed. Retrying #{4-n} more times."
+      else
+        puts "Captcha failed. Out of retries."
+      end
+    end
+    break
   end
 end
 
-# End Temporary Methods from Shared.rb
+@browser.goto 'http://www.showmelocal.com/register.aspx?ReturnURL=/business-registration.aspx'
 
-@browser.goto( 'http://www.showmelocal.com/businessregistration.aspx' )
-@browser.text_field( :id => '_ctl0_txtFirstName').set data[ 'fname' ]
-@browser.text_field( :id => '_ctl0_txtLastName').set data[ 'lname' ]
-@browser.text_field( :id => '_ctl0_txtEmail').set data[ 'email' ]
-@browser.text_field( :id => '_ctl0_txtPassword').set data[ 'password' ]
-	enter_captcha
+@browser.text_field(:id => '_ctl0_txtFirstName').set data['contact_first_name']
+@browser.text_field(:id => '_ctl0_txtLastName').set data['contact_last_name']
+@browser.text_field(:id => '_ctl0_txtEmail').set data['email']
+@browser.text_field(:id => '_ctl0_txtPassword').set data['password']
+try_captcha("you logged in as")
+
+@browser.text_field(:id => '_ctl0_txtBusinessName').when_present.set data['business_name']
+@browser.text_field(:id => '_ctl0_txtBusinessType').set data['category2']
+@browser.text_field(:id => '_ctl0_txtPhone').set data['alternate_phone']
+@browser.text_field(:id => '_ctl0_txtAddress').set data['address']
+try_captcha("Your account requires activation")
+
 RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['email'], 'account[password]' => data['password'], 'model' => 'Showmelocal'
 	if @chained
 		self.start("Showmelocal/Verify")

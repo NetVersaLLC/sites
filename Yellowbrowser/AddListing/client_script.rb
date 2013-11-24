@@ -1,109 +1,93 @@
-@browser = Watir::Browser.new :firefox
-at_exit do
-	unless @browser.nil?
-		@browser.close
-	end
+def signup (data)
+  tries ||= 5
+  @browser.goto( 'http://yellowbrowser.com/add_business.php' )
+
+  @browser.text_field( :name => 'visitor').set data[ 'fullname' ]
+  @browser.text_field( :name => 'visitor').fire_event('onBlur')
+  @browser.text_field( :name => 'visitormail').set data[ 'email' ]
+  @browser.text_field( :name => 'visitormail').fire_event('onBlur')
+  @browser.text_field( :name => 'phone').set data[ 'phone' ]
+  @browser.text_field( :name => 'phone').fire_event('onBlur')
+  @browser.text_field( :name => 'fax').set data[ 'fax' ]
+  @browser.text_field( :name => 'fax').fire_event('onBlur')
+  @browser.text_field( :name => 'business').set data[ 'business' ]
+  @browser.text_field( :name => 'business').fire_event('onBlur')
+  @browser.text_field( :name => 'address').set data[ 'addressComb' ]
+  @browser.text_field( :name => 'address').fire_event('onBlur')
+  @browser.text_field( :name => 'city').set data[ 'city' ]
+  @browser.text_field( :name => 'city').fire_event('onBlur')
+  @browser.text_field( :name => 'state').set data[ 'state' ]
+  @browser.text_field( :name => 'state').fire_event('onBlur')
+  @browser.text_field( :name => 'zip').set data[ 'zip' ]
+  @browser.text_field( :name => 'zip').fire_event('onBlur')
+  @browser.text_field( :name => 'keyword').set data[ 'category' ]
+  @browser.text_field( :name => 'keyword').fire_event('onBlur')
+  @browser.text_field( :name => 'url').set data[ 'website' ]
+  @browser.text_field( :name => 'url').fire_event('onBlur')
+  @browser.text_field( :name => 'notes').set data[ 'description' ]
+  @browser.text_field( :name => 'notes').fire_event('onBlur')
+  @browser.select_list( :name => 'attn').select "New Listing Request"
+  @browser.select_list( :name => 'attn').fire_event('onBlur')
+
+  button = @browser.button(:name=>"Submit")
+  field = @browser.text_field(:id=>"captcha")
+  image = @browser.image(:id=>"phoca-captcha")
+  enter_captcha(button,field,image,"has been received")
+rescue => e
+  if (tries -= 1) > 0
+    puts "Yellowbrowser/AddListing failed. Retrying #{tries} more times."
+    puts "Details: #{e.message}"
+    sleep 2
+    retry
+  else
+    puts "Yellowbrowser/AddListing failed. Out of retries. Quitting."
+    puts "Details: #{e.message}"
+    raise e
+  end
+else
+  puts "Yellowbrowser/AddListing succeeded!"
+  true
 end
 
-# Temporary methods from Shared.rb
+@browser = Watir::Browser.new :firefox
+at_exit do
+  unless @browser.nil?
+    @browser.close
+  end
+end
 
-def solve_captcha2
-  begin
-  image = "#{ENV['USERPROFILE']}\citation\bing1_captcha.png"
-  obj = @browser.img( :xpath, '//div/table/tbody/tr/td/img[1]' )
+#BEGIN CAPTCHA
+def solve_captcha( obj )
+  image = ["#{ENV['USERPROFILE']}",'\citation\site_captcha.png'].join
   puts "CAPTCHA source: #{obj.src}"
   puts "CAPTCHA width: #{obj.width}"
   obj.save image
 
-    return CAPTCHA.solve image, :manual
-  rescue Exception => e
-    puts(e.inspect)
-  end
+  CAPTCHA.solve image, :manual
 end
 
-def enter_captcha
-  captcharetries = 5
+
+def enter_captcha( button, field, image, successTrigger, failureTrigger=nil )
   capSolved = false
- until capSolved == true
-	  captcha_code = solve_captcha2	
-    @browser.execute_script("
-      function getRealId(partialid){
-        var re= new RegExp(partialid,'g')
-        var el = document.getElementsByTagName('*');
-        for(var i=0;i<el.length;i++){
-          if(el[i].id.match(re)){
-            return el[i].id;
-            break;
-          }
-        }
-      }
-      
-      _d.getElementById(getRealId('wlspispSolutionElement')).value = '#{captcha_code}';
-
-      ")
-      sleep(5)
-
-      @browser.execute_script('
-        jQuery("#SignUpForm").submit()
-      ')
-
-      sleep 15
-
-    if @browser.url =~ /https:\/\/account.live.com\/summarypage.aspx/i
+  count = 1
+  until capSolved or count > 5 do
+    captcha_code = solve_captcha(image)
+    field.set captcha_code
+    button.click
+    
+    if failureTrigger.nil? or not @browser.text.include? failureTrigger
       capSolved = true
-    else
-      captcharetries -= 1
     end
-    if capSolved == true
-      break
-    end
-
+    
+  count+=1  
   end
-
   if capSolved == true
-    return true
+    Watir::Wait.until { @browser.text.include? successTrigger }
+    true
   else
-    throw "Captcha could not be solved"
+    throw("Captcha was not solved")
   end
 end
+#END CAPTCHA
 
-# End Temporary Methods from Shared.rb
-
-@browser.goto( 'http://yellowbrowser.com/add_business.php' )
-
-@browser.text_field( :name => 'visitor').set data[ 'fullname' ]
-@browser.text_field( :name => 'visitor').fire_event('onBlur')
-@browser.text_field( :name => 'visitormail').set data[ 'email' ]
-@browser.text_field( :name => 'visitormail').fire_event('onBlur')
-@browser.text_field( :name => 'phone').set data[ 'phone' ]
-@browser.text_field( :name => 'phone').fire_event('onBlur')
-@browser.text_field( :name => 'fax').set data[ 'fax' ]
-@browser.text_field( :name => 'fax').fire_event('onBlur')
-@browser.text_field( :name => 'business').set data[ 'business' ]
-@browser.text_field( :name => 'business').fire_event('onBlur')
-@browser.text_field( :name => 'address').set data[ 'addressComb' ]
-@browser.text_field( :name => 'address').fire_event('onBlur')
-@browser.text_field( :name => 'city').set data[ 'city' ]
-@browser.text_field( :name => 'city').fire_event('onBlur')
-@browser.text_field( :name => 'state').set data[ 'state' ]
-@browser.text_field( :name => 'state').fire_event('onBlur')
-@browser.text_field( :name => 'zip').set data[ 'zip' ]
-@browser.text_field( :name => 'zip').fire_event('onBlur')
-@browser.text_field( :name => 'keyword').set data[ 'category' ]
-@browser.text_field( :name => 'keyword').fire_event('onBlur')
-@browser.text_field( :name => 'url').set data[ 'website' ]
-@browser.text_field( :name => 'url').fire_event('onBlur')
-@browser.text_field( :name => 'notes').set data[ 'description' ]
-@browser.text_field( :name => 'notes').fire_event('onBlur')
-@browser.select_list( :name => 'attn').select "New Listing Request"
-@browser.select_list( :name => 'attn').fire_event('onBlur')
-
-enter_captcha
-
-@browser.button(:name => 'Submit').click
-
-sleep 2
-Watir::Wait.until {@browser.text.include? "Your Listing Update Request has been received successfully..."}
-
-true
-
+signup data

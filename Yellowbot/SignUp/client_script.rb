@@ -4,89 +4,72 @@ at_exit do
     @browser.close
   end
 end
-# Temporary methods from Shared.rb
-
-def solve_captcha2
-  begin
-  image = "#{ENV['USERPROFILE']}\citation\bing1_captcha.png"
-  obj = @browser.img( :xpath, '//div/table/tbody/tr/td/img[1]' )
+#BEGIN CAPTCHA
+def solve_captcha( obj )
+  image = ["#{ENV['USERPROFILE']}",'\citation\site_captcha.png'].join
   puts "CAPTCHA source: #{obj.src}"
   puts "CAPTCHA width: #{obj.width}"
   obj.save image
 
-    return CAPTCHA.solve image, :manual
-  rescue Exception => e
-    puts(e.inspect)
-  end
+  CAPTCHA.solve image, :manual
 end
 
-def enter_captcha
-  captcharetries = 5
+
+def enter_captcha( button, field, image, successTrigger, failureTrigger=nil )
   capSolved = false
- until capSolved == true
-    captcha_code = solve_captcha2  
-    @browser.execute_script("
-      function getRealId(partialid){
-        var re= new RegExp(partialid,'g')
-        var el = document.getElementsByTagName('*');
-        for(var i=0;i<el.length;i++){
-          if(el[i].id.match(re)){
-            return el[i].id;
-            break;
-          }
-        }
-      }
-      
-      _d.getElementById(getRealId('wlspispSolutionElement')).value = '#{captcha_code}';
+  count = 1
+  until capSolved or count > 5 do
+    captcha_code = solve_captcha(image)
+    field.set captcha_code
+    button.click
 
-      ")
-      sleep(5)
-
-      @browser.execute_script('
-        jQuery("#SignUpForm").submit()
-      ')
-
-      sleep 15
-
-    if @browser.url =~ /https:\/\/account.live.com\/summarypage.aspx/i
+    30.times{ break if @browser.status == "Done"; sleep 1}
+    
+    unless failureTrigger.nil? or @browser.text.include? failureTrigger
       capSolved = true
-    else
-      captcharetries -= 1
     end
-    if capSolved == true
-      break
-    end
-
+    
+  count+=1  
   end
-
   if capSolved == true
-    return true
+    Watir::Wait.until { @browser.text.include? successTrigger }
+    true
   else
-    throw "Captcha could not be solved"
+    throw("Captcha was not solved")
   end
 end
-
-# End Temporary Methods from Shared.rb
+#END CAPTCHA
 
 @browser.goto( "https://www.yellowbot.com/signin/register" )
 
-  @browser.text_field( :id => 'reg_email' ).set data[ 'email' ]
-  @browser.text_field( :id => 'reg_email_again' ).set data[ 'email' ]
+@browser.text_field( :id => 'reg_email' ).set data[ 'email' ]
+@browser.text_field( :id => 'reg_email_again' ).set data[ 'email' ]
 
-  @browser.text_field( :id => 'reg_name' ).set data[ 'username' ]
-  @browser.text_field( :id => 'reg_password' ).set data[ 'password' ]
-  @browser.text_field( :id => 'reg_password2' ).set data[ 'password' ]
-  
-  @browser.checkbox( :name => 'tos' ).set
-  @browser.checkbox( :name => 'opt_in' ).clear
+@browser.text_field( :id => 'reg_name' ).set data[ 'username' ]
+@browser.text_field( :id => 'reg_password' ).set data[ 'password' ]
+@browser.text_field( :id => 'reg_password2' ).set data[ 'password' ]
 
-	enter_captcha
-  
-  RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'YellowBot'
-  
-  if @chained
-	  self.start("Yellowbot/Verify")
-	end
-  
-  
-  true
+@browser.checkbox( :name => 'tos' ).set
+@browser.checkbox( :name => 'opt_in' ).clear
+
+button = @browser.button(:class => "submitBtnSignin")
+image = @browser.div(:id=>"recaptcha_image").image
+field = @browser.text_field(:id => "recaptcha_response_field")
+
+begin
+  enter_captcha(button,field,image,"Welcome to YellowBot!")
+rescue
+  if @browser.text.include? "Please correct the errors below"
+    self.start("Yellowbot/SignUp")
+    throw "Incorrect CAPTCHA, retrying"
+  end
+end
+
+
+self.save_account("Site", { :email => data['email'], :password => data['password']})
+if @chained
+  self.start("Yellowbot/Verify")
+end
+
+
+true

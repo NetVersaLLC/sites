@@ -1,5 +1,5 @@
 data = {}
-data[ 'full_name' ]				= business.contact_first_name + business.contact_last_name
+data[ 'full_name' ]				= [business.contact_first_name,business.contact_last_name].join ' '
 data[ 'category1' ]				= business.category1
 data[ 'category2' ]				= business.category2
 data[ 'category3' ]				= business.category3

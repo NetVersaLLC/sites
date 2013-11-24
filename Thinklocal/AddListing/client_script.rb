@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit do
+  unless @browser.nil?
+    @browser.close
+  end
+end
+
 # Methd for Sign up
 def sign_up(data)
   @browser.text_field(:id => /regEmail/).set data['email']

@@ -1,7 +1,8 @@
 data = {}
 catty                       = Cornerstonesworld.where(:business_id => business.id).first
+catty = CornerstonesworldCategory.find(catty.category_id)
 data[ 'business' ]		= business.business_name
-data[ 'category' ]  = catty.cornerstonesworld_category.name.gsub("\n", "")
+data[ 'category' ]  = catty.name.gsub("\n", "")
 data[ 'address' ]		= business.address + ' ' + business.address2
 data[ 'city' ]			= business.city
 data[ 'zip' ] 			= business.zip

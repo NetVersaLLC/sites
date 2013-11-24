@@ -47,12 +47,11 @@ def fill_map_routing(data)
   @browser.text_field(:name => /companystreet/).set data['address']
   @browser.text_field(:name => /companycity/).set data['city']
   sleep(4)
+  @browser.link(:xpath => '//*[@id="ctl00_bodyadmin"]/ul[2]/li/a').when_present.click
   @browser.text_field(:name => /postnr/).set data['zip']
   @browser.text_field(:name => /companyweb/).set data['website']
   @browser.text_field(:name => /companymail/).set data['email']
-  @browser.text_field(:id => "p_scnt_phone").set data['phone']
-  @browser.text_field(:id => "p_scnt_fax").set data['fax']
-=begin
+  @browser.text_field(:name => /companyphone/).set data['phone']
   unless self.logo.nil? 
     @browser.file_field(:name => /FileUpload1/).set self.logo
     @browser.button(:value => "Upload").click
@@ -60,10 +59,9 @@ def fill_map_routing(data)
     @browser.file_field(:name => /FileUpload1/).set self.images.first unless self.images.empty?
     @browser.button(:value => "Upload").click
   end
-=end
 
-  @browser.button(:id => /modifybasicinfo_save/).click
-  Watir::Wait.until { @browser.text.include? "Saving was successful." }
+  @browser.button(:value => "Save changes").click
+  30.times { break if @browser.text.include? "Saving was successful."; sleep 1 }
   @browser.link(:id => /home/).click
 end
 
@@ -82,7 +80,7 @@ def fill_payment_methods(data)
     @browser.div(:class => /block-content/).ul.li(:index => key.to_i).input.click if data[method]
   end
   @browser.button(:value => 'Save').click
-  15.times { break if @browser.status == "Done"; sleep 1 }
+  30.times { break if @browser.status == "Done"; sleep 1 }
   @browser.link(:id => /home/).click
 end
 
@@ -98,7 +96,7 @@ def search_result(data)
   @browser.text_field(:name => /website/).set data['website']
   @browser.button(:value => 'Check name').click
   # @browser.wait()
-  15.times { break if @browser.status == "Done"; sleep 1 }
+  30.times { break if @browser.status == "Done"; sleep 1 }
 end
 
 def add_new_business(data)

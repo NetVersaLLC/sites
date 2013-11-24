@@ -8,12 +8,13 @@ end
 @url = 'https://www.thumbtack.com/register'
   @browser.goto(@url)
 
+  30.times{ break if @browser.status == "Done"; sleep 1}
   
-@browser.text_field(:id => 'usr_first_name').when_present.set data['first_name']
+@browser.text_field(:id => 'usr_first_name').set data['first_name']
 @browser.text_field(:id => 'usr_last_name').set data['last_name']
 @browser.text_field(:id => 'usr_email').set data['email']
 @browser.text_field(:id => 'usr_password').set data['password']
-@browser.button(:text => /Create Account/i).click
+@browser.link(:text => /Join/i).click
 sleep 2
 Watir::Wait.until { @browser.text.include? "Please verify your email address" }
 

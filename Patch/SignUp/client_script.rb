@@ -10,20 +10,12 @@ at_exit {
 @browser.text_field(:id => 'zip').set '90210' #data[ 'zip' ]
 @browser.button(:class => 'submit').click
 
-@browser.wait_until do
-	if @browser.text =~ /We’re not in your town quite yet, but we will be./
-		return true
-	elsif @browser.text =~ /We've got you covered! Here's your Patch:/
-		return true
-	else
-		return false
-	end
-end
+Watir::Wait.until { @browser.text.include? ("We’re not in your town quite yet, but we will be." or "We've got you covered! Here's your Patch:") }
 
 if @browser.text.include? "We’re not in your town quite yet, but we will be."
 	puts "Patch not avilable for this business!"
 else
-	@browser.div(:class => /nearby_patches/).link(:href => /patch.com/).click
+	@browser.div(:class => "response").div.link.click
 	@browser.link(:class => 'js-trackable js-needs_current_user data-tag').click
 	@browser.text_field(:name => 'name').set 'John Smith'
 	@browser.text_field(:name => 'email').set 'wnvta123@live.com'

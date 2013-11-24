@@ -1,28 +1,3 @@
-@browser = Watir::Browser.new :firefox
-at_exit {
-  unless @browser.nil?
-    @browser.close
-  end
-}
-
-def sign_in(data)
-@browser.goto("https://www.yellowbot.com/signin?")
-@browser.text_field( :name => 'login').set data['email']
-@browser.text_field( :name => 'password').set data['password']
-@browser.button( :name => 'subbtn').click
-sleep(5)
-end
-
-def solve_captcha2
-  image = "#{ENV['USERPROFILE']}\\citation\\yellowbot2_captcha.png"
-  obj = @browser.image( :xpath, "/html/body/div[3]/div/div[2]/div/div/div/div/div/div/div/form/div/div/table/tbody/tr[2]/td[2]/div/img" )
-  puts "CAPTCHA source: #{obj.src}"
-  puts "CAPTCHA width: #{obj.width}"
-  obj.save image
-
-  CAPTCHA.solve image, :manual
-end
-
 #Add business
 def add_business(data)
   @browser.text_field( :name, 'name').set data['business']

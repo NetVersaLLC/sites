@@ -1,10 +1,3 @@
-@browser = Watir::Browser.new :firefox
-at_exit {
-	unless @browser.nil?
-		@browser.close
-	end
-}
-
 @browser.goto( "http://www.yellowbot.com/" )
 @browser.text_field( :id => 'search-field' ).set data[ 'phone' ]
 @browser.button( :value => 'Find my business' ).click #, :type => 'submit'

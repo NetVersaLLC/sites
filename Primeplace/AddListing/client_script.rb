@@ -20,10 +20,6 @@ sign_in(data)
 
 @browser.goto( 'http://primeplace.nokia.com/place/create' )
 
-if @browser.link( :text => /Accept/i).exists?
-	@browser.link( :text => /Accept/i).click
-end
-
 @browser.text_field( :id => 'name').when_present.set data['business']
 @browser.select_list( :id => 'country').select data['country']
 sleep(2)
@@ -42,6 +38,9 @@ sleep(1)
 
 @browser.button( :id => 'add_place').click
 sleep(5)
+if @browser.link( :text => /Accept/i).exists?
+	@browser.link( :text => /Accept/i).click
+end
 #if @browser.link( :class => 'button big').exists?
 #	@browser.link( :class => 'button big').click
 #end

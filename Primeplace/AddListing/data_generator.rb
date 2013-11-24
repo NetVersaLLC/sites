@@ -6,8 +6,8 @@ data[ 'lname' ]			= business.contact_last_name
 data[ 'fullname' ]		= data[ 'fname' ] + ' ' + data[ 'lname' ]
 primey 					= Primeplace.where(:business_id => business.id).first
 primey 					= PrimeplaceCategory.find(primey.category_id)
-data[ 'category1' ]          = primey.primeplace_category.parent.name
-data[ 'category2' ]          = primey.primeplace_category.name
+data[ 'category1' ]          = primey.parent.name
+data[ 'category2' ]          = primey.name
 data[ 'state_name' ]		= business.state_name
 data[ 'state' ]			= business.state
 data[ 'city' ]			= ""#leave nil (form autocompletes)

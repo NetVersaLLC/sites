@@ -11,21 +11,29 @@ at_exit {
 @browser.link( :text => /#{data['state']}/).click
 @browser.link( :text => /#{data['cityState']}/).click	
 
-@browser.img( :title => 'Add Your Business').when_present.click
-@browser.link( :class => 'linkMarketButton').click
-@browser.text_field( :id => 'subfolder_name').set data['siteName']
+begin
+	@browser.img( :title => 'Add Your Business').when_present.click
+	@browser.link( :class => 'linkMarketButton').click
+	@browser.text_field( :id => 'subfolder_name').set data['siteName']
 
-@browser.text_field( :name => 'email').set data['email']
-@browser.text_field( :name => 'pw1').set data['password']
+	@browser.text_field( :name => 'email').set data['email']
+	@browser.text_field( :name => 'pw1').set data['password']
 
-@browser.link( :title => 'GET STARTED!').click
+	@browser.link( :title => 'GET STARTED!').click
 
-sleep(5)
-if @browser.text.include? "Congratulations!"
-	RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['email'], 'account[password]' => data['password'], 'model' => 'Shopcity'
+	sleep(5)
+	if @browser.text.include? "Congratulations!"
+		RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['email'], 'account[password]' => data['password'], 'model' => 'Shopcity'
 
-	if @chained
-		self.start("Shopcity/AddListing")
+		if @chained
+			self.start("Shopcity/AddListing")
+		end
 	end
-true
+rescue
+	if @browser.text.include? "Login Now"
+		puts "Business e-mail already exists"
+	else
+		puts "Something went wrong"
+	end
 end
+true

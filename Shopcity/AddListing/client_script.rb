@@ -62,7 +62,6 @@ end
 # end temp copy from shared.rb
 
 sign_in(data)
-@browser.link( :text => "My Businesses").when_present.click
 @browser.link( :text => "Add Business").when_present.click
 @browser.link( :href => /package=10000004/).when_present.click
 @browser.text_field( :id => "subfolder_name").when_present.set data[ 'siteName' ]
@@ -74,27 +73,37 @@ fill_contact_info(data)
 @browser.button(:value => /Next/).click
 
 #Categories
-fill_categories(data)
-@browser.button(:value => /Next/).click
+count = 0
+until @browser.text.include? "Set Your Hours"
+  if count == 5
+    throw "Categories could not be set"
+  end
+  fill_categories(data)
+  sleep 2 # Won't save cats without a pause
+  @browser.button(:xpath => '//*[@id="categories_page"]/form/div[2]/div[2]/input').click
+  sleep 5
+  count += 1
+end
 
 #Hours
 #ToDo
 sleep 5
-@browser.button(:value => /Next/).when_present.click
+@browser.button(:xpath => '//*[@id="hours_page"]/form/div[2]/div[2]/input').click
 
 #Payment methods
 sleep 5
 fill_payment_methods(data)
-@browser.button(:value => /Next/).click
+@browser.button(:xpath => '//*[@id="pay_methods_page"]/form/div/div[2]/input').click
 
 #Title & Description
 fill_titles(data)
-@browser.button(:value => /Next/).click
+@browser.button(:xpath => '//*[@id="description_page"]/form/div/div[2]/input').click
 
 #Logo
 sleep 5
-fill_logo(data)
-@browser.button(:value => /Next/).click
+#fill_logo(data) Fix later
+@browser.button(:xpath => '//*[@id="stage7Form"]/div[3]/div[2]/input').click
+sleep 2
 @browser.button(:value => /Finish/).when_present.click
 
 Watir::Wait.until { @browser.text.include? "What's New" }

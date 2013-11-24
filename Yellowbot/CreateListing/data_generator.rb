@@ -14,5 +14,5 @@ data[ 'state' ]		= business.state_name
 data[ 'zip' ]			= business.zip
 data[ 'tollfree_number' ]	= business.toll_free_phone
 data[ 'website' ]		= business.company_website
-data[ 'hours_open' ]		= Getfav.consolidate_hours( business )
+data[ 'hours_open' ]		= Getfave.consolidate_hours( business )
 data

@@ -1,5 +1,6 @@
 data = {}
 catty = Citydata.where(:business_id => business.id).first
+catty = CitydataCategory.find(catty.category_id)
 
 data['business']	= business.business_name
 data['address1']	= business.address
@@ -19,6 +20,6 @@ else
 end
 data['employees']	= 'skipped'
 data['password']	= Yahoo.make_password
-data['category']	= CitydataCategory.find(catty.category_id).name
-data['description']	= business.business_description
+data['category']	= catty.name
+data['description']	= business.business_description#business.status_message+" "+business.tag_line + " " + business.business_description + " \n " + data['hours'] + business.company_website.to_s
 data

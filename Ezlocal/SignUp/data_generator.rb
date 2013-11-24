@@ -1,8 +1,9 @@
 data = {}
 seed = rand(1000).to_s
 
-catty                   = Ezlocal.where(:business_id => business.id).first
-data[ 'ezlocal_category1' ]          = catty.ezlocal_category.name.gsub("\n", "").gsub("\r","")
+catty                  				 = Ezlocal.where(:business_id => business.id).first
+catty								 = EzlocalCategory.find(catty.category_id)
+data[ 'ezlocal_category1' ]          = catty.name.gsub("\n", "").gsub("\r","")
 
 data['phone_area_code']		= business.local_phone.split("-")[0]
 data['phone_prefix']		= business.local_phone.split("-")[1]

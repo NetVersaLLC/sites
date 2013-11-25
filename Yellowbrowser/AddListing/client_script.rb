@@ -33,6 +33,7 @@ def signup (data)
   field = @browser.text_field(:id=>"captcha")
   image = @browser.image(:id=>"phoca-captcha")
   enter_captcha(button,field,image,"has been received")
+  true
 rescue => e
   if (tries -= 1) > 0
     puts "Yellowbrowser/AddListing failed. Retrying #{tries} more times."

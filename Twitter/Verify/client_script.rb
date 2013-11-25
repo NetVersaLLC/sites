@@ -1,3 +1,19 @@
+@browser = Watir::Browser.new :firefox
+at_exit {
+	unless @browser.nil?
+		@browser.close
+	end
+}
+
+def solve_captcha2
+  image = "#{ENV['USERPROFILE']}\\citation\\twitter_captcha.png"
+  obj = @browser.img(:src => /recaptcha/)
+  puts "CAPTCHA source: #{obj.src}"
+  puts "CAPTCHA width: #{obj.width}"
+  obj.save image
+  CAPTCHA.solve image, :manual
+end
+
 @browser.goto(data['url'])
 
 	@browser.h1(:text => 'Sign in to Twitter').click
@@ -17,7 +33,13 @@ begin
 	30.times { break if (begin @browser.text.include? "We gotta check... are you human?" or @browser.text.include? "Your account has been confirmed. Thanks!" rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1 }
 
 	if @browser.text.include? "We gotta check... are you human?"
-		retry_captcha2(data)
+		@browser.text_field(:name => 'recaptcha_response_field').set solve_captcha2
+		@browser.h1(:text => 'Sign in to Twitter').click
+		@browser.send_keys :tab
+		@browser.send_keys :tab
+		@browser.send_keys data['password'].split("")
+		@browser.send_keys :enter
+		sleep 5
 	elsif @browser.text.include? "Your account has been confirmed. Thanks!"
 		#Continue
 	else

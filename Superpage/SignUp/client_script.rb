@@ -6,67 +6,43 @@ at_exit do
 end
 
 # Temporary methods from Shared.rb
-
-def solve_captcha2
-  begin
-  image = "#{ENV['USERPROFILE']}\citation\bing1_captcha.png"
-  obj = @browser.img( :xpath, '//div/table/tbody/tr/td/img[1]' )
+def solve_captcha
+  image = "#{ENV['USERPROFILE']}\\citation\\business_captcha.png"
+  obj = @browser.image( :xpath, "/html/body/div[2]/div[2]/div/div/form/div/table/tbody/tr[2]/td/div/div[2]/table/tbody/tr[10]/td[2]/div/img" )
   puts "CAPTCHA source: #{obj.src}"
   puts "CAPTCHA width: #{obj.width}"
   obj.save image
 
-    return CAPTCHA.solve image, :manual
-  rescue Exception => e
-    puts(e.inspect)
-  end
+  CAPTCHA.solve image, :manual
 end
 
-def enter_captcha
-  captcharetries = 5
+def enter_captcha( data )
+
   capSolved = false
- until capSolved == true
-	  captcha_code = solve_captcha2	
-    @browser.execute_script("
-      function getRealId(partialid){
-        var re= new RegExp(partialid,'g')
-        var el = document.getElementsByTagName('*');
-        for(var i=0;i<el.length;i++){
-          if(el[i].id.match(re)){
-            return el[i].id;
-            break;
-          }
-        }
-      }
-      
-      _d.getElementById(getRealId('wlspispSolutionElement')).value = '#{captcha_code}';
-
-      ")
-      sleep(5)
-
-      @browser.execute_script('
-        jQuery("#SignUpForm").submit()
-      ')
-
-      sleep 15
-
-    if @browser.url =~ /https:\/\/account.live.com\/summarypage.aspx/i
-      capSolved = true
-    else
-      captcharetries -= 1
-    end
-    if capSolved == true
-      break
+  count = 1
+  until capSolved or count > 5 do
+    captcha_code = solve_captcha
+    @browser.text_field( :id, 'captchaRes').set captcha_code
+    @browser.link( :text, 'continue' ).click
+    
+    if @browser.div( :class, 'error').exists?
+      errors = @browser.div( :class, 'error').text
+      puts( errors )
     end
 
+    if not @browser.text.include? "Please try again.  Entry did not match display."
+      capSolve = true
+    end
+    
+  count+=1  
   end
 
-  if capSolved == true
-    return true
+  if capSolve == true
+    true
   else
-    throw "Captcha could not be solved"
+    throw("Captcha was not solved")
   end
 end
-
 # End Temporary Methods from Shared.rb
 
 url = 'http://www.superpages.com/'
@@ -100,7 +76,7 @@ else
         @browser.text_field( :name => 'customerProfile.email' ).set data[ 'email' ]
         @browser.text_field( :name => 'emailConfirmation' ).set data[ 'email' ]	
 	
-	enter_captcha
+	enter_captcha(data)
 	#captcha_text = solve_captcha()
 	#@browser.text_field( :name => 'captchaRes' ).set captcha_text
 

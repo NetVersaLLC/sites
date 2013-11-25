@@ -54,6 +54,7 @@ if search_business(data)
   puts "Claiming the business"
   claim_business(data) 
 else
-  puts "Business is not listed"  
+  puts "Business is not listed"
+  self.start("Citygrid/AddListing")
   true
 end

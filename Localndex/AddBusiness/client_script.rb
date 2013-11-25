@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new
+at_exit {
+	unless @browser.nil?
+		@browser.close 
+	end
+}
+
 def add_business(data)
 @browser.goto( 'http://www.localndex.com/claim/addnew.aspx' )
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtBusName').set data['business']

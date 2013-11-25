@@ -1,89 +1,78 @@
+def signup (data)
+  tries ||= 5
+  @browser.goto("http://www.findthebest.com/")
+
+  sleep 5
+  @browser.execute_script("create_account_form();")
+
+  @browser.text_field(:id => 'edit-name').when_present.set data['username']
+  @browser.text_field(:id => 'edit-mail').set data['email']
+  @browser.text_field(:id => 'edit-pass').set data['password']
+  @browser.checkbox(:name => 'agree_tc').click
+
+  button = @browser.button(:id => "edit-submit")
+  field = @browser.text_field(:id => "recaptcha_response_field")
+  image = @browser.div(:id=>"recaptcha_image").image
+  enter_captcha(button,field,image,"Thanks for registering. Check your email to confirm your account.")
+rescue => e
+  if (tries -= 1) > 0
+    puts "Findthebest/SignUp failed. Retrying #{tries} more times."
+    puts "Details: #{e.message}"
+    sleep 2
+    retry
+  else
+    puts "Findthebest/SignUp failed. Out of retries. Quitting."
+    raise e
+  end
+else
+  puts "Findthebest/SignUp succeeded!"
+  credentials = {
+    :email => data['email'],
+    :password => data['password']
+  }
+  self.save_account("Findthebest", credentials)
+  true
+end
+
 @browser = Watir::Browser.new :firefox
 at_exit do
-	unless @browser.nil?
-		@browser.close
-	end
+  unless @browser.nil?
+    @browser.close
+  end
 end
-# Temporary methods from Shared.rb
 
-def solve_captcha2
-  begin
-  image = "#{ENV['USERPROFILE']}\citation\bing1_captcha.png"
-  obj = @browser.img( :xpath, '//div/table/tbody/tr/td/img[1]' )
+#BEGIN CAPTCHA
+def solve_captcha( obj )
+  image = ["#{ENV['USERPROFILE']}",'\citation\site_captcha.png'].join
   puts "CAPTCHA source: #{obj.src}"
   puts "CAPTCHA width: #{obj.width}"
   obj.save image
 
-    return CAPTCHA.solve image, :manual
-  rescue Exception => e
-    puts(e.inspect)
-  end
+  CAPTCHA.solve image, :manual
 end
 
-def enter_captcha
-  captcharetries = 5
+
+def enter_captcha( button, field, image, successTrigger, failureTrigger=nil )
   capSolved = false
- until capSolved == true
-	  captcha_code = solve_captcha2	
-    @browser.execute_script("
-      function getRealId(partialid){
-        var re= new RegExp(partialid,'g')
-        var el = document.getElementsByTagName('*');
-        for(var i=0;i<el.length;i++){
-          if(el[i].id.match(re)){
-            return el[i].id;
-            break;
-          }
-        }
-      }
-      
-      _d.getElementById(getRealId('wlspispSolutionElement')).value = '#{captcha_code}';
-
-      ")
-      sleep(5)
-
-      @browser.execute_script('
-        jQuery("#SignUpForm").submit()
-      ')
-
-      sleep 15
-
-    if @browser.url =~ /https:\/\/account.live.com\/summarypage.aspx/i
+  count = 1
+  until capSolved or count > 5 do
+    captcha_code = solve_captcha(image)
+    field.set captcha_code
+    button.click
+    
+    if failureTrigger.nil? or not @browser.text.include? failureTrigger
       capSolved = true
-    else
-      captcharetries -= 1
     end
-    if capSolved == true
-      break
-    end
-
+    
+  count+=1  
   end
-
   if capSolved == true
-    return true
+    Watir::Wait.until { @browser.text.include? successTrigger }
+    true
   else
-    throw "Captcha could not be solved"
+    throw("Captcha was not solved")
   end
 end
+#END CAPTCHA
 
-# End Temporary Methods from Shared.rb
-@browser.goto("http://www.findthebest.com/")
-
-sleep 5
-@browser.execute_script("create_account_form();")
-
-sleep(3)
-
-@thebox = @browser.div(:id => 'user_register')
-
-puts(@thebox.to_s)
-@thebox.text_field(:id => 'edit-name').set data['username']
-@thebox.text_field(:id => 'edit-mail').set data['email']
-@thebox.text_field(:id => 'edit-pass').set data['password']
-@thebox.checkbox(:name => 'agree_tc').click
-enter_captcha
-
-sleep(2)
-
-	RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'Findthebest'
-	true
+signup data

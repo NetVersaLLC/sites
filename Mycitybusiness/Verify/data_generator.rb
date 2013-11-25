@@ -1,3 +1,3 @@
-data = {}
-data['url'] = Mycitybusiness.check_email(business)
-data
+ data = {}
+ data['url'] = Nsphere.check_email(business)
+ data

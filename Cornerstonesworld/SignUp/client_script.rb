@@ -23,16 +23,17 @@ def enter_captcha( button, field, image, successTrigger, failureTrigger=nil )
     field.set captcha_code
     button.click
 
-    30.times{ break if @browser.status == "Done"; sleep 1}
-    
-    unless failureTrigger.nil? or @browser.text.include? failureTrigger
+    sleep 10
+
+    if not @browser.text.include? "SECURITY AUTHENTICATION"
       capSolved = true
+    else
+      capSolved = false
     end
     
   count+=1  
   end
   if capSolved == true
-    Watir::Wait.until { @browser.text.include? successTrigger }
     true
   else
     throw("Captcha was not solved")
@@ -52,24 +53,31 @@ puts(data['category'])
 @browser.text_field( :id => 'phonecl').set data[ 'phone' ]
 @browser.text_field( :id => 'web').set data[ 'website' ]
 @browser.text_field( :id => 'emailcl').set data[ 'email' ]
+@browser.execute_script("document.getElementById('cat').value = '#{data[ 'category' ]}';")
+#@browser.select_list( :id => 'cat').select data[ 'category' ]
 
 button = @browser.button(:name=>'register')
 field = @browser.text_field(:id => 'capchacl1')
 image = @browser.image(:id=>'cap')
 enter_captcha(button,field,image,"Account manager's details")
 
-@browser.link(:class => 'linkclose', :index => 2).when_present.click
+#@browser.link(:class => 'linkclose', :index => 2).when_present.click
+@browser.element(:xpath => '//*[@id="hspop"]/div[1]/a').click
 @browser.text_field( :id => 'namecl').set data[ 'name' ]
 @browser.text_field( :id => 'snamecl').set data[ 'namelast' ]
 @browser.select_list( :id => 'sexcl').select data[ 'gender' ]
 @browser.text_field( :id => 'jobcl').set data[ 'jobtitle' ]
 @browser.text_field(:id=>'pwdcl').set data['password']
 @browser.text_field(:id=>'pwdccl').set data['password']
-@browser.checkbox( :id => 'subch').clear
+unless @browser.checkbox( :id => 'subch').disabled?
+  @browser.checkbox( :id => 'subch').clear
+end
 @browser.checkbox( :id => 'newsch').clear
 @browser.checkbox( :id => 'agreecl').click
 
-Watir::Wait.until {@browser.text.include?"Thank you for registering."}
+@browser.button( :value => 'Finish').click
+
+Watir::Wait.until  {@browser.text.include?"Thank you for registering." }
 
 self.save_account("Cornerstonesworld", {:password => data['password']})
 	if @chained

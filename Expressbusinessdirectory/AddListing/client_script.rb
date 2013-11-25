@@ -42,7 +42,7 @@ end
 
 @browser.link( :id => 'ctl00_ContentPlaceHolder1_cmdStep1Next').click
 
-30.times{ break if @browser.status == "Done"; sleep 1}
+sleep 10
 
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtPhone').when_present.set data[ 'phone' ]
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtFax').set data[ 'fax' ]
@@ -51,13 +51,13 @@ end
 
 @browser.link( :id => 'ctl00_ContentPlaceHolder1_cmdStep2Next').click
 
-30.times{ break if @browser.status == "Done"; sleep 1}
+sleep 10
 
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtBusinessDesc').when_present.set data['description']
 
 @browser.link( :id => 'ctl00_ContentPlaceHolder1_cmdStep3Next').click
 
-30.times{ break if @browser.status == "Done"; sleep 1}
+sleep 10
 
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtBusinessKeywords').set data['keywords']
 lkey = data['city'] + ", " + data ['state'] + ", " + data ['country']
@@ -65,7 +65,7 @@ lkey = data['city'] + ", " + data ['state'] + ", " + data ['country']
 
 @browser.link( :id => 'ctl00_ContentPlaceHolder1_cmdStep4Next').click
 
-30.times{ break if @browser.status == "Done"; sleep 1}
+sleep 10
 
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtFName' ).when_present.set data['fname']
 @browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtLName' ).set data['lname']
@@ -75,9 +75,8 @@ lkey = data['city'] + ", " + data ['state'] + ", " + data ['country']
 
 @browser.link( :id => 'ctl00_ContentPlaceHolder1_cmdClaim').click
 
-30.times{ break if @browser.status == "Done"; sleep 1}
+sleep 20
 
-sleep 500
 RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['email'], 'model' => 'Expressbusinessdirectory'
 	if @chained
 		self.start("Expressbusinessdirectory/Verify")

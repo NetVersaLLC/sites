@@ -27,7 +27,7 @@ end
 
 def solve_captcha2
   image = "#{ENV['USERPROFILE']}\\citation\\twitter_captcha.png"
-  obj = @browser.div(:id => 'recaptcha_image').image()
+  obj = @browser.img(:src => /recaptcha/)
   puts "CAPTCHA source: #{obj.src}"
   puts "CAPTCHA width: #{obj.width}"
   obj.save image

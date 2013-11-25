@@ -14,12 +14,15 @@ def solve_captcha( obj )
   CAPTCHA.solve image, :manual
 end
 
+@password = data['password']
 
 def enter_captcha( button, field, image, successTrigger, failureTrigger=nil )
   capSolved = false
   count = 1
   until capSolved or count > 5 do
     captcha_code = solve_captcha(image)
+    @browser.text_field(:id => 'pass2').set @password
+    @browser.text_field(:id => 'pass1').set @password
     field.set captcha_code
     button.click
 
@@ -46,8 +49,8 @@ end
 @browser.text_field(:id => 'lastname').set data['contact_last_name']
 @browser.text_field(:id => 'email').set data['email']
 @browser.text_field(:id => 'user_id').set data['userid']
-@browser.text_field(:id => 'pass2').set data['password']
-@browser.text_field(:id => 'pass1').set data['password']
+#@browser.text_field(:id => 'pass2').set data['password']
+#@browser.text_field(:id => 'pass1').set data['password']
 image = @browser.image(:id => 'validn_img')
 captcha = @browser.text_field(:id => 'validn_code')
 submit = @browser.button(:id => 'newcompany')

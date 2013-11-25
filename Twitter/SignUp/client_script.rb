@@ -6,8 +6,9 @@ at_exit do
 end
 
 #BEGIN CAPTCHA
-def solve_captcha( obj )
-  image = ["#{ENV['USERPROFILE']}",'\citation\site_captcha.png'].join
+def solve_captcha
+  image = "#{ENV['USERPROFILE']}\\citation\\twitter_captcha.png"
+  obj = @browser.image( :src, /recaptcha/ )
   puts "CAPTCHA source: #{obj.src}"
   puts "CAPTCHA width: #{obj.width}"
   obj.save image
@@ -15,28 +16,28 @@ def solve_captcha( obj )
   CAPTCHA.solve image, :manual
 end
 
-def enter_captcha( button, field, image, successTrigger, failureTrigger=nil )
-  capSolved = false
-  count = 1
-  until capSolved or count > 5 do
-    captcha_code = solve_captcha(image)
-    field.set captcha_code
-    button.click
 
-    30.times{ break if @browser.status == "Done"; sleep 1}
-    
-    unless failureTrigger.nil? or @browser.text.include? failureTrigger
-      capSolved = true
-    end
-    
-  count+=1  
-  end
-  if capSolved == true
-    Watir::Wait.until { @browser.text.include? successTrigger }
-    true
-  else
-    throw("Captcha was not solved")
-  end
+def enter_captcha( data )
+	capSolved = false
+	count = 1
+	until capSolved or count > 5 do
+		captcha_code = solve_captcha
+		@browser.text_field( :id, "recaptcha_response_field" ).set captcha_code
+		@browser.button( :name, "submit_button").click
+
+		sleep 10 # Got a better solution?
+		
+		if not @browser.text.include? "Please try again..."
+			capSolved = true
+		end
+		
+	count+=1	
+	end
+	if capSolved == true
+		true
+	else
+		throw("Captcha was not solved")
+	end
 end
 #END CAPTCHA
 
@@ -75,32 +76,12 @@ begin
 
 
 	if @browser.text.include? "Are you human?"
-		button = @browser.div(:class=>"sign-up-box").text_field(:class=>"submit")
-		field = @brower.text_field(:id=>"recaptcha_response_field")
-		image = @browser.div(:id=>"recaptcha_image").image
-		field.click
-		@browser.execute_script "$('#recaptcha_response_field').val(#{solve_captcha(image)})"
-		button.click
-		enter_captcha(button,field,image,"Preview")
-		if @browser.text.include? "Join Twitter today."
-			raise "Captcha code invalid"
-		end
+		enter_captcha(data)
 	end
 
-rescue RuntimeError => e # this rescues from the "Raise" statement above. 
+rescue StandardError => e
 	puts e.inspect
 	if retries > 0
-		retries -= 1
-		retry
-	else
-		throw "Twitter account creation failed, likely due to captcha."
-	end
-
-rescue Exception => e
-	puts e.inspect
-	if retries > 0
-
-
 		retries -= 1
 		retry
 	else

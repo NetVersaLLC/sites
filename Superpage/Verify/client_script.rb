@@ -7,6 +7,7 @@ at_exit {
 
 link = data['link']
 if link.nil?
+	@browser.goto(link)
 	self.start("Superpage/Verify", 1440)
 else
 	@browser.goto(link)

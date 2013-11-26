@@ -1,11 +1,4 @@
-@browser = Watir::Browser.new :firefox
-at_exit {
-	unless @browser.nil?
-		@browser.close
-	end
-}
-
-
+puts(data['category1'])
 @browser.goto( 'http://submit.yippie.biz/' )
 
 @browser.text_field( :name => 'businessname').set data['business']
@@ -46,7 +39,6 @@ begin
 	end
 
 @browser.button( :value => 'Submit').click
-sleep 2
 
 if @browser.text.include? "Thank you for submitting your FREE business listing to YiPpIe!"
 	true

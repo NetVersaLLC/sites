@@ -1,3 +1,56 @@
+@browser = Watir::Browser.new :firefox
+at_exit {
+  unless @browser.nil?
+    @browser.close
+  end
+}
+
+def sign_in_business( business )
+
+retries = 3
+begin
+    @browser.goto( 'https://www.bingplaces.com/' )
+
+    @browser.button(:id => 'loginButton').click
+
+    sleep 2
+    @browser.link(:text => 'Login').when_present.click
+
+    email_parts = {}
+    email_parts = business[ 'hotmail' ].split( '.' )
+    sleep 2
+    Watir::Wait.until { @browser.input( :name, 'login' ).exists? }
+
+    @browser.input( :name, 'login' ).send_keys email_parts[ 0 ]
+    @browser.input( :name, 'login' ).send_keys :decimal
+    @browser.input( :name, 'login' ).send_keys email_parts[ 1 ]
+    # TODO: check that email entered correctly since other characters may play a trick
+    @browser.text_field( :name, 'passwd' ).set business[ 'password' ]
+    # @browser.checkbox( :name, 'KMSI' ).set
+    @browser.button( :name, 'SI' ).click
+
+    sleep 2
+    Watir::Wait.until {@browser.button(:id => 'loginButton').exists?}
+
+    if @browser.button(:id => 'loginButton').text =~ /Sign in/i
+      throw "Sign-in failed"
+    end
+
+
+  rescue Exception => e
+    if retries > 0
+      puts e.inspect
+      retries -= 1
+      retry
+    else
+      throw "Sign in was not able to complete. "
+    end
+  end
+
+
+
+end
+
 def update_business_portal_details( business )
 
    puts("Debug: Waiting for page to load")
@@ -43,7 +96,7 @@ def update_business_portal_details( business )
   @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
   sleep(2)
   @browser.text_field(:id => 'categoryInputTextBox').send_keys :enter
-  @browser.button( :id, 'categoryAddButton').click
+  #@browser.button( :id, 'categoryAddButton').click
   puts("Debug: Category Updated Successfully")
 	if @browser.text.include? "Please enter at least one category." then
 		@browser.text_field(:id => 'categoryInputTextBox').set business[ 'category' ]
@@ -53,7 +106,7 @@ def update_business_portal_details( business )
   		@browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
   		sleep(2)
   		@browser.text_field(:id => 'categoryInputTextBox').send_keys :enter
-  		@browser.button( :id, 'categoryAddButton').click
+  		#@browser.button( :id, 'categoryAddButton').click
 	end
 end
 
@@ -94,7 +147,7 @@ puts("1")
 puts("3")
 
 #  logo = self.logo
-puts "logo: " +logo.to_s
+#puts "logo: " +logo.to_s
 puts("4")
 #   @browser.file_field(:id => 'imageFiles1').set logo
    sleep 5
@@ -103,6 +156,7 @@ puts("4")
 
   sleep 5
 puts("6")
+=begin
 if not self.images.exists? or self.images.nil? then
   images = self.images
   puts images.to_s
@@ -128,6 +182,7 @@ puts("9")
         end
   end
 end  
+=end
 end
 
 def update_business_portal_other_contact_information( business )

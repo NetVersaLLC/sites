@@ -16,8 +16,8 @@ data[ '24hours' ] 			= business.open_24_hours
 data[ 'hours' ]			    = Getfave.consolidate_hours(business)
 data[ 'brands' ]			= business.get_brands
 
-bingy = Bing.where(:business_id => business.id).first
-data[ 'category' ]          = bingy.bing_category.name
+catty 					= Bing.where(:business_id => business.id).first
+data[ 'category' ]		= BingCategory.find(catty.category_id).name
 
 data[ 'mobile' ]			= business.mobile_phone
 data[ 'toll_free_number' ]  = business.toll_free_phone
@@ -28,7 +28,7 @@ data[ 'twitter' ]           = '' # NOTE: unimplemented
 
 data[ 'year_established' ]  = business.year_founded
 data[ 'description' ]       = business.business_description
-data[ 'languages' ]         = [ 'English' ]
+data[ 'languages' ]         = 'English'
 data[ 'payments' ]          = Bing.make_payments(business)
 # data[ 'hours_monday_from' ] = '8:00'
 # data[ 'hours_monday_to' ]   = '8:00'

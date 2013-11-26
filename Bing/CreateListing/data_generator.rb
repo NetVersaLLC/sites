@@ -12,5 +12,5 @@ data[ 'secret_answer' ]	= business.bings.first.secret_answer
 data[ 'local_phone' ]	= business.local_phone
 data[ 'website' ]		= business.company_website
 catty 					= Bing.where(:business_id => business.id).first
-data[ 'category' ]		= catty.bing_category.name
+data[ 'category' ]		= BingCategory.find(catty.category_id).name
 data

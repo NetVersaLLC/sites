@@ -39,13 +39,6 @@ def add_business(data)
     throw "Mislleneous problems."
   end    
 end
-
-@browser = Watir::Browser.new :firefox
-at_exit do
-  unless @browser.nil?
-    @browser.close
-  end
-end
-
+    
 #~ #Main Steps
 add_business(data)

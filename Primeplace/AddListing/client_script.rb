@@ -46,10 +46,6 @@ sleep(5)
 #	@browser.link( :class => 'button big').click
 #end
 
-if @browser.text.include? "Nokia Terms and Conditions"
-@browser.link(:href=>/acceptTerms/).click
-end
-
 #Wait for Verification Page
 Watir::Wait.until { @browser.text.include? "Choose a verification method" }
 

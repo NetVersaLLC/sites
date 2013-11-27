@@ -96,7 +96,7 @@ end
 30.times { break if (begin @browser.text.include? "Confirm your email address to access all of Twitter's features." or @browser.text.include? "Here are some people you might enjoy following." rescue Selenium::WebDriver::Error::NoSuchElementError raise "Error validating Twitter SignUp" end) == true; sleep 1 }
 #Watir::Wait.until{@browser.text.include? "Confirm your email address to access all of Twitter's features." }
 
-self.save_account("Twitter", {:username => data['username'], :password => data['password'], :twitter_page => 'http://twitter.com/'+data['username']})
+self.save_account("Twitter", {:username => data['username'], :password => data['password']})
 
 @browser.goto("https://twitter.com/settings/profile")
 

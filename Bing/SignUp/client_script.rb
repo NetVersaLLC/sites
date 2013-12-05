@@ -53,6 +53,8 @@ def enter_captcha
 
     if @browser.url =~ /https:\/\/account.live.com\/summarypage.aspx/i
       capSolved = true
+    elsif @browser.text.include? "The email address or single-use code is incorrect. Please try again."
+    	capSolved = true
     else
       captcharetries -= 1
     end
@@ -204,7 +206,7 @@ puts data['password']
 
 enter_captcha
 
-    Watir::Wait.until { @browser.text.include? "Account summary" }
+    #Watir::Wait.until { @browser.text.include? "Account summary" }
     self.save_account('Bing',  {:email => data['email'],:password => data['password'],:secret_answer => data['secret_answer']})
 
 true

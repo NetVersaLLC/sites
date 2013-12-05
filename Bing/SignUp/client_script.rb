@@ -184,7 +184,7 @@ rescue Selenium::WebDriver::Error::JavascriptError
 
 rescue Watir::Exception::NoValueFoundException
 	if retries > 0
-    puts("Watir cannot find the element, trying again in 3 seconds. #{retries} remaining.")
+    puts("Bing isn't recognizing data input, trying again in 3 seconds. #{retries} remaining.")
     sleep 3
     retries -= 1
     retry

@@ -45,9 +45,14 @@ def add_business( data )
 		sleep 10
 		@browser.link( :text, 'Save').click
 		30.times{ break if @browser.status == "Done"; sleep 1}
+	elsif not @browser.text.include? "Thank you for updating our directory."
+		@browser.link( :text, 'Save').click
+		sleep 10
 	end
 	if @browser.text.include? "Thank you for updating our directory. Updates take effect within 3 business days. Check back for opportunities to upgrade your listing at that time."
 		true
+	else
+		puts "Payload did not successfully complete"
 	end
 end
 
@@ -59,12 +64,8 @@ def main( data )
 	@browser.text_field( :id, 'lookupForm:tel').when_present.set data[ 'phone' ]
 	@browser.link( :id, 'lookupForm:submit').click
 
-	#wait until the next page loads
-	30.times{ break if @browser.status == "Done"; sleep 1}
-
-	if @browser.text.include? 'Click on the listing you want to update.'
-		puts ("Business already added. Business name is as below")
-		puts @browser.element(:css, "td.col_left_align a").text
+	if @browser.text.include? data[ 'business' ]
+		puts ("Business already added.")
 	else
 		add_business(data)
 	end

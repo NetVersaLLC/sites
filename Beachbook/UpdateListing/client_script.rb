@@ -1,10 +1,3 @@
-@browser = Watir::Browser.new :firefox
-at_exit {
-  unless @browser.nil?
-    @browser.close
-  end
-}
-
 #Funtion for update listing
 
 def update_listing(data)

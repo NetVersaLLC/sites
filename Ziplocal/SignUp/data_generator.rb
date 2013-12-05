@@ -16,6 +16,6 @@ data[ 'citystate' ] = data[ 'city' ] + ', ' + data[ 'stateabreviation' ]
 data[ 'password' ] = Yahoo.make_password
 data[ 'website' ] = business.company_website
 catty = Ziplocal.where(:business_id => business.id).first
-data[ 'categoryKeyword' ] = catty.ziplocal_category.name
-data['prefix'] = business.contact_prefix
+data[ 'categoryKeyword' ] = ZiplocalCategory.find(catty.category_id).name
+data[ 'prefix' ] = business.contact_prefix
 data

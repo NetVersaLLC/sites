@@ -53,7 +53,7 @@ end
 
 def main( data )
 #this method runs the show
-	@browser.goto('http://www.infopaginas.com/olc/lookup.faces')
+	@browser.goto('http://www.mysunshinemedia.com/olc/lookup.faces')
 
 	#enter the phone number
 	@browser.text_field( :id, 'lookupForm:tel').when_present.set data[ 'phone' ]

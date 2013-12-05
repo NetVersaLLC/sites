@@ -1,16 +1,21 @@
+@browser = Watir::Browser.new :firefox
+at_exit {
+  unless @browser.nil?
+    @browser.close
+  end
+}
+
 #Funtion for update listing
 
 def update_listing(data)
-  @browser.link(:text => 'Update Listings').click
-  @browser.text_field(:name => 'lookupForm:tel').set data['phone']
+  @browser.text_field(:name => 'lookupForm:tel').when_present.set data['phone']
   @browser.div(:class=> 'button_search').click
   30.times{ break if @browser.status == "Done"; sleep 1}
   if @browser.div(:id=> 'content_container_solid').text.include?(data['business'])
     puts "Yes business is there"
     @browser.div(:id=> 'content_container_solid').link(:text => data['business']).click
     @browser.link(:text => 'Update or add more information').click
-    30.times{ break if @browser.status == "Done"; sleep 1}
-    @browser.text_field( :id, 'listingForm:disp').set data[ 'business' ]
+    @browser.text_field( :id, 'listingForm:disp').when_present.set data[ 'business' ]
     @browser.text_field( :id, 'listingForm:web').set data[ 'website' ]
     @browser.text_field( :id, 'listingForm:email').set data[ 'business_email' ]
     @browser.button( :id, 'listingForm:addTest2' ).click
@@ -32,8 +37,7 @@ def update_listing(data)
 end
 
 #Main steps
-url= "http://www.georgialocalsearch.com/"
+url= "http://www.georgialocalsearch.com/olc/lookup.faces"
 @browser.goto(url)
-30.times{ break if @browser.status == "Done"; sleep 1}
 update_listing(data)
 

@@ -37,7 +37,7 @@ def update_listing(data)
 end
 
 #Main steps
-url= "http://www.infopaginas.com/olc/lookup.faces"
+url= "http://www.mysunshinemedia.com/olc/lookup.faces"
 @browser.goto(url)
 update_listing(data)
 

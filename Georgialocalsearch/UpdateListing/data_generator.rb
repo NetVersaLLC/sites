@@ -6,6 +6,6 @@ data[ 'email' ] = business.bings.first.email
 data[ 'business_email' ] = business.bings.first.email
 data[ 'business' ] = business.business_name
 data[ 'website' ] = business.company_website
-catty 			= Georgialocalsearch.where(:business_id => business.id).first
-data[ 'categoryKeyword' ] = catty.ziplocal_category.name
+catty 			= Ziplocal.where(:business_id => business.id).first
+data[ 'categoryKeyword' ] = ZiplocalCategory.find(catty.category_id).name
 data

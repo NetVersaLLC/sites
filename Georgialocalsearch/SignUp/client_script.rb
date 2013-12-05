@@ -37,16 +37,16 @@ def add_business( data )
 		@browser.button( :value, 'Add new').click #Try one more time hth!!
 	end
 	sleep(3)
-	@browser.link( :text, 'Save').click
+	@browser.span( :text, 'Save').click
 	sleep 15
 	#Re-check if category was added.
 	if @browser.text.include? "Category is required." #If we get the category is required message we try last time.
 		@browser.button( :value, 'Add new').click
 		sleep 10
-		@browser.link( :text, 'Save').click
+		@browser.span( :text, 'Save').click
 		30.times{ break if @browser.status == "Done"; sleep 1}
 	elsif not @browser.text.include? "Thank you for updating our directory."
-		@browser.link( :text, 'Save').click
+		@browser.span( :text, 'Save').click
 		sleep 10
 	end
 	if @browser.text.include? "Thank you for updating our directory. Updates take effect within 3 business days. Check back for opportunities to upgrade your listing at that time."

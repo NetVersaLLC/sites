@@ -131,8 +131,8 @@ begin
     
 
   else
-    @browser.text_field(  :id, /iFirstName/ ).send_keys data[ "first_name" ]
-    @browser.text_field(  :id, /iLastName/ ).send_keys data[ "last_name" ]
+    @browser.text_field(  :id, /iFirstName/ ).set data[ "first_name" ]
+    @browser.text_field(  :id, /iLastName/ ).set data[ "last_name" ]
     @browser.select_list( :id, /iBirthMonth/ ).when_present.select_value data[ 'birth_month' ]
     @browser.select_list( :id, /iBirthDay/ ).select   data[ 'birth_day' ]
     @browser.select_list( :id, /iBirthYear/ ).select  data[ 'birth_year' ]
@@ -144,14 +144,14 @@ begin
     @browser.link( :id, /iqsaswitch/ ).click
     sleep 4 # or wait until id => iSA exists
     @browser.select_list( :id, /iSQ/ ).select      'Name of first pet'
-    @browser.text_field( :id, /iAltEmail/ ).send_keys    data[ 'alt_email' ]
-    @browser.text_field( :id, /iSA/ ).send_keys          data[ 'secret_answer' ]
+    @browser.text_field( :id, /iAltEmail/ ).set    data[ 'alt_email' ]
+    @browser.text_field( :id, /iSA/ ).set          data[ 'secret_answer' ]
     @browser.select_list( :id, /iCountry/ ).select data[ 'country' ]
-    @browser.text_field( :id, /iZipCode/ ).send_keys     data[ 'zip' ]
+    @browser.text_field( :id, /iZipCode/ ).set     data[ 'zip' ]
     @browser.checkbox( :id, /iOptinEmail/ ).clear
  
-    @browser.text_field( :name, /iPwd/ ).send_keys       data[ 'password' ]
-    @browser.text_field( :name, /iRetypePwd/ ).send_keys data[ 'password' ]
+    @browser.text_field( :name, /iPwd/ ).set       data[ 'password' ]
+    @browser.text_field( :name, /iRetypePwd/ ).set data[ 'password' ]
     email_name = data[ 'name' ].downcase.delete( ' ' ).strip + (rand( 10000 )+200).to_s
     @browser.text_field( :id, /imembernamelive/ ).send_keys email_name
     data[ 'hotmail' ] = email_name + '@outlook.com'
@@ -182,6 +182,18 @@ rescue Selenium::WebDriver::Error::JavascriptError
     puts("The javascript failed and we are out of options.")
   end
 
+rescue Watir::Webdriver::Exception::NoValueFoundException
+	if retries > 0
+    puts("Watir cannot find the element, trying again in 3 seconds. #{retries} remaining.")
+    sleep 3
+    retries -= 1
+    retry
+  else
+    puts("Bing isn't recognizing data input, attempting Javascript.")
+    type = "javascript"
+    retries = 3
+    retry
+  end
 
 rescue Exception => e
     puts "Caught a #{e.class}"
@@ -192,6 +204,10 @@ rescue Exception => e
     retries -= 1
     retry
   else
+  	puts("Watir cannot find the element, switching to Javascript.")
+    type = "javascript"
+    retries = 3
+    retry
     throw("Job has failed with an unhandled error: #{e.class}")
   end
 

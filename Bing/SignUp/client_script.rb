@@ -182,7 +182,7 @@ rescue Selenium::WebDriver::Error::JavascriptError
     puts("The javascript failed and we are out of options.")
   end
 
-rescue Watir::Webdriver::Exception::NoValueFoundException
+rescue Watir::Exception::NoValueFoundException
 	if retries > 0
     puts("Watir cannot find the element, trying again in 3 seconds. #{retries} remaining.")
     sleep 3

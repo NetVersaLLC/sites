@@ -182,7 +182,7 @@ rescue Selenium::WebDriver::Error::JavascriptError
     puts("The javascript failed and we are out of options.")
   end
 
-rescue Watir::Exception::NoValueFoundException
+rescue NoValueFoundException
 	if retries > 0
     puts("Bing isn't recognizing data input, trying again in 3 seconds. #{retries} remaining.")
     sleep 3

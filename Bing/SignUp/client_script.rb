@@ -25,7 +25,7 @@ end
 def enter_captcha
   captcharetries = 5
   capSolved = false
- until capSolved == true
+ until capSolved == true || captcharetries == 0
     captcha_code = solve_captcha2 
     @browser.execute_script("
       function getRealId(partialid){

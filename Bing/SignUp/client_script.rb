@@ -6,7 +6,6 @@ at_exit {
   end
 }
 
-
 # Temporary methods from Shared.rb
 
 def solve_captcha2
@@ -182,18 +181,9 @@ rescue Selenium::WebDriver::Error::JavascriptError
     puts("The javascript failed and we are out of options.")
   end
 
-rescue NoValueFoundException
-	if retries > 0
-    puts("Bing isn't recognizing data input, trying again in 3 seconds. #{retries} remaining.")
-    sleep 3
-    retries -= 1
-    retry
-  else
-    puts("Bing isn't recognizing data input, attempting Javascript.")
-    type = "javascript"
-    retries = 3
-    retry
-  end
+rescue Watir::Exception::NoValueFoundError
+  puts("NoValueFoundErrror encountered")
+end
 
 rescue Exception => e
     puts "Caught a #{e.class}"
@@ -204,7 +194,7 @@ rescue Exception => e
     retries -= 1
     retry
   else
-  	puts("Watir cannot find the element, switching to Javascript.")
+    puts("Watir cannot find the element, switching to Javascript.")
     type = "javascript"
     retries = 3
     retry

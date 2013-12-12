@@ -82,6 +82,7 @@ puts data
 
 retries = 3
 type = ""
+@switched = false
 begin
 
   case type
@@ -181,9 +182,10 @@ rescue Selenium::WebDriver::Error::JavascriptError
     puts("The javascript failed and we are out of options.")
   end
 
+
 rescue Watir::Exception::NoValueFoundError
   puts("NoValueFoundErrror encountered")
-end
+
 
 rescue Exception => e
     puts "Caught a #{e.class}"
@@ -194,11 +196,15 @@ rescue Exception => e
     retries -= 1
     retry
   else
-    puts("Watir cannot find the element, switching to Javascript.")
-    type = "javascript"
-    retries = 3
-    retry
-    throw("Job has failed with an unhandled error: #{e.class}")
+    if @switched == true
+      throw("Job has failed with an unhandled error: #{e.class}")
+    else
+      puts("Watir cannot find the element, switching to Javascript.")
+      type = "javascript"
+      retries = 3
+      @switched = true
+      retry
+    end
   end
 
 end

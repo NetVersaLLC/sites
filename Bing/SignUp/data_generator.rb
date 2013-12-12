@@ -3,7 +3,7 @@ data = {}
 data[ 'name' ]              = business.business_name.strip.gsub(/[^A-Za-z0-9_ ]/, '')
 data[ 'country' ]           = 'United States'
 data[ 'password' ]          = Bing.make_password
-data[ 'secret_answer' ]     = Bing.make_secret_answer
+data[ 'mobile_phone' ]      = business.mobile_phone
 data[ 'first_name' ]        = business.contact_first_name
 data[ 'last_name' ]         = business.contact_last_name
 begin

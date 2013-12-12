@@ -6,6 +6,7 @@ at_exit {
   end
 }
 
+
 # Temporary methods from Shared.rb
 
 def solve_captcha2
@@ -82,7 +83,6 @@ puts data
 
 retries = 3
 type = ""
-@switched = false
 begin
 
   case type
@@ -104,13 +104,8 @@ begin
     sleep(4)
 
     @browser.execute_script("
-      jQuery('#iqsaswitch').trigger('click')
-    ")
-    sleep(4)
-    @browser.execute_script("
-      _d.getElementById('iSQ').value = 'Name of first pet'
       _d.getElementById('iAltEmail').value = '#{data[ "alt_email" ]}';
-      _d.getElementById('iSA').value = '#{data[ "secret_answer" ]}';
+      _d.getElementById('iPhone').value = '#{data[ "mobile_phone" ]}';
       _d.getElementById('iCountry').value = '#{data[ "country" ]}';
       _d.getElementById('iZipCode').value = '#{data["zip"]}';
       _d.getElementById('iOptinEmail').checked = false;
@@ -131,7 +126,7 @@ begin
     
 
   else
-    @browser.text_field(  :id, /iFirstName/ ).set data[ "first_name" ]
+    @browser.text_field(  :xpath, '//*[@id="iFirstName"]' ).set data[ "first_name" ]
     @browser.text_field(  :id, /iLastName/ ).set data[ "last_name" ]
     @browser.select_list( :id, /iBirthMonth/ ).when_present.select_value data[ 'birth_month' ]
     @browser.select_list( :id, /iBirthDay/ ).select   data[ 'birth_day' ]
@@ -140,12 +135,8 @@ begin
     # click <get a new email address> to open alt email field
     @browser.link( :id, /iliveswitch/ ).click
     sleep 4 # or wait until id => imembernamelive exists
-    # Choose a security question
-    @browser.link( :id, /iqsaswitch/ ).click
-    sleep 4 # or wait until id => iSA exists
-    @browser.select_list( :id, /iSQ/ ).select      'Name of first pet'
     @browser.text_field( :id, /iAltEmail/ ).set    data[ 'alt_email' ]
-    @browser.text_field( :id, /iSA/ ).set          data[ 'secret_answer' ]
+    @browser.text_field( :id, /iPhone/ ).set       data[ 'mobile_phone' ]
     @browser.select_list( :id, /iCountry/ ).select data[ 'country' ]
     @browser.text_field( :id, /iZipCode/ ).set     data[ 'zip' ]
     @browser.checkbox( :id, /iOptinEmail/ ).clear
@@ -153,7 +144,7 @@ begin
     @browser.text_field( :name, /iPwd/ ).set       data[ 'password' ]
     @browser.text_field( :name, /iRetypePwd/ ).set data[ 'password' ]
     email_name = data[ 'name' ].downcase.delete( ' ' ).strip + (rand( 10000 )+200).to_s
-    @browser.text_field( :id, /imembernamelive/ ).send_keys email_name
+    @browser.text_field( :id, /imembernamelive/ ).set email_name
     data[ 'hotmail' ] = email_name + '@outlook.com'
   end
 
@@ -182,10 +173,8 @@ rescue Selenium::WebDriver::Error::JavascriptError
     puts("The javascript failed and we are out of options.")
   end
 
-
-rescue Watir::Exception::NoValueFoundError
-  puts("NoValueFoundErrror encountered")
-
+rescue Watir::Exception::NoValueFoundException
+    throw("A field has been removed from the page. Please verify all contents of the payload.")
 
 rescue Exception => e
     puts "Caught a #{e.class}"
@@ -196,15 +185,7 @@ rescue Exception => e
     retries -= 1
     retry
   else
-    if @switched == true
-      throw("Job has failed with an unhandled error: #{e.class}")
-    else
-      puts("Watir cannot find the element, switching to Javascript.")
-      type = "javascript"
-      retries = 3
-      @switched = true
-      retry
-    end
+    throw("Job has failed with an unhandled error: #{e.class}")
   end
 
 end
@@ -219,6 +200,6 @@ puts data['password']
 enter_captcha
 
     #Watir::Wait.until { @browser.text.include? "Account summary" }
-    self.save_account('Bing',  {:email => data['email'],:password => data['password'],:secret_answer => data['secret_answer']})
+    self.save_account('Bing',  {:email => data['email'],:password => data['password']})
 
 true

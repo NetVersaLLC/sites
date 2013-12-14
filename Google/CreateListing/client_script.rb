@@ -1,3 +1,9 @@
+@browser = Watir::Browser.new :firefox
+
+at_exit do
+  @browser.close unless @browser.nil?
+end
+
 # BEGIN temp methods from shared.rb #
 # Login
 def login ( data )

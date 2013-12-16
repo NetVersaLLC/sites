@@ -1,214 +1,244 @@
-@browser = Watir::Browser.new :firefox
+agent = Mechanize.new
+agent.user_agent_alias = 'Windows Mozilla'
 
-at_exit {
-	unless @browser.nil?
-		@browser.close
-	end
-}
-
-# Temporary methods copied from Shared.rb
-
-def solve_captcha
-  image = "#{ENV['USERPROFILE']}\\citation\\cylex_captcha.png"
-  obj = @browser.image(:src, /randomimage/)
-  puts "CAPTCHA source: #{obj.src}"
-  puts "CAPTCHA width: #{obj.width}"
-  obj.save image
-  captcha_text = CAPTCHA.solve image, :manual
-  return captcha_text
+def solve_captcha(page)
+    captcha = page.image_with(:src => /randomimage/)
+    captcha.fetch.save! "#{ENV['USERPROFILE']}\\citation\\cylex_captcha.png"
+    image = "#{ENV['USERPROFILE']}\\citation\\cylex_captcha.png" # Do not combine with above line
+    captcha_text = CAPTCHA.solve image, :manual
+    return captcha_text
 end
 
-def enter_captcha(data)
-  capSolved = false
-  count = 1
-  until capSolved or count > 5 do
-    captcha_code = solve_captcha  
-    @browser.text_field(:id => /step1_captchaTb/).set captcha_code
-    sleep 10
-    @browser.text_field(:name => /companypass1/).set data['password']
-    @browser.text_field(:name => /companypass2/).set data['password']
-    @browser.button(:value => 'Next step').click
-    sleep(5)
-    if not @browser.text.include? "Incorrect validation code, please try again"
-      capSolved = true
+def enter_captcha(page)
+    capSolved = false
+    capRetries = 5
+    until capSolved == true # A
+        form = page.form_with("aspnetForm")
+        form.field_with(:name => /captchaTb/).value = solve_captcha(page)
+        page = form.click_button(form.button_with(:type => 'submit'))
+        if page.body =~ /Thank you for updating this presentation page!/
+            capSolved = true
+            self.success("Payload listing updated successfully")
+            puts "Payload completed successfully"
+        elsif page.body =~ /Business information/ # Add Business
+            capSolved = true
+        elsif capRetries == 0 # B
+            throw "Payload did not complete successfully due to captcha."
+        else
+            capRetries -= 1
+        end
     end
-    count+=1
-  end
-  if capSolved == true
-    true
-  else
-    throw "Captcha was not solved"
-  end
+    return page
 end
 
-def fill_map_routing(data)
-  @browser.link(:text => /Company details/).click
-  @browser.text_field(:name => /companyname/).set data['business']
-  @browser.text_field(:name => /companystreet/).set data['address']
-  @browser.text_field(:name => /companycity/).set data['city']
-  sleep(4)
-  @browser.link(:xpath => '//*[@id="ctl00_bodyadmin"]/ul[2]/li/a').when_present.click
-  @browser.text_field(:name => /postnr/).set data['zip']
-  @browser.text_field(:name => /companyweb/).set data['website']
-  @browser.text_field(:name => /companymail/).set data['email']
-  @browser.text_field(:name => /companyphone/).set data['phone']
-  unless self.logo.nil? 
-    @browser.file_field(:name => /FileUpload1/).set self.logo
-    @browser.button(:value => "Upload").click
-  else
-    @browser.file_field(:name => /FileUpload1/).set self.images.first unless self.images.empty?
-    @browser.button(:value => "Upload").click
-  end
-
-  @browser.button(:value => "Save changes").click
-  30.times { break if @browser.text.include? "Saving was successful."; sleep 1 }
-  @browser.link(:id => /home/).click
-end
-
-def fill_payment_methods(data)
-  @browser.link(:text => /Payment methods/).click
-
-  payment_methods = { "13" => "cash", "2" => "check", "14" => "mastercard", "16" => "visa", "4" => "discover", "8" => "diners", "12" => "amex", "15" => "paypal" }
-
-  payment_methods.each do |key, method|
-    @browser.div(:class => /block-content/).ul.lis.each do |list_item|
-      list_item.input.click if list_item.input.attribute_value("checked") == "true"
+def update_business(data, page)
+    form = page.form_with("aspnetForm")
+    form.field_with(:name => /companystreet/).value = data['address'] + ", " + data['address2']
+    form.field_with(:name => /companycity/).value = data['city']
+    form.field_with(:name => /postnr/).value = data['zip']
+    form.field_with(:name => /tb_region/).value = data['state']
+    form.field_with(:name => /companyphone/).value = data['phone']
+    form.field_with(:name => /companyfax/).value = data['fax']
+    form.field_with(:name => /companyweb/).value = data['website']
+    form.field_with(:name => /companymail/).value = data['email']
+    # Begin update of Hours of Operation
+    form.radiobutton_with(:value => '2').check
+    #pp page
+    if data['24hours'] == true
+        # Don't ask, it only works this way
+        form.checkboxes.each do |checkbox|
+            if checkbox.name =~ /CheckBoxNonStop/
+                checkbox.check
+                break
+            end
+        end
+    else
+        count = 0
+        data['hours'].each do |day,time|
+            count += 1
+            unless data['hours'][day].nil?
+                # Don't ask, it only works this way
+                form.checkboxes.each do |checkbox| 
+                    if checkbox.name =~ /ctl0#{count}$CheckBox/
+                        checkbox.uncheck
+                        break
+                    end
+                end
+                # I don't know why it only works this way, I tried the other ways
+                form.fields.each do |field|
+                    if field.name =~ /ctl0#{count}$DropDownListCurrentDayHour/
+                        field.value = time.first[0..1].to_s
+                    end
+                    if field.name =~ /ctl0#{count}$DropDownListCurrentDayMinutes/
+                        field.value = time.first[3..4].to_s
+                    end
+                    if field.name =~ /ctl0#{count}$DropDownList12h_1/
+                        field.value = time.first[5..6].to_s
+                    end
+                    if field.name =~ /ctl0#{count}$DropDownListCurrentDayHour2/
+                        field.value = time.last[0..1].to_s
+                    end
+                    if field.name =~ /ctl0#{count}$DropDownListCurrentDayMinutes2/
+                        field.value = time.last[3..4].to_s
+                    end
+                    if field.name =~ /ctl0#{count}$DropDownList12h_2/
+                        field.value = time.last[5..6].to_s
+                    end
+                end
+            else
+                # Don't ask, it only works this way
+                form.checkboxes.each do |checkbox|
+                    if checkbox.name =~ /ctl0#{count}$CheckBox/
+                        checkbox.check
+                        break
+                    end
+                end
+            end
+        end
     end
-  end
-
-  payment_methods.each do |key, method|
-    @browser.div(:class => /block-content/).ul.li(:index => key.to_i).input.click if data[method]
-  end
-  @browser.button(:value => 'Save').click
-  30.times { break if @browser.status == "Done"; sleep 1 }
-  @browser.link(:id => /home/).click
+    # End update of Hours of Operation
+    form.field_with(:name => /tb_keywords/).value = data['keywords']
+    form.field_with(:name => /shortdesc/).value = data['description']
+    form.field_with(:name => /tb_complain/).value = data['update_reason']
+    form.field_with(:name => /visitor_firstname/).value = data['first_name']
+    form.field_with(:name => /visitor_surname/).value = data['last_name']
+    form.field_with(:name => /visitor_email/).value = data['email']
+    enter_captcha(page)
+    @update = true
 end
 
-# End temporary methods copied from shared.rb
-
-def search_result(data)
-  @browser.text_field(:name => /companyname/).set data['business']
-  @browser.text_field(:name => /city/).set data['city']
-  sleep 1
-  if @browser.link(:text, /data['state']/).present?
-  	@browser.link(:text, /data['state']/).click
-  end
-  @browser.text_field(:name => /website/).set data['website']
-  @browser.button(:value => 'Check name').click
-  # @browser.wait()
-  30.times { break if @browser.status == "Done"; sleep 1 }
-end
-
-def add_new_business(data)
-  @browser.link(:text => 'Add Company').click
-  @browser.text_field(:name => /companyname/).set data['business']
-  #Password is set during captcha solve
-  @browser.text_field(:name => /companystreet/).set data['address']
-  @browser.text_field(:name => /companycity/).set data['city']
-  sleep(4)
-  @browser.link(:xpath => '//*[@id="ctl00_bodyadmin"]/ul[2]/li/a').when_present.click
-  @browser.text_field(:name => /postnr/).set data['zip']
-  @browser.text_field(:name => /companymail/).set data['email']
-  @browser.text_field(:id => /p_scnt_phone/).set data['phone']
-  @browser.checkbox(:name => /cbaccept/).set
-
-  # Enter Captcha Code
-  enter_captcha(data)
-  # Check for error
-  # error_msg = @browser.span(:class => 'message error no-margin')
-  # if @error_msg.exist?
-  #   puts "Showing error message saying #{@error_msg.text}"
-  # end
-  # Step 2
-  @browser.textarea(:name => /tb_keywords/).when_present.set data['keywords']
-  @browser.textarea(:name => /tb_shortdesc/).set data['business_description']
-  @browser.button(:value => 'Save').click
-  
-  # Check for confirmation
-  unless @browser.span(:id => /lb_profstatus/).text.include? "Profile complete:"
-    throw "Initial Business registration is Unsuccessful"
-  end
-
-  puts "Initial Business registration is successful"
-  RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'Cylex'
-
-  # Filling rest of information.
-  @browser.send_keys :f5
-
-  fill_map_routing data
-  fill_payment_methods data
-  return true
-end
-
-def search_company(data)
-  @business_found = false
-  
-  if @browser.table(:id => /companynamechecking_gv_companies/).exist?
-    @table = @browser.table(:id => /companynamechecking_gv_companies/)
-    @table.rows.each do |row|
-      if row[1].text == data['business']
-        puts "Claiming the business"
-        row.link(:text => 'This is my company').click
-        @business_found = true
+page = agent.get("http://admin.cylex-usa.com/firma_default.aspx?step=0&d=cylex-usa.com")
+form = page.form_with("aspnetForm")
+form.field_with(:name => /companyname/).value = "testgarble"#data['business']
+form.field_with(:name => /city/).value = ''#data['city']
+form.field_with(:name => /website/).value = ''#data['website']
+page = form.click_button()
+@update = false
+page.links.each do |link|
+    if link.href =~ /#{data['search_business']}/
+        puts "Updating!"
+        page = agent.click(link)
+        update_business(data, page)
         break
-      end
     end
-  end
-  return @business_found
 end
-
-def claim_business(data)
-  @browser.radio(:value => "#{data['role']}").set
-  @browser.text_field(:name => /companyname/).set data['business']
-  @browser.text_field(:name => /companystreet/).set data['address']
-  @browser.text_field(:name => /companycity/).set data['city']
-  @browser.text_field(:name => /postnr/).set data['zip']
-  @browser.select_list(:name => /state2/).select data['state']
-  @browser.text_field(:name => /companyphone/).set data['phone']
-  @browser.text_field(:name => /companyweb/).set data['website']
-  @browser.text_field(:name => /companymail/).set data['email']
-  @browser.text_field(:name => /tb_keywords/).set data['keywords']
-  @browser.text_field(:name => /tb_shortdesc/).set data['business_description']
-  rolewise_info_update(data)
-  @browser.text_field(:name => /captchaTb/).set captcha
-  @browser.button(:value => 'Save changes').click
-  
-  #Check for confirmation
-  @success_text ="Thank you for updating the company presentation page! "
-  
-  if @browser.span(:id => /registered_infotext/).text.include?(@success_text)
-    puts "Business has been claimed successful"
-  else
-    throw "Business has not been claimed successful"
-  end
+# This only runs if the business isn't updating
+if @update == false then
+    errors = 0
+    page = agent.click(page.link_with(:text => "Add Company"))
+    form = page.form_with("aspnetForm")
+    form.field_with(:name => /companyname/).value = data['business']
+    form.field_with(:name => /companypass1/).value = data['password']
+    form.field_with(:name => /companypass2/).value = data['password']
+    form.field_with(:name => /companystreet/).value = data['address'] + ', ' + data['address2']
+    form.field_with(:name => /companycity/).value = data['city']
+    form.field_with(:name => /postnr/).value = data['zip']
+    form.field_with(:name => /companyweb/).value = data['website']
+    form.field_with(:name => /companymail/).value = data['email']
+    form.field_with(:name => /companyphone/).value = data['phone']
+    form.field_with(:name => /companyfax/).value = data['fax']
+    form.checkbox_with(:name => /cbaccept/).check
+    page = enter_captcha(page)
+    form = page.form_with("aspnetForm")
+    form.field_with(:name => /tb_keywords/).value = data['keywords']
+    form.field_with(:name => /tb_shortdesc/).value = data['description']
+    page = form.click_button(form.button_with(:name => /b_save/))
+    if page.body =~ /Logged as/
+        puts "[Listing] Added successfully."
+    else
+        throw "Listing did not add successfully."
+    end
+    # Update Service Area
+    page = page.link_with(:href => /serviceAreas/).click
+    form = page.form_with("aspnetForm")
+    form.field_with(:name => /tb_serviceareas/).value = data['city']
+    page = form.click_button(form.button_with(:type => 'submit'))
+    if page.body =~ /Saving was successful/
+        puts "[Service Area] Updated successfully."
+    else
+        puts "[Service Area] Something went wrong, continuing anyway."
+    end
+    page = page.link_with(:id => /btn_home/).click
+    # Update Contact persons
+    page = page.link_with(:href => /action=contacts/).click
+    form = page.form_with("aspnetForm")
+    form.field_with(:name => /ddldept/).value = 11 # Management
+    if data['gender'] == "Female"
+        form.field_with(:name => /ddltitle/).value = 2 # Ms.
+    else
+        form.field_with(:name => /ddltitle/).value = 1 # Mr.
+    end
+    form.field_with(:name => /vorname/).value = data['first_name']
+    form.field_with("ctl00$ContentPlaceHolder1$contactpersons$name").value = data['last_name']
+    form.field_with(:name => /phone/).value = data['phone']
+    form.field_with(:name => /fax/).value = data['fax']
+    form.field_with(:name => /mobile/).value = data['mobile']
+    form.field_with(:name => /email/).value = data['email']
+    page = form.click_button(form.button_with(:type => 'submit'))
+    if page.body =~ /The saving was successful/
+        puts "[Contacts] Updated successfully."
+    else
+        puts "[Contacts] Something went wrong, continuing anyway."
+    end
+    page = page.link_with(:id => /btn_home/).click
+    # Update payment methods
+    page = page.link_with(:href => /action=paymentmethods/).click
+    form = page.form_with("aspnetForm")
+    data[ 'payments' ].each{ |pay|
+      form.checkbox_with(pay).checked = true
+    }
+    page = form.click_button(form.button_with(:type => 'submit'))
+    if page.body =~ /The saving was successful/
+        puts "[Payment Methods] Updated successfully."
+    else
+        puts "[Payment Methods] Something went wrong, continuing anyway."
+    end
+=begin
+    page = page.link_with(:id => /btn_home/).click
+    # Update company logo
+    unless self.logo.nil? || self.logo == ""
+        begin
+            page = page.link_with(:href => /action=companylogo/).click
+            form = page.form_with("aspnetForm")
+            form.file_upload_with(:name => /FileUpload1/).file_name = self.logo
+            sleep 20 # File takes time to upload, couldn't verify upload
+            page = form.click_button(form.button_with(:name => /ButtonSaveChanges/))
+            sleep 10 # Couldn't verify that the image saved correctly
+            page = page.link_with(:id => /btn_home/).click
+            puts "[Logo] Appears to have updated successfully."
+        rescue
+            page = page.link_with(:id => /btn_home/).click
+            logo_error = true
+            throw "[Logo] Something went wrong, continuing anyway."
+        end
+    end
+    if not logo_error.nil? || logo_error == true
+        catch "[Logo] Something went wrong, continuing anyway."
+    end
+    # Update company gallery
+    unless self.images.nil? || self.images == ""
+        page = page.link_with(:href => /action=companygallery/).click
+        form = page.form_with("aspnetForm")
+        self.images.each do |image|
+            count = 0
+            count += 1
+            form.field_with(:name => /tb_title/).value = count.to_s
+            form.file_upload_with(:name => /FileUpload1/).file_name = image
+            page = form.click_button(form.button_with(:name => /Upload_Image/))
+            sleep 20 
+            if page.body =~ /Saving was successful./
+                puts "[Images] Image #{count} uploaded successfully."
+            else
+                page = page.link_with(:id => /btn_home/).click
+                images_error = true
+                throw "[Images] Image #{count} did not upload successfully."
+            end
+        end
+    end
+    if not images_error.nil? || images_error == true
+        catch "[Images] Image #{count} did not upload successfully."
+    end
+=end
+    # TODO - There's a few unsupported features on this site
 end
-
-def rolewise_info_update(data)
-  if data['role'] == 'owner'
-    @browser.text_field(:id => /tb_complain/).set data['reason_for_info_update']
-    @browser.select_list(:name => /ddltitle/).select data['name_title']
-    @browser.text_field(:id => /owner_firstname/).set data['first_name']
-    @browser.text_field(:id => /owner_surname/).set data['last_name']
-    @browser.text_field(:id => /ddldept/).set data['department']
-    @browser.text_field(:id => /owner_email/).set data['email']
-  elsif data['role'] == 'visitor'
-    @browser.text_field(:id => /tb_complain/).set data['reason_for_info_update']
-    @browser.text_field(:id => /owner_firstname/).set data['first_name']
-    @browser.text_field(:id => /owner_surname/).set data['last_name']
-  end
-end
-    
-# Main Steps
-# Launch browser
-@url = 'http://admin.cylex-usa.com/firma_default.aspx?step=0&d=cylex-usa.com'
-@browser.goto(@url)
-
-# Search for Business
-
-search_result(data)
-if search_company(data)
-  claim_business(data)
-else
-  add_new_business(data)
-  true
-end
+true

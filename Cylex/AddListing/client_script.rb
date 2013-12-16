@@ -18,8 +18,7 @@ def enter_captcha(page)
         page = form.click_button(form.button_with(:type => 'submit'))
         if page.body =~ /Thank you for updating this presentation page!/
             capSolved = true
-            self.success("Payload listing updated successfully")
-            puts "Payload completed successfully"
+            puts "[Listing] Updated successfully."
         elsif page.body =~ /Business information/ # Add Business
             capSolved = true
         elsif capRetries == 0 # B

@@ -123,7 +123,6 @@ page.links.each do |link|
 end
 # This only runs if the business isn't updating
 if @update == false then
-    errors = 0
     page = agent.click(page.link_with(:text => "Add Company"))
     form = page.form_with("aspnetForm")
     form.field_with(:name => /companyname/).value = data['business']

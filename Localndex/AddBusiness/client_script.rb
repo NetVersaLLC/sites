@@ -1,44 +1,50 @@
-@browser = Watir::Browser.new
-at_exit {
-	unless @browser.nil?
-		@browser.close 
-	end
-}
+agent = Mechanize.new
+agent.user_agent_alias = 'Windows Mozilla'
 
-def add_business(data)
-@browser.goto( 'http://www.localndex.com/claim/addnew.aspx' )
-@browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtBusName').set data['business']
-@browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtBusAddress').set data['address']
-@browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtBusCity').set data['city']
-@browser.select_list( :id => 'ctl00_ContentPlaceHolder1_ddlBusState').select data['state']
-@browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtBusPhone').set data['phone']
-@browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtBusZip').set data['zip']
-@browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtBusTollFree').set data['tollfree']
-@browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtBusEmail').set data['email']
-@browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtBusWebsite').set data['website']
-@browser.text_field( :id => 'ctl00_ContentPlaceHolder1_txtUserEmail').set data['email']
-rescue => e
-  unless @retries == 0
-    puts "Error caught in business registration: #{e.inspect}"
-    puts "Retrying in two seconds. #{@retries} attempts remaining."
-    sleep 2
-    @retries -= 1
-    retry
-  else
-    raise "Error in business registration could not be resolved. Error: #{e.inspect}"
+def solve_captcha(page)
+  captcha = page.image_with(:src => /CaptchaImg/)
+  captcha.fetch.save! "#{ENV['USERPROFILE']}\\citation\\localndex_captcha.png"
+  image = "#{ENV['USERPROFILE']}\\citation\\localndex_captcha.png" # Do not combine with above line
+  captcha_text = CAPTCHA.solve image, :manual
+  return captcha_text
+end
+
+def enter_captcha(page, data)
+  capSolved = false
+  capRetries = 5
+  until capSolved == true # A
+    form = page.form_with("aspnetForm")
+    form.field_with(:name => /txtSecurity/).value = solve_captcha(page)
+    page = form.click_button(form.button_with(:type => 'submit'))
+    if page.body =~ /This is the information you entered for your business/
+      capSolved = true
+    elsif capRetries == 0 # B
+      throw "Payload did not complete successfully due to captcha."
+    else
+      capRetries -= 1
+    end
   end
-
-end
-def finish_bregistration
-@browser.button(:value => /Submit for revision/i).click
-
-30.times{ break if @browser.status == "Done"; sleep 1}
+  return page
 end
 
-#Main 
-@retries = 5
-add_business(data)
-enter_captcha( data )
-30.times{ break if @browser.status == "Done"; sleep 1}
-finish_bregistration
-true
+page = agent.get('http://www.localndex.com/claim/addnew.aspx')
+form = page.form_with(:name => 'aspnetForm')
+form.field_with(:name => /BusName/).value = data['business']
+form.field_with(:name => /BusAddress/).value = data['address']
+form.field_with(:name => /BusCity/).value = data['city']
+form.field_with(:name => /BusState/).value = data['state']
+form.field_with(:name => /BusZip$/).value = data['zip']
+form.field_with(:name => /BusPhone$/).value = data['phone']
+form.field_with(:name => /BusTollFree$/).value = data['toll']
+form.field_with(:name => /BusEmail/).value = data['email']
+form.field_with(:name => /BusWebsite/).value = data['website']
+form.field_with(:name => /txtReason/).value = 1
+form.field_with(:name => /UserEmail/).value = data['email']
+page = enter_captcha(page, data)
+form = page.form_with("aspnetForm")
+page = form.click_button(form.button_with(:type => 'submit'))
+if page.body =~ /Thank You for Submitting/
+  true
+else
+  throw "Payload did not submit successfully."
+end

@@ -1,70 +1,37 @@
-def signup(data)
-  tries ||= 5
-  @browser.goto( 'http://www.localndex.com/register.aspx' )
-  @browser.text_field(:id, 'ctl00_MainContentPlaceHolder_txtUserName').when_present.set data ['username']
-  @browser.text_field(:id, 'ctl00_MainContentPlaceHolder_txtUserEmail').set data ['email']
-  @browser.text_field(:id, 'ctl00_MainContentPlaceHolder_txtUserPass1').set data ['password']
-  @browser.text_field(:id, 'ctl00_MainContentPlaceHolder_txtUserPass2').set data ['password']
-  button = @browser.input(:id=>"ctl00_MainContentPlaceHolder_btnRegister")
-  field = @browser.text_field(:id=>"ctl00_MainContentPlaceHolder_txtSecurity")
-  image = @browser.image(:src => /frmCaptchaImg/)
-  enter_captcha(button,field,image,"Thank You For Registering!")
-rescue => e
-  if (tries -= 1) > 0
-    puts "Error caught in initial registration: #{e.inspect}"
-    puts "Retrying in two seconds. #{@retries} attempts remaining."
-    sleep 2
-    retry
-  else
-    puts "Error in initial registration could not be resolved. Error: #{e.inspect}"
-    false
-  end
-else
-  puts "Job Localindex/Signup successful!"
-  self.save_account("Localndex", { :email=>data['email'],:username => data['username'], :password => data['password']})
-  self.start("Localndex/Verify") if @chained
-  true
+def solve_captcha(page)
+    captcha = page.image_with(:src => /CaptchaImg/)
+    captcha.fetch.save! "#{ENV['USERPROFILE']}\\citation\\localndex_captcha.png"
+    image = "#{ENV['USERPROFILE']}\\citation\\localndex_captcha.png" # Do not combine with above line
+    captcha_text = CAPTCHA.solve image, :manual
+    return captcha_text
 end
 
-@browser = Watir::Browser.new :firefox
-at_exit do
-  unless @browser.nil?
-    @browser.close
-  end
-end
-
-#BEGIN CAPTCHA
-def solve_captcha( obj )
-  image = ["#{ENV['USERPROFILE']}",'\citation\site_captcha.png'].join
-  puts "CAPTCHA source: #{obj.src}"
-  puts "CAPTCHA width: #{obj.width}"
-  obj.save image
-
-  CAPTCHA.solve image, :manual
-end
-
-
-def enter_captcha( button, field, image, successTrigger, failureTrigger=nil )
+def enter_captcha(page, data)
   capSolved = false
-  count = 1
-  until capSolved or count > 5 do
-    captcha_code = solve_captcha(image)
-    field.set captcha_code
-    button.click
-    
-    if failureTrigger.nil? or not @browser.text.include? failureTrigger
-      capSolved = true
-    end
-    
-  count+=1  
+  capRetries = 5
+  until capSolved == true # A
+    form = page.form_with("aspnetForm")
+    form.field_with(:name => /UserPass1/).value = data['password']
+    form.field_with(:name => /UserPass2/).value = data['password']
+    form.field_with(:name => /txtSecurity/).value = solve_captcha(page)
+    page = form.click_button(form.button_with(:type => 'submit'))
+      if page.body =~ /Thank You For Registering!/
+        capSolved = true
+      elsif capRetries == 0 # B
+        throw "Payload did not complete successfully due to captcha."
+      else
+        capRetries -= 1
+      end
   end
-  if capSolved == true
-    Watir::Wait.until { @browser.text.include? successTrigger }
-    true
-  else
-    throw("Captcha was not solved")
-  end
+  return page
 end
-#END CAPTCHA
 
-signup(data)
+agent = Mechanize.new
+agent.user_agent_alias = 'Windows Mozilla'
+
+page = agent.get('http://www.localndex.com/register.aspx')
+form = page.form_with(:name => 'aspnetForm')
+form.field_with(:name => /UserName/).value = data['username']
+form.field_with(:name => /UserEmail/).value = data['email']
+enter_captcha(page, data)
+true

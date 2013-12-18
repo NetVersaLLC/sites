@@ -5,7 +5,7 @@ at_exit {
 	end
 }
 
-# Temporary methods from Shared.rb
+# Temporary methods from Shared.rb 
 def solve_captcha_signup
   image = "#{ENV['USERPROFILE']}\\citation\\digabusiness_captcha.png"
   obj = @browser.img( :xpath, '//*[@id="padding"]/form/table/tbody/tr[8]/td[2]/img' )
@@ -43,7 +43,7 @@ else
 
   @browser.goto("http://www.digabusiness.com/profile.php?mode=register&agreed=true")
 
-  @browser.text_field(:name => 'LOGIN').set data['email']
+  @browser.text_field(:name => 'LOGIN').set data['username']
   @browser.text_field(:name => 'NAME').set data['fname'] + " " + data['lname']
   @browser.text_field(:name => 'PASSWORD').set data['password']
   @browser.text_field(:name => 'PASSWORDC').set data['password']
@@ -54,7 +54,7 @@ else
 
 
   Watir::Wait.until { @browser.text.include? "Thank you for registering. Your account has been created." } #effectively an IF
-	RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'Digabusiness'
+	RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['username'], 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'Digabusiness'
 	if @chained
 		self.start("Digabusiness/AddListing")
   end

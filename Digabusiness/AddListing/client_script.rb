@@ -7,7 +7,7 @@ at_exit {
 
 def sign_in(data)
 	@browser.goto("http://www.digabusiness.com/login.php")
-	@browser.text_field(:name => 'user').set data['email']
+	@browser.text_field(:name => 'user').set data['username']
 	@browser.text_field(:name => 'pass').set data['password']
 	@browser.button(:name => 'submit').click
 end

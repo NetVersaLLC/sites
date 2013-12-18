@@ -6,6 +6,7 @@ data[ 'category2' ]         = catty.name.chomp
 
 data['password']		= business.digabusinesses.first.password
 data[ 'email' ]			= business.digabusinesses.first.email
+data['username']		= business.digabusinesses.first.username
 
 data[ 'business' ]		= business.business_name
 data[ 'website' ]		= business.company_website

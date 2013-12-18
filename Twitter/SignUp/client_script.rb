@@ -5,7 +5,7 @@ at_exit do
 	end
 end
 
-data['email'] = 'Bumbaloo1213910@hotmail.com'
+# data['email'] = 'Bumbaloo1213910@hotmail.com'
 
 #BEGIN CAPTCHA
 def solve_captcha

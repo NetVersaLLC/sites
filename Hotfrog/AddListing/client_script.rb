@@ -49,9 +49,11 @@ end
 
 #Main Steps
 # Launch browser
-
+puts "Beginning browser code"
 begin
+  puts "Creating browser"
 @browser = Watir::Browser.new :firefox
+puts "Browser created"
 @url = 'http://www.hotfrog.com/AddYourBusinessSingle.aspx'
 @browser.goto(@url)
 #@browser.link(:text => 'Add your business').click

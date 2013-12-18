@@ -1,7 +1,7 @@
 @browser = Watir::Browser.new :firefox
 at_exit {
 	unless @browser.nil?
-		@browser.close
+		# @browser.close
 	end
 }
 
@@ -42,9 +42,9 @@ sleep(1)
 
 @browser.button( :id => 'add_place').click
 sleep(5)
-#if @browser.link( :class => 'button big').exists?
-#	@browser.link( :class => 'button big').click
-#end
+if @browser.link( :class => 'button', :class => 'big').exists?
+	@browser.link( :class => 'button', :class => 'big').click
+end
 
 #Wait for Verification Page
 Watir::Wait.until { @browser.text.include? "Choose a verification method" }

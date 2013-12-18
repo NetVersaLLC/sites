@@ -1,7 +1,7 @@
 @browser = Watir::Browser.new :firefox
 at_exit do
 	unless @browser.nil?
-		@browser.close
+		#@browser.close
 	end
 end
 

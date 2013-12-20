@@ -1,16 +1,32 @@
-@browser.goto( 'http://www.listwns.com/home/register.aspx' )
+#!/usr/bin/env ruby
 
-@browser.text_field( :id => 'email').set data[ 'email' ]
-@browser.text_field( :id => 'pw1').set data[ 'password' ]
-@browser.text_field( :id => 'pw2').set data[ 'password' ]
+require 'mechanize'
 
-@browser.button( :id => 'btn').click
+agent = Mechanize.new
+agent.user_agent_alias = 'Windows Mozilla'
 
-RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['email'], 'account[password]' => data['password'], 'model' => 'Listwns'
+page = agent.get('http://www.listwns.com/home/register.aspx')
+form = page.form_with("form1")
+form.email = data['email']
+form.pw1 = data['password']
+form.pw2 = data['password']
+form.checkbox_with("agree").checked = true
 
-if @chained
-	self.start("Listwns/Verify")
-end
+# binding.pry
+# exit
+self.save_account('Listwns', { :username => data['email'], :password => data['password']})
 
-true
+# page = form.click_button(form.button_with(:type => 'submit'))
+# form = page.form_with("form1")
+# form.title = data['business']
+# form.phone = data['phone']
+# form.address = data['address']
+# form.bztype = data['category']
+# form.city = data['city']
+# form.country = data['country']
+# form.zipcode = data['zip']
+# form.content = data['description']
+# form.tag = data['keywords']
+# page = form.click_button(form.button_with(:type => 'submit'))
+# true
 

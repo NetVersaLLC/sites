@@ -239,4 +239,5 @@ if @update == false then
 =end
     # TODO - There's a few unsupported features on this site
 end
+self.save_account('Cylex',{:username=>data['email'],:password=>data['password']})
 true

@@ -108,9 +108,9 @@ end
 
 page = agent.get("http://admin.cylex-usa.com/firma_default.aspx?step=0&d=cylex-usa.com")
 form = page.form_with("aspnetForm")
-form.field_with(:name => /companyname/).value = "testgarble"#data['business']
-form.field_with(:name => /city/).value = ''#data['city']
-form.field_with(:name => /website/).value = ''#data['website']
+form.field_with(:name => /companyname/).value = data['business']
+form.field_with(:name => /city/).value = data['city']
+form.field_with(:name => /website/).value = data['website']
 page = form.click_button()
 @update = false
 page.links.each do |link|
@@ -143,6 +143,8 @@ if @update == false then
     page = form.click_button(form.button_with(:name => /b_save/))
     if page.body =~ /Logged as/
         puts "[Listing] Added successfully."
+        profile_url = page.link_with(:text=>
+        self.save_account('Cylex',{:email=>data['email'],:password=>data['password'],:listing_url=>page.link_with(:id=>/ctl00_CompanyFeatures_lit_cmp_name/).uri})
     else
         throw "Listing did not add successfully."
     end
@@ -239,5 +241,4 @@ if @update == false then
 =end
     # TODO - There's a few unsupported features on this site
 end
-self.save_account('Cylex',{:username=>data['email'],:password=>data['password']})
 true

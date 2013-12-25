@@ -89,7 +89,7 @@ rescue Selenium::WebDriver::Error::ElementNotVisibleError
 		retries -= 1
 		retry
 	else
-		puts("Cound not add additional phone numbers")
+		puts("Could not add additional phone numbers")
 	end
 end
 
@@ -99,6 +99,7 @@ begin
 	sleep 1
 
 	data['payments'].each do |pay|
+        puts "Payment: " + pay
 		@browser.checkbox(:id => pay).clear
 		@browser.checkbox(:id => pay).click
 	end

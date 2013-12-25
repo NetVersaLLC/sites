@@ -25,6 +25,7 @@ begin
   @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.AddressLine1').set data['address']
   @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.AddressLine2').set data['address2']
   @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.City.CityName').set data['city']
+  @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.City.CityName').send_keys :enter
   @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.State.StateName').set data['state_name']
   @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.ZipCode').set data['zip']
   @browser.text_field(:name => 'BasicBusinessInfo.MainPhoneNumber.PhoneNumberField').set data['local_phone']
@@ -36,14 +37,71 @@ begin
       close.to_subtype.click
     end
   end
-  @browser.text_field(:id => 'categoryInputTextBox').set data['category']
-  sleep(9 - retries)
+  @browser.text_field(:id => 'categoryInputTextBox').clear
+  category = Array.new
+  data['category'].chomp.split("").each{ |letter|
+    next if not letter =~ /[\w\d\s\!\@\#\$\%\^\&\*\(\)]/
+    puts "Letter: " + letter
+    category.push(letter)
+  }
+  category.each{ |letter|
+    sleep 0.1
+    @browser.text_field(:id => 'categoryInputTextBox').send_keys letter
+  }
+  puts "Category entered"
+  sleep(5 - retries)
+  @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
+  puts "Arrow down"
+  sleep (5 - retries)
   @browser.text_field(:id => 'categoryInputTextBox').send_keys :enter
-  sleep(6 - retries)
-  #@browser.button(:id => 'categoryAddButton').click
-  #sleep(5 - retries)
+  puts "Enter pressed"
+  sleep(5 - retries)
+  unless @browser.label(:for => /BasicBusinessInfo\.BusinessCategory\.Categories[autoValue.]\.CategoryName/).exists?
+    puts "Trying something else.."
+    @browser.text_field(:id => 'categoryInputTextBox').clear
+    sleep 3
+    category.each{ |letter|
+      sleep 0.1
+      @browser.text_field(:id => 'categoryInputTextBox').send_keys letter
+    }
+    sleep 3
+    puts "Hitting Enter..."
+    @browser.send_keys :enter
+    puts "Enter hit."
+    sleep 5
+    unless @browser.label(:for => /BasicBusinessInfo\.BusinessCategory\.Categories[autoValue.]\.CategoryName/).exists?
+      puts "Trying YET ANOTHER something..."
+      @browser.text_field(:id => 'categoryInputTextBox').clear
+      sleep 3
+      category.each{ |letter|
+        sleep 0.1
+        @browser.text_field(:id => 'categoryInputTextBox').send_keys letter
+      }
+      sleep 3
+      @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
+      sleep 1
+      @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
+      sleep 1
+      @browser.text_field(:id => 'categoryInputTextBox').send_keys :enter
+      sleep 3
+      unless @browser.label(:for => /BasicBusinessInfo\.BusinessCategory\.Categories[autoValue.]\.CategoryName/).exists?
+        puts "RRAAGGGHH!!"
+        @browser.text_field(:id => 'categoryInputTextBox').clear
+        sleep 3
+        category.each{ |letter|
+          sleep 0.2
+          @browser.text_field(:id => 'categoryInputTextBox').send_keys letter
+        }
+        sleep 3
+        @browser.text_field(:id => 'categoryInputTextBox').send_keys :tab
+        sleep 3
+      end
+    end
+  end
   @browser.button(:id => 'submitBusiness').click
+  puts "Submitted"
   sleep(4 - retries)
+  puts "Waiting for Verify Later"
   @browser.button(:value => 'Verify Later').when_present.click
 
   sleep(4 - retries)
@@ -176,7 +234,7 @@ begin
 end
 
 
-def search_for_business( business )
+def search_for_business( data )
   retries = 3
   begin
   @browser.goto( 'http://www.bing.com/businessportal/' ) 
@@ -191,7 +249,9 @@ def search_for_business( business )
     
     sleep 2
     @browser.execute_script("hidePopUp()")
-    @browser.text_field(:name => 'PhoneNumber').when_present.set business['local_phone']
+    #@browser.text_field(:name => 'PhoneNumber').when_present.set business['local_phone']
+    @browser.text_field(:name => 'BusinessName').when_present.set data['business']
+    @browser.text_field(:name => 'City').when_present.set data['city'] + ", " + data['state']
     @browser.execute_script("hidePopUp()")
     @browser.button(:value => 'Search').click
     @browser.execute_script("hidePopUp()")
@@ -200,8 +260,8 @@ def search_for_business( business )
     Watir::Wait.until(10) { @browser.text.include? "Search Results" or @browser.text.include? "We found no businesses with the given information"}
    
     if @browser.text.include? "Search Results"
-      @browser.link(:href => /http:\/\/www.bing.com\/local\/details.aspx/i).each do |item|
-        if item.text =~ /#{business['business']}/i
+      @browser.links(:href => /http:\/\/www.bing.com\/local\/details.aspx/i).each do |item|
+        if item.text =~ /#{data['business']}/i
           @businessfound = true
         end
       end 
@@ -346,8 +406,9 @@ end
 
 
 sign_in_business( data )
+search_for_business( data )
 
-if not search_for_business( data )
+if not @businessfound == true
 
   add_new_listing( data )
 

@@ -10,6 +10,7 @@ data[ 'zip' ]			= business.zip
 data[ 'phone' ]			= business.local_phone
 data[ 'website' ]		= business.company_website
 data[ 'email' ]			= business.bings.first.email
+data[ 'hours' ]         = Yelp.get_hours(business)
 
 data['category'] 		= catty.name
 

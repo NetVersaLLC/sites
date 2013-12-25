@@ -2,6 +2,7 @@ data = {}
 data[ 'business' ]    	= business.business_name
 data[ 'city' ]         	= business.city
 data[ 'state_name' ]  	= business.state_name
+data[ 'state' ]         = business.state
 data[ 'address' ]      	= business.address
 data[ 'address2' ]		= business.address2
 data[ 'zip' ]          	= business.zip

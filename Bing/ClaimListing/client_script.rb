@@ -211,38 +211,47 @@ begin
     puts "Letter: " + letter
     category.push(letter)
   }
+  sleep 3
   category.each{ |letter|
     sleep 0.1
-    @browser.text_field(:id => 'categoryInputTextBox').send_keys letter
+    if letter =~ /\&/
+      @browser.text_field(:id => 'categoryInputTextBox').send_keys [:shift, 7]
+    else
+      @browser.text_field(:id => 'categoryInputTextBox').send_keys letter
+    end
   }
-  puts "Category entered"
-  sleep(5 - retries)
-  @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
-  puts "Arrow down"
-  sleep (5 - retries)
-  @browser.text_field(:id => 'categoryInputTextBox').send_keys :enter
-  puts "Enter pressed"
-  sleep(5 - retries)
-  unless @browser.label(:for => /BasicBusinessInfo\.BusinessCategory\.Categories[autoValue.]\.CategoryName/).exists?
+  sleep 3
+  @browser.text_field(:id => 'categoryInputTextBox').send_keys :tab
+  sleep 3
+  ####
+  unless @browser.img(:src, /CloseMark/).exists?
     puts "Trying something else.."
     @browser.text_field(:id => 'categoryInputTextBox').clear
     sleep 3
     category.each{ |letter|
-      sleep 0.1
+    sleep 0.1
+    if letter =~ /\&/
+      @browser.text_field(:id => 'categoryInputTextBox').send_keys [:shift, 7]
+    else
       @browser.text_field(:id => 'categoryInputTextBox').send_keys letter
-    }
+    end
+  }
     sleep 3
     puts "Hitting Enter..."
     @browser.send_keys :enter
     puts "Enter hit."
-    sleep 5
-    unless @browser.label(:for => /BasicBusinessInfo\.BusinessCategory\.Categories[autoValue.]\.CategoryName/).exists?
+    sleep 3
+    unless @browser.img(:src, /CloseMark/).exists?
       puts "Trying YET ANOTHER something..."
       @browser.text_field(:id => 'categoryInputTextBox').clear
       sleep 3
       category.each{ |letter|
         sleep 0.1
-        @browser.text_field(:id => 'categoryInputTextBox').send_keys letter
+        if letter =~ /\&/
+            @browser.text_field(:id => 'categoryInputTextBox').send_keys [:shift, 7]
+        else
+            @browser.text_field(:id => 'categoryInputTextBox').send_keys letter
+        end
       }
       sleep 3
       @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
@@ -251,17 +260,33 @@ begin
       sleep 1
       @browser.text_field(:id => 'categoryInputTextBox').send_keys :enter
       sleep 3
-      unless @browser.label(:for => /BasicBusinessInfo\.BusinessCategory\.Categories[autoValue.]\.CategoryName/).exists?
-        puts "RRAAGGGHH!!"
+      unless @browser.img(:src, /CloseMark/).exists?
+        puts "Come on, now..."
         @browser.text_field(:id => 'categoryInputTextBox').clear
-        sleep 3
         category.each{ |letter|
-          sleep 0.2
-          @browser.text_field(:id => 'categoryInputTextBox').send_keys letter
+            sleep 0.1
+            if letter =~ /\&/
+                @browser.text_field(:id => 'categoryInputTextBox').send_keys [:shift, 7]
+            else
+                @browser.text_field(:id => 'categoryInputTextBox').send_keys letter
+            end
         }
-        sleep 3
-        @browser.text_field(:id => 'categoryInputTextBox').send_keys :tab
-        sleep 3
+        puts "Category entered"
+        sleep(3)
+        @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
+        puts "Arrow down"
+        sleep (2)
+        @browser.text_field(:id => 'categoryInputTextBox').send_keys :enter
+        puts "Enter pressed"
+        sleep(1)
+        unless @browser.img(:src, /CloseMark/).exists?
+          puts "RAAGGGHH!! *The payload rips off it's shirt and turns green*"
+          @browser.text_field(:id => 'categoryInputTextBox').clear
+          @browser.text_field(:id => 'categoryInputTextBox').set category.join.to_s
+          sleep 3
+          @browser.text_field(:id => 'categoryInputTextBox').send_keys :tab
+          sleep 3
+        end
       end
     end
   end

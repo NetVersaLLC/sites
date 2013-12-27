@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit{
+    unless @browser.nil?
+        @browser.close
+    end
+}
+
 def create_profile( data )
 	@browser.text_field(:name, 'firstname').set data['first_name']
 	@browser.text_field(:name, 'lastname').set data['last_name']
@@ -20,25 +27,23 @@ def end_result( data )
 		puts("No Verification Required")
 		if @chained
 			self.start("Facebook/CreatePage")
-			true
 		end
 	elsif @browser.text.include? "Please Verify Your Identity"
 		puts("Phone Verification Required")
 		if @chained
 			self.start("Facebook/Notify")
-			true
 		end
 	else
 		puts("Email Verification Required")
 		if @chained
 	  		self.start("Facebook/Verify")
-	  		true
 		end
 	end
 end
 
 @browser.goto("https://www.facebook.com/")
 create_profile( data )
-sleep(15)
+@browser.img(:src, 'fbstatic-a.akamaihd.net/rsrc.php/v2/yb/r/GsNJNwuI-UM.gif').wait_while_present
 self.save_account("Facebook", {:email=>data['email'],:password=>data['password']})
 end_result( data )
+true

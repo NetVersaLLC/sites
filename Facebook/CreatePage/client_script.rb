@@ -1,3 +1,46 @@
+@browser = Watir::Browser.new :firefox
+at_exit{
+  unless @browser.nil?
+    @browser.close
+  end
+}
+
+def solve_verify_captcha
+  image = "#{ENV['USERPROFILE']}\\citation\\facebook_captcha.png"
+  if @browser.image(:src, /facebook.com\/captcha\/tfbimage.php/).exists?
+    obj = @browser.image(:src, /facebook.com\/captcha\/tfbimage.php/)
+  elsif @browser.image(:src, /recaptcha\/api\/image/).exists?
+    obj = @browser.image(:src, /recaptcha\/api\/image/)
+  else
+    throw "A wild new captcha appears!"
+  end
+  puts "CAPTCHA source: #{obj.src}"
+  puts "CAPTCHA width: #{obj.width}"
+  obj.save image
+  captcha_text = CAPTCHA.solve image, :manual
+  return captcha_text
+end
+
+def retry_verify_captcha(data)
+  capSolved = false
+  count = 1
+  until capSolved or count > 5 do
+    captcha_text = solve_verify_captcha
+    @browser.text_field(:name=> 'captcha_response').when_present.set captcha_text
+    @browser.button(:name =>'submit[Submit]').click
+
+     sleep(5)
+    if not @browser.text.include? "The text you entered didn't match the security check. Please try again."
+      capSolved = true
+    end
+    count+=1
+   end
+  if capSolved == true
+    true
+  else
+  throw("Captcha was not solved")
+  end
+end
 
 =begin
 def sign_up(data)
@@ -109,11 +152,7 @@ login(data)
 create_page(data)
 sleep(2)
 if @browser.text.include? "Enter the text below"
-  begin
-    retry_captcha(data)
-  rescue
     retry_verify_captcha(data)
-  end
   #Thank you for completing security checkpoint (finish this)
 end
 create_list(data)

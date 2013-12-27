@@ -6,6 +6,14 @@ at_exit {
   end
 }
 
+def coinflip
+  coin = rand(100)
+  if coin > 50
+    return true
+  else
+    return false
+  end
+end
 
 # Temporary methods from Shared.rb
 
@@ -114,7 +122,7 @@ begin
       _d.getElementById('iRetypePwd').value = '#{data[ "password" ]}';
     ")
   
-    email_name = data[ 'name' ].downcase.delete( ' ' ).strip + (rand( 10000 )+200).to_s #get_email_name( data )
+    email_name = data[ 'name_longer' ].downcase.delete( ' ' ).strip + (rand( 10000 )+200).to_s #get_email_name( data )
 
     @browser.execute_script("
       _d.getElementById('imembernamelive').value = '#{email_name}';
@@ -143,8 +151,60 @@ begin
  
     @browser.text_field( :name, /iPwd/ ).set       data[ 'password' ]
     @browser.text_field( :name, /iRetypePwd/ ).set data[ 'password' ]
-    email_name = data[ 'name' ].downcase.delete( ' ' ).strip + (rand( 10000 )+200).to_s
+    # Add a smidge of randomization
+    if coinflip == true
+      firstname = data['first_name'].capitalize
+    else
+      firstname = data['first_name'].downcase
+    end
+    if coinflip == true
+      lastname = data['last_name'].capitalize
+    else
+      lastname = data['last_name'].downcase
+    end
+    emailretries = 3
+    email_name = firstname + data['last_name'].downcase
     @browser.text_field( :id, /imembernamelive/ ).set email_name
+    @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
+    sleep 1
+    @browser.img(:src, /progressindicator\.gif/).wait_while_present
+    until @browser.text.include? "@outlook.com is available"
+      if emailretries == 1
+        @var = rand(99)
+        email_name = firstname + data['name'].downcase.delete( ' ' ).strip + @var.to_s
+        @browser.text_field( :id, /imembernamelive/ ).set email_name
+        @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
+        sleep 1
+        @browser.img(:src, /progressindicator\.gif/).wait_while_present
+        emailretries -= 1
+      elsif emailretries == 2
+        @var = rand(99)
+        email_name = lastname + data['first_name'].downcase + @var.to_s
+        @browser.text_field( :id, /imembernamelive/ ).set email_name
+        @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
+        sleep 1
+        @browser.img(:src, /progressindicator\.gif/).wait_while_present
+        emailretries -= 1
+      elsif emailretries == 3
+        @var = rand(99)
+        email_name = firstname + data['last_name'].downcase + @var.to_s
+        @browser.text_field( :id, /imembernamelive/ ).set email_name
+        @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
+        sleep 1
+        @browser.img(:src, /progressindicator\.gif/).wait_while_present
+        emailretries -= 1
+      elsif emailretries == 0
+        throw "Email could not be set uniquely."
+      else
+        @var = rand(9999)
+        email_name = data[ 'name_longer' ].downcase.delete( ' ' ).strip + @var.to_s
+        @browser.text_field( :id, /imembernamelive/ ).set email_name
+        @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
+        sleep 1
+        @browser.img(:src, /progressindicator\.gif/).wait_while_present
+        emailretries -= 1
+      end
+    end
     data[ 'hotmail' ] = email_name + '@outlook.com'
   end
 
@@ -173,9 +233,6 @@ rescue Selenium::WebDriver::Error::JavascriptError
     puts("The javascript failed and we are out of options.")
   end
 
-rescue Watir::Exception::NoValueFoundException
-    throw("A field has been removed from the page. Please verify all contents of the payload.")
-
 rescue Exception => e
     puts "Caught a #{e.class}"
   if retries > 0
@@ -184,7 +241,7 @@ rescue Exception => e
     sleep 3
     retries -= 1
     retry
-  else
+  elsif
     throw("Job has failed with an unhandled error: #{e.class}")
   end
 
@@ -201,5 +258,9 @@ enter_captcha
 
     #Watir::Wait.until { @browser.text.include? "Account summary" }
     self.save_account('Bing',  {:email => data['email'],:password => data['password']})
+
+if @chained
+  self.start("Bing/CreateRule")
+end
 
 true

@@ -1,6 +1,7 @@
 seed = rand(10000).to_s
 data = {}
-data[ 'name' ]              = business.business_name.strip.first(15).gsub(/[^A-Za-z0-9_ ]/, '')
+data[ 'name' ]              = business.business_name.strip.first(5).gsub(/[^A-Za-z0-9_ ]/, '')
+data[ 'name_longer' ]       = business.business_name.strip.first(10).gsub(/[^A-Za-z0-9_ ]/, '')
 data[ 'country' ]           = 'United States'
 data[ 'password' ]          = Bing.make_password
 data[ 'mobile_phone' ]      = business.mobile_phone

@@ -1,10 +1,9 @@
 @browser = Watir::Browser.new :firefox
 at_exit {
-	unless @browser.nil?
-		@browser.close
-	end
+  unless @browser.nil?
+    @browser.close
+  end
 }
-
 
 def sign_in_business( business )
 
@@ -54,33 +53,15 @@ end
 
 sign_in_business(data)
 
-retries = 3
-begin
+sleep 2
+@browser.link(:text => /Enter PIN/i).when_present.click
 
-	if retries < 3 
-		@browser.goto("https://www.bingplaces.com/DashBoard")
-	end
-	@browser.link(:text => "Verify now").click
-	sleep 2
-	@browser.button(:value => 'Verify now', :class => "bigButton").when_present.click
+sleep 2
+code = "1234"#PhoneVerify.retrieve_code("Bing")
+@browser.text_field(:id => 'Pin').when_present.set code
 
-	sleep 2
-	@browser.button(:value => 'OK', :class => "bigButton").when_present.click
-	
+sleep 2
+@browser.execute_script("ValidateAndPerformAjaxCall('SubmitVerificationPIN', '#enterPinForm')")
 
-	if @chained 
-		self.start("Bing/MailNotify", 4320)
-	end
-	true
-
-rescue Exception => e
-	puts(e.inspect)
-	if retries > 0
-		puts("Something went wrong while trying to Verify the account. Retrying in 2 seconds...")
-		sleep
-		retries -= 1
-		retry
-	else
-
-	end
-end
+sleep 10
+true

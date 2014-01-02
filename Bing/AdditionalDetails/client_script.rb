@@ -117,8 +117,13 @@ end
 sleep 2
 Watir::Wait.until { @browser.text.include? "All Businesses" }
 
+@browser.link(:text, /Verify now/).when_present.click
+@browser.text_field(:id, /MailRecipient/).when_present.set data['full_name']
+@browser.button(:value, /Verify now/).click
+@browser.button(:value, /OK/).when_present.click
+
 if @chained
-	self.start("Bing/VerifyMail")
+	self.start("Bing/MailNotify", 4323) # Wait 3 days
 end
 
 true

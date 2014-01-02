@@ -1,4 +1,4 @@
-data = {}
-data[ 'hotmail' ]      	= business.bings.first.email
-data[ 'password' ]     	= business.bings.first.password
-data
+notification = business.notifications.new
+notification.url = "/businesses/#{business.id}/codes/new?site_name=bing&next_job=VerifyMail"
+notification.title = "Bing Postcard Verify"
+notification.save

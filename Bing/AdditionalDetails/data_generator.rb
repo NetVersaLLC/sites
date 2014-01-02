@@ -10,4 +10,5 @@ data[ 'tollfree' ]		= business.toll_free_phone
 data[ 'mobile' ]		= business.fax_number
 data[ 'payments' ]		= Bing.make_payments(business)
 data[ 'description' ]	= business.business_description
+data[ 'full_name' ]     = business.contact_first_name + " " + business.contact_last_name
 data

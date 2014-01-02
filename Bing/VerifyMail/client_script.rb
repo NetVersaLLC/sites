@@ -57,7 +57,7 @@ sleep 2
 @browser.link(:text => /Enter PIN/i).when_present.click
 
 sleep 2
-code = "1234"#PhoneVerify.retrieve_code("Bing")
+code = PhoneVerify.retrieve_code("Bing")
 @browser.text_field(:id => 'Pin').when_present.set code
 
 sleep 2

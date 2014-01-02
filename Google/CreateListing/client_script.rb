@@ -12,17 +12,6 @@ at_exit{
   end
 }
 
-# Many methods in the finish_business methods are identical
-# However, they are left seperated in the event that google
-# makes significant changes to either of them and to catch
-# possible discrepencies. 
-
-# Please be aware that there ARE some discrepencies.
-
-# That said, if you feel that it is a safe bet to optimize
-# this code by combining the similar methods and calling them
-# from different places, feel free.
-
 # Login
 def login ( data )
   site = 'https://www.google.com/local/business/add'
@@ -92,6 +81,7 @@ end
 
 def check_scenarios( data )
   businessFound = false
+  puts "Checking result scenarios..."
   # Check for different scenarios
   if @browser.text.include? "Is this your business?"
     # Scenario 1
@@ -106,7 +96,7 @@ def check_scenarios( data )
     @scenario = 2
     puts "Multiple Businesses Scenario"
     count = 1
-    until count == 4
+    until count == 4 # From old code, unneeded, left for reference
       if @browser.h4(:text, "#{data['business']}").exists? then
         puts "Match Found!"
         businessFound = true
@@ -146,9 +136,8 @@ def search_business( data )
   end
   
   puts "Searching for business..."
-  @browser.text_field(:placeholder, 'Search for your business…').when_present.set data['business'] + ", " + data['state'] + ' ' + data['city']
+  @browser.element(:css => '.b-Ca').when_present.send_keys data['business'] + ", " + data['state'] + ' ' + data['city']
   @browser.img(:src, /search-white/).click
-  puts "Checking result scenarios..."
   @browser.element(:css => '.I0vWDf').wait_until_present(60)
   sleep 3 # Just in case some elements haven't loaded yet
 end
@@ -239,199 +228,7 @@ def postcard_verify( data )
   puts "Page Successfully Created"
 end
 
-def add_business_description_1( data )
-  unless @retries < 3
-    @retries = 3
-  end
-  if @retries < 3
-    @browser.refresh
-  end
-  sleep 1
-  @browser.element(:css => 'div.wb:nth-child(6)').when_present.click
-  puts "Adding Business Description..."
-  sleep 3
-  @frame = @browser.frame(:id, /bfeSharedRichTextFieldId/)
-  @frame.body(:id => /bfeSharedRichTextFieldId/).click
-  @frame.body(:id => /bfeSharedRichTextFieldId/).send_keys data['description']
-  sleep 2
-  @browser.element(:css => '.dn').click
-  puts "Description Set"
-rescue => e
-  unless @retries == 0
-    puts "Error caught in add_business_description_1: #{e.inspect}"
-    puts "Retrying in two seconds. #{@retries} attempts remaining."
-    sleep 2
-    @retries -= 1
-    retry
-  else
-    raise "Error in add_business_description_1 could not be resolved. Error: #{e.inspect}"
-  end
-end
-
-def add_business_contact_1( data )
-  unless @retries < 3
-    @retries = 3
-  end
-  if @retries < 3
-    @browser.refresh
-  end
-  @browser.element(:css => 'div.wb:nth-child(3)').when_present.click
-  puts "Adding Contact Information..."
-  @browser.element(:css => '.vn').when_present.send_keys data['website']
-  @browser.element(:css => '.Fv').send_keys data['email']
-  sleep 1
-  @browser.element(:css => 'div.on:nth-child(6) > div:nth-child(1)').click
-  puts "Contact Information Set"
-rescue => e
-  unless @retries == 0
-    puts "Error caught in add_business_contact_1: #{e.inspect}"
-    puts "Retrying in two seconds. #{@retries} attempts remaining."
-    sleep 2
-    @retries -= 1
-    retry
-  else
-    raise "Error in add_business_contact_1 could not be resolved. Error: #{e.inspect}"
-  end
-end
-
-def add_hours_1( data )
-  unless @retries < 3
-    @retries = 3
-  end
-  if @retries < 3
-    @browser.refresh
-  end
-  puts "Adding Hours of Operation..."
-  @browser.element(:css => 'div.wb:nth-child(5)').when_present.click
-  7.times { 
-    @browser.element(:css => '.Ov > div:nth-child(1)').click 
-    sleep 0.5
-  }
-  data['hours'].each do |day,time|
-    day = day.capitalize
-    if time.nil? || time == ""
-      puts "#{day} is closed"
-    elsif time.first.nil? || time.first == ""
-      puts "#{day}'s opening time is nil"
-    elsif time.last.nil? || time.last == ""
-      puts "#{day}'s closing time is nil"
-    elsif not time.nil? || time == ""
-      puts "Current Day: #{day}"
-      if day == "Sunday"
-        @browser.element(:css => 'div.zn:nth-child(2) > div:nth-child(1) > div:nth-child(1)').click
-        @list = @browser.element(:css => 'div.zn:nth-child(2) > div:nth-child(1) > div:nth-child(5)')
-        sleep 0.5
-        #@browser.div(:text => 'Sunday').click
-        @list.divs(:class, 'c-X c-Ne').first.click
-        @browser.element(:css => 'div.zn:nth-child(2) > div:nth-child(1) > input:nth-child(2)').send_keys time.first
-        @browser.element(:css => 'div.zn:nth-child(2) > div:nth-child(1) > input:nth-child(4)').send_keys time.last
-      elsif day == "Monday"
-        @browser.element(:css => 'div.zn:nth-child(3) > div:nth-child(1) > div:nth-child(1)').click
-        @list = @browser.element(:css => 'div.zn:nth-child(3) > div:nth-child(1) > div:nth-child(5)')
-        sleep 0.5
-        #@browser.div(:text => 'Monday').click
-        @list.divs(:class, 'c-X c-Ne')[1].click
-        @browser.element(:css => 'div.zn:nth-child(3) > div:nth-child(1) > input:nth-child(2)').send_keys time.first
-        @browser.element(:css => 'div.zn:nth-child(3) > div:nth-child(1) > input:nth-child(4)').send_keys time.last
-      elsif day == "Tuesday"
-        @browser.element(:css => 'div.zn:nth-child(4) > div:nth-child(1) > div:nth-child(1)').click
-        @list = @browser.element(:css => 'div.zn:nth-child(4) > div:nth-child(1) > div:nth-child(5)')
-        sleep 0.5
-        #@browser.div(:text => 'Tuesday').click
-        @list.divs(:class, 'c-X c-Ne')[2].click
-        @browser.element(:css => 'div.zn:nth-child(4) > div:nth-child(1) > input:nth-child(2)').send_keys time.first
-        @browser.element(:css => 'div.zn:nth-child(4) > div:nth-child(1) > input:nth-child(4)').send_keys time.last
-      elsif day == "Wednesday"
-        @browser.element(:css => 'div.zn:nth-child(5) > div:nth-child(1) > div:nth-child(1)').click
-        @list = @browser.element(:css => 'div.zn:nth-child(5) > div:nth-child(1) > div:nth-child(5)')
-        sleep 0.5
-        #@browser.div(:text => 'Wednesday').click
-        @list.divs(:class, 'c-X c-Ne')[3].click
-        @browser.element(:css => 'div.zn:nth-child(5) > div:nth-child(1) > input:nth-child(2)').send_keys time.first
-        @browser.element(:css => 'div.zn:nth-child(5) > div:nth-child(1) > input:nth-child(4)').send_keys time.last
-      elsif day == "Thursday"
-        @browser.element(:css => 'div.zn:nth-child(6) > div:nth-child(1) > div:nth-child(1)').click
-        @list = @browser.element(:css => 'div.zn:nth-child(6) > div:nth-child(1) > div:nth-child(5)')
-        sleep 0.5
-        #@browser.div(:text => 'Thursday').click
-        @list.divs(:class, 'c-X c-Ne')[4].click
-        @browser.element(:css => 'div.zn:nth-child(6) > div:nth-child(1) > input:nth-child(2)').send_keys time.first
-        @browser.element(:css => 'div.zn:nth-child(6) > div:nth-child(1) > input:nth-child(4)').send_keys time.last
-      elsif day == "Friday"
-        @browser.element(:css => 'div.zn:nth-child(7) > div:nth-child(1) > div:nth-child(1)').click
-        @list = @browser.element(:css => 'div.zn:nth-child(7) > div:nth-child(1) > div:nth-child(5)')
-        sleep 0.5
-        #@browser.div(:text => 'Friday').click
-        @list.divs(:class, 'c-X c-Ne')[5].click
-        @browser.element(:css => 'div.zn:nth-child(7) > div:nth-child(1) > input:nth-child(2)').send_keys time.first
-        @browser.element(:css => 'div.zn:nth-child(7) > div:nth-child(1) > input:nth-child(4)').send_keys time.last
-      elsif day == "Saturday"
-        @browser.element(:css => 'div.zn:nth-child(8) > div:nth-child(1) > div:nth-child(1)').click
-        @list = @browser.element(:css => 'div.zn:nth-child(8) > div:nth-child(1) > div:nth-child(5)')
-        sleep 0.5
-        #@browser.div(:text => 'Saturday').click
-        @list.divs(:class, 'c-X c-Ne').last.click
-        @browser.element(:css => 'div.zn:nth-child(8) > div:nth-child(1) > input:nth-child(2)').send_keys time.first
-        @browser.element(:css => 'div.zn:nth-child(8) > div:nth-child(1) > input:nth-child(4)').send_keys time.last
-      end
-    end
-  end
-@browser.element(:css => 'div.on:nth-child(3) > div:nth-child(1)').click  
-sleep 5
-puts "Hours of Operation Set"
-rescue => e
-  unless @retries == 0
-    puts "Error caught in add_hours_1: #{e.inspect}"
-    puts "Retrying in two seconds. #{@retries} attempts remaining."
-    sleep 2
-    @retries -= 1
-    retry
-  else
-    raise "Error in add_hours_1 could not be resolved. Error: #{e.inspect}"
-  end
-end
-
-
-def finish_business_1( data )
-  unless @retries < 3
-    @retries = 3
-  end
-
-  if @browser.text.include? "Verify your account"
-    puts "Google's onto us! Hide!"
-    ## For debug purposes ##
-    @browser.element(:css => '.XShxJc').wait_until_present(300)
-    ########################
-    if @chained
-      self.start("Google/Notify")
-    end
-  end
-
-  @browser.element(:css => '.yid').when_present.click
-
-  add_business_description_1( data )
-
-  sleep 3
-
-  add_business_contact_1( data )
-  
-  sleep 3
-
-  add_hours_1( data )
-
-rescue => e
-  unless @retries == 0
-    puts "Error caught in finish_business_1: #{e.inspect}"
-    puts "Retrying in two seconds. #{@retries} attempts remaining."
-    sleep 2
-    @retries -= 1
-    retry
-  else
-    raise "Error in finish_business_1 could not be resolved. Error: #{e.inspect}"
-  end
-end
-
-def add_business_contact_2( data)
+def add_business_contact( data)
   unless @retries < 3
     @retries = 3
   end
@@ -443,6 +240,7 @@ def add_business_contact_2( data)
   unless data['website'].nil?
     @browser.element(:css => '.vn').when_present.send_keys data['website']
   end
+  @browser.element(:css => '.Fv').send_keys data['email']
   if data['mobile?'] == true then
     @browser.element(:css => '.wc').click
     @browser.element(:css => '.Iv').when_present.send_keys data['mobile']
@@ -454,17 +252,17 @@ def add_business_contact_2( data)
   sleep 3 # Saved
 rescue => e
   unless @retries == 0
-    puts "Error caught in add_business_contact_2: #{e.inspect}"
+    puts "Error caught in add_business_contact: #{e.inspect}"
     puts "Retrying in two seconds. #{@retries} attempts remaining."
     sleep 2
     @retries -= 1
     retry
   else
-    raise "Error in add_business_contact_2 could not be resolved. Error: #{e.inspect}"
+    raise "Error in add_business_contact could not be resolved. Error: #{e.inspect}"
   end
 end
 
-def add_hours_2( data )
+def add_hours( data )
   unless @retries < 3
     @retries = 3
   end
@@ -554,17 +352,17 @@ puts "Hours of Operation Set"
 sleep 3 # Saved
 rescue => e
   unless @retries == 0
-    puts "Error caught in add_hours_2: #{e.inspect}"
+    puts "Error caught in add_hours: #{e.inspect}"
     puts "Retrying in two seconds. #{@retries} attempts remaining."
     sleep 2
     @retries -= 1
     retry
   else
-    raise "Error in add_hours_2 could not be resolved. Error: #{e.inspect}"
+    raise "Error in add_hours could not be resolved. Error: #{e.inspect}"
   end
 end
 
-def add_photos_2( data )
+def add_photos( data )
   unless @retries < 3
     @retries = 3
   end
@@ -604,7 +402,7 @@ def add_photos_2( data )
 
 rescue => e
   unless @retries == 0
-    puts "Error caught in add_photos_2: #{e.inspect}"
+    puts "Error caught in add_photos: #{e.inspect}"
     puts "Retrying in two seconds. #{@retries} attempts remaining."
     sleep 2
     @retries -= 1
@@ -616,7 +414,7 @@ rescue => e
   end
 end
 
-def add_business_description_2( data )
+def add_business_description( data )
   unless @retries < 3
     @retries = 3
   end
@@ -633,46 +431,39 @@ def add_business_description_2( data )
   puts "Description Set"
 rescue => e
   unless @retries == 0
-    puts "Error caught in add_business_description_2: #{e.inspect}"
+    puts "Error caught in add_business_description: #{e.inspect}"
     puts "Retrying in two seconds. #{@retries} attempts remaining."
     sleep 2
     @retries -= 1
     retry
   else
-    raise "Error in add_business_description_2 could not be resolved. Error: #{e.inspect}"
+    raise "Error in add_business_description could not be resolved. Error: #{e.inspect}"
   end
 end
 
-def finish_business_2( data )
+def finish_business( data )
   @browser.element(:css => '.rB').when_present.click
 
-  add_business_contact_2( data )
+  add_business_contact( data )
 
-  add_hours_2( data )
+  add_hours( data )
 
   # Needs RAutomation support
-  add_photos_2( data )
+  #add_photos( data )
 
-  add_business_description_2( data )
+  add_business_description( data )
+
+  sleep 3 # Ensure stuff saves
 
 rescue => e
   unless @retries == 0
-    puts "Error caught in finish_business_2: #{e.inspect}"
+    puts "Error caught in finish_business: #{e.inspect}"
     puts "Retrying in two seconds. #{@retries} attempts remaining."
     sleep 2
     @retries -= 1
     retry
   else
-    raise "Error in finish_business_2 could not be resolved. Error: #{e.inspect}"
-  end
-end
-
-def check_dashboard_type()
-  sleep 5 # Bonus time for elements to load
-  if @browser.element(:css => '.rB').present?
-    return 2
-  elsif @browser.element(:css => '.yid').present?
-    return 1
+    raise "Error in finish_business could not be resolved. Error: #{e.inspect}"
   end
 end
 
@@ -690,12 +481,9 @@ begin
     initial_signup_form( data )
     postcard_verify( data )
     begin
-      if check_dashboard_type() == 1
-        puts "Dashboard Type 1"
-        finish_business_1( data )
-      elsif check_dashboard_type() == 2
-        puts "Dashboard Type 2"
-        finish_business_2( data )
+      sleep 5
+      if @browser.element(:css => '.rB').present?
+        finish_business( data )
       else
         raise InvalidDashboard
       end
@@ -706,7 +494,7 @@ begin
         @retries -= 1
         retry
       else
-        raise "Invalid Dashboard or Dashboard not found!"
+        raise "Dashboard could not be found!"
       end
     end
   end

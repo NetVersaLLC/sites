@@ -143,8 +143,8 @@ if @update == false then
     page = form.click_button(form.button_with(:name => /b_save/))
     if page.body =~ /Logged as/
         puts "[Listing] Added successfully."
-        profile_url = page.link_with(:text=>
-        self.save_account('Cylex',{:email=>data['email'],:password=>data['password'],:listing_url=>page.link_with(:id=>/ctl00_CompanyFeatures_lit_cmp_name/).uri})
+        profile_url = page.link_with(:id=>/ctl00_CompanyFeatures_lit_cmp_name/).href
+        self.save_account('Cylex',{:email=>data['email'],:password=>data['password'],:listing_url=> profile_url})
     else
         throw "Listing did not add successfully."
     end

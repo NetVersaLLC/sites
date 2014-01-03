@@ -65,7 +65,8 @@ def main( data )
 	@browser.link( :id, 'lookupForm:submit').click
 
 	listing_url = @browser.div(:id=>'content_container_solid').link
-	if listing_url.exists?
+	
+	if @browser.text.include? 'We found the following'
 		puts ("Business already added.")
 		self.save_account(:Ziplocal,{:listing_url=>listing_url.href})
 	else

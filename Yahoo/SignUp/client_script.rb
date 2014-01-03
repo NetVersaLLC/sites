@@ -1,4 +1,3 @@
-
 class Runner
   attr_reader :data
 
@@ -199,3 +198,4 @@ runner.main(data)
 data= runner.data
 self.save_account('Yahoo',  {:email => data['username'],:password => data['password']})
 true
+

@@ -4,9 +4,11 @@ def update_listing(data)
   @browser.text_field(:name => 'lookupForm:tel').when_present.set data['phone']
   @browser.div(:class=> 'button_search').click
   30.times{ break if @browser.status == "Done"; sleep 1}
-  if @browser.div(:id=> 'content_container_solid').text.include?(data['business'])
+  listing_link = @browser.div(:id=> 'content_container_solid')
+  if listing_link.text.include?(data['business'])
     puts "Yes business is there"
-    @browser.div(:id=> 'content_container_solid').link(:text => data['business']).click
+    self.save_account(:Ziplocal,{:listing_url=>listing_link.link.href})
+    listing_link.link(:text => data['business']).click
     @browser.link(:text => 'Update or add more information').click
     @browser.text_field( :id, 'listingForm:disp').when_present.set data[ 'business' ]
     @browser.text_field( :id, 'listingForm:web').set data[ 'website' ]

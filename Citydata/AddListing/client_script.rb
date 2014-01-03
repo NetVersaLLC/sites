@@ -38,9 +38,13 @@ end
 @browser.button(:value => 'Add profile').click
 
 sleep 4
-30.times{ break if @browser.status == "Done"; sleep 1}
-30.times { break if (begin @browser.text.include? "Thank you, your profile has been successfully added! It is now live on our site" rescue Selenium::WebDriver::Error::NoSuchElementError end) == true; sleep 1 }
 
-self.save_account("Citydata", {:email => data['email'], :password => data['password']})
+Watir::Wait.until {
+	@browser.text.include? "Thank you, your profile has been successfully added! It is now live on our site"
+}
+
+listing_url = @browser.link(:text=>/here/).href
+
+self.save_account("Citydata", {:email => data['email'], :password => data['password'], :listing_url=>listing_url})
 
 true

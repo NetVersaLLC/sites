@@ -64,8 +64,10 @@ def main( data )
 	@browser.text_field( :id, 'lookupForm:tel').when_present.set data[ 'phone' ]
 	@browser.link( :id, 'lookupForm:submit').click
 
-	if @browser.text.include? data[ 'business' ]
+	listing_url = @browser.div(:id=>'content_container_solid').link
+	if listing_url.exists?
 		puts ("Business already added.")
+		self.save_account(:Ziplocal,{:listing_url=>listing_url.href})
 	else
 		add_business(data)
 	end

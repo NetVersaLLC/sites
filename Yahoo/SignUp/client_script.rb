@@ -16,6 +16,7 @@ class Runner
        input_verification_sms(code)
     end
     try_do :register_business, 3
+  ensure
     @brow.close if @brow
   end
 
@@ -26,7 +27,7 @@ class Runner
   end
 
   def register_business
-    wait_for_page_load
+    wait_for_page_load false
     txt_set({:name        => 'bizemail'}, @data['bizemail'])
     txt_set({:name        => 'bizurl'}, @data['bizurl'])
     @brow.checkbox(:name    => 'tos').set
@@ -40,8 +41,8 @@ class Runner
     @brow.select_list(:name => 'payment').options.each{|op| op.select if @data['payment'].include?(op.value) }
     ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].each do |day|
       @brow.element(:css    =>   "li[data-id='#{day}']").click
-      try_do :select_value, 2, {:class=>'op-time-from'}, @data["#{day}_open"]
-      try_do :select_value, 2, {:class=>'op-time-to'  }, @data["#{day}_close"]
+      try_do :select_value, 3, {:class=>'op-time-from'}, @data["#{day}_open"]
+      try_do :select_value, 3, {:class=>'op-time-to'  }, @data["#{day}_close"]
       @brow.element( :css   =>   "[value='+ Add']").click
     end
     @brow.button(:class     =>   'submit').click
@@ -111,6 +112,7 @@ class Runner
   def select_value selector, val
     @brow.select_list(selector).select_value(val)
     @brow.select_list(selector).send_keys :tab
+    sleep 0.5
     @brow.select_list(selector).selected_options.first.value == val
   end
 

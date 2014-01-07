@@ -5,7 +5,7 @@ class Runner
     @data= data
     @brow = Watir::Browser.new :firefox
     try_do :scan, 3
-    signup
+    try_do :signup, 3
     wait_for_page_load
     if @brow.element(:css => '#timer-message a').exists?
        @brow.element(:css => '#timer-message a').click            
@@ -15,27 +15,27 @@ class Runner
        code = PhoneVerify.retrieve_code("Yahoo")
        input_verification_sms(code)
     end
-    register_business
+    try_do :register_business, 3
     @brow.close if @brow
   end
 
   def input_verification_sms(code)
     wait_for_page_load
-    send_keys({:id => 'verification-code'}, code.to_s)
+    txt_set({:id => 'verification-code'}, code.to_s)
     @brow.button(:type => 'submit').click
   end
 
   def register_business
     wait_for_page_load
-    send_keys({:name        => 'bizemail'}, @data['bizemail'])
-    send_keys({:name        => 'bizurl'}, @data['bizurl'])
+    txt_set({:name        => 'bizemail'}, @data['bizemail'])
+    txt_set({:name        => 'bizurl'}, @data['bizurl'])
     @brow.checkbox(:name    => 'tos').set
     @brow.li(:id            => 'additional').click
-    send_keys({:name        => 'yearestablished'}, @data['yearestablished'])
+    txt_set({:name        => 'yearestablished'}, @data['yearestablished'])
     @brow.radio(:name       => 'workduration', :value => 'DETAILED').set
-    send_keys({:name        => 'addlphone'}, @data['addlphone'])
-    send_keys({:name        => 'toll_free_phone'}, @data['toll_free_phone'])
-    send_keys({:name        => 'fax' }, @data['fax'])
+    txt_set({:name        => 'addlphone'}, @data['addlphone'])
+    txt_set({:name        => 'toll_free_phone'}, @data['toll_free_phone'])
+    txt_set({:name        => 'fax' }, @data['fax'])
     @brow.textarea(:name    => 'products').set @data['products']
     @brow.select_list(:name => 'payment').options.each{|op| op.select if @data['payment'].include?(op.value) }
     ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].each do |day|
@@ -45,18 +45,19 @@ class Runner
       @brow.element( :css   =>   "[value='+ Add']").click
     end
     @brow.button(:class     =>   'submit').click
+    true
   end
 
   def scan
     @brow.goto('http://smallbusiness.yahoo.com/local-listings/sign-up/')
     wait_for_page_load
     @brow.execute_script("jQuery('form[name=\\'msb\\']').trigger('reset');")
-    send_keys( {:id => 'bizname'}, @data['business_name'])
-    send_keys( {:id => 'phone'}, @data[ 'phone' ])
-    send_keys( {:id => 'addr'}, @data[ 'address' ])
-    send_keys( {:id => 'city'}, @data[ 'city' ])
+    txt_set( {:id => 'bizname'}, @data['business_name'])
+    txt_set( {:id => 'phone'}, @data[ 'phone' ])
+    txt_set( {:id => 'addr'}, @data[ 'address' ])
+    txt_set( {:id => 'city'}, @data[ 'city' ])
     try_do :select_value, 2, {:id => 'fstate'}, @data['state' ]
-    send_keys( {:id => 'zip'}, @data[ 'zip' ])
+    txt_set( {:id => 'zip'}, @data[ 'zip' ])
 
     try_do :fill_category, 5
 
@@ -75,6 +76,19 @@ class Runner
     end
     true
   end
+
+  def txt_set(selector, keys)
+    sleep 5 until @brow.text_field(selector).exists?
+    if keys.is_a? String
+      @brow.text_field(selector).clear
+      @brow.text_field(selector).set keys
+    else
+      @brow.text_field(selector).send_keys keys
+    end
+
+    @brow.text_field(selector)
+  end
+
 
   def send_keys(selector, keys)
     sleep 5 until @brow.text_field(selector).exists?
@@ -117,40 +131,44 @@ class Runner
 
   def signup
     wait_for_page_load
-    send_keys({:name=> 'firstname'},       @data['firstname'])
-    send_keys({:name=> 'secondname'},      @data['lastname'])
-
+    txt_set({:name=> 'firstname'},       @data['firstname'])
+    txt_set({:name=> 'secondname'},      @data['lastname'])
+    
     try_do :make_yahoo_id, 3
 
-    send_keys({:name=> 'password'},        @data['password'])
-    send_keys({:name=> 'mobileNumber'},    @data['mobile'])
+    txt_set({:name=> 'password'},        @data['password'])
+    txt_set({:name=> 'mobileNumber'},    @data['mobile'])
     try_do :select_value, 2, {:id=> 'year'},  @data['birthday'][0..3].to_s
     try_do :select_value, 2, {:id=> 'month'}, @data['birthday'][5..6].to_i.to_s
     try_do :select_value, 2, {:id=> 'day'},   @data['birthday'][8..9].to_i.to_s
     @brow.radio(:name=> 'gender',:value => @data['gender']).set
     @brow.button(:type => 'submit').click
+    true
   end
 
   def make_yahoo_id
-    wait_for_page_load false
     i=0
     until @brow.execute_script("return jQuery('#suggestions li').length;") >= 1
-      sleep 1 if i<5
+      if i<5 
+        sleep 1 
+      else
+        break
+      end
       i+=1
     end
     ids= @brow.execute_script <<-JS
      return jQuery('#suggestions li').map(function(){return jQuery(this).text();}).get();
     JS
     @data['username']= (ids.empty? ? nil : ids[0]) || (@data['username']+(rand(2**15)%941).to_s)
-    send_keys({:name=> 'yahooid'}, @data['username'])
-    send_keys({:name=> 'yahooid'}, :tab)
+    txt_set({:name=> 'yahooid'}, @data['username'])
+    txt_set({:name=> 'yahooid'}, :tab)
     wait_for_page_load false
     @brow.p(:id => 'user-name-validation-message').text.strip == ""
   end
 
   def phone_verify
     wait_for_page_load
-    send_keys({:id => 'mobile'}, @data['verification_mobile'])
+    txt_set({:id => 'mobile'}, @data['verification_mobile'])
     @brow.execute_script <<-script
       return jQuery('#country-code option:first')
                .attr('value', '#{@data['verification_country_code']}')
@@ -178,16 +196,17 @@ class Runner
     rescue Exception => e
       retries+=1
       retry if retries< n
-      puts  "exhauseted on retries in #{func} due to #{e}"
-      raise "exhauseted on retries in #{func} due to #{e}"
+      puts  "exhauseted on retries in #{func} due to \n'#{e}'"
+      raise "exhauseted on retries in #{func} due to \n'#{e}'"
     end
   end
 
   def inject_jquery
-    @brow.execute_script <<-JS
-      (function(){var el=document.createElement('div'),b=document.getElementsByTagName('body')[0],otherlib=false,msg='';el.style.position='fixed';el.style.height='32px';el.style.width='220px';el.style.marginLeft='-110px';el.style.top='0';el.style.left='50%';el.style.padding='5px 10px';el.style.zIndex=1001;el.style.fontSize='12px';el.style.color='#222';el.style.backgroundColor='#f99';if(typeof jQuery!='undefined'){msg='This page already using jQuery v'+jQuery.fn.jquery;return showMsg()}else if(typeof $=='function'){otherlib=true}function getScript(url,success){var script=document.createElement('script');script.src=url;var head=document.getElementsByTagName('head')[0],done=false;script.onload=script.onreadystatechange=function(){if(!done&&(!this.readyState||this.readyState=='loaded'||this.readyState=='complete')){done=true;success();script.onload=script.onreadystatechange=null;head.removeChild(script)}};head.appendChild(script)}getScript('https://code.jquery.com/jquery.min.js',function(){if(typeof jQuery=='undefined'){msg='Sorry, but jQuery wasnt able to load'}else{msg='This page is now jQuerified with v'+jQuery.fn.jquery;if(otherlib){msg+=' and noConflict(). Use $jq(), not $().'}}return showMsg()});function showMsg(){el.innerHTML=msg;b.appendChild(el);window.setTimeout(function(){if(typeof jQuery=='undefined'){b.removeChild(el)}else{jQuery(el).fadeOut('slow',function(){jQuery(this).remove()});if(otherlib){$jq=jQuery.noConflict()}}},2500)}})();
-    JS
     until @brow.execute_script('return !!window.jQuery')
+      @brow.execute_script <<-JS
+        (function(){var el=document.createElement('div'),b=document.getElementsByTagName('body')[0],otherlib=false,msg='';el.style.position='fixed';el.style.height='32px';el.style.width='220px';el.style.marginLeft='-110px';el.style.top='0';el.style.left='50%';el.style.padding='5px 10px';el.style.zIndex=1001;el.style.fontSize='12px';el.style.color='#222';el.style.backgroundColor='#f99';if(typeof jQuery!='undefined'){msg='This page already using jQuery v'+jQuery.fn.jquery;return showMsg()}else if(typeof $=='function'){otherlib=true}function getScript(url,success){var script=document.createElement('script');script.src=url;var head=document.getElementsByTagName('head')[0],done=false;script.onload=script.onreadystatechange=function(){if(!done&&(!this.readyState||this.readyState=='loaded'||this.readyState=='complete')){done=true;success();script.onload=script.onreadystatechange=null;head.removeChild(script)}};head.appendChild(script)}getScript('https://code.jquery.com/jquery.min.js',function(){if(typeof jQuery=='undefined'){msg='Sorry, but jQuery wasnt able to load'}else{msg='This page is now jQuerified with v'+jQuery.fn.jquery;if(otherlib){msg+=' and noConflict(). Use $jq(), not $().'}}return showMsg()});function showMsg(){el.innerHTML=msg;b.appendChild(el);window.setTimeout(function(){if(typeof jQuery=='undefined'){b.removeChild(el)}else{jQuery(el).fadeOut('slow',function(){jQuery(this).remove()});if(otherlib){$jq=jQuery.noConflict()}}},2500)}})();
+        JS
+    
       sleep 1
     end
   end
@@ -198,4 +217,3 @@ runner.main(data)
 data= runner.data
 self.save_account('Yahoo',  {:email => data['username'],:password => data['password']})
 true
-

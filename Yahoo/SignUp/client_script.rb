@@ -39,12 +39,12 @@ class Runner
     txt_set({:name        => 'fax' }, @data['fax'])
     @brow.textarea(:name    => 'products').set @data['products']
     @brow.select_list(:name => 'payment').options.each{|op| op.select if @data['payment'].include?(op.value) }
-    ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].each do |day|
-      @brow.element(:css    =>   "li[data-id='#{day}']").click
-      try_do :select_value, 3, {:class=>'op-time-from'}, @data["#{day}_open"]
-      try_do :select_value, 3, {:class=>'op-time-to'  }, @data["#{day}_close"]
-      @brow.element( :css   =>   "[value='+ Add']").click
-    end
+    # ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].each do |day|
+    #   @brow.element(:css    =>   "li[data-id='#{day}']").click
+    #   try_do :select_value, 3, {:class=>'op-time-from'}, @data["#{day}_open"]
+    #   try_do :select_value, 3, {:class=>'op-time-to'  }, @data["#{day}_close"]
+    #   @brow.element( :css   =>   "[value='+ Add']").click
+    # end
     @brow.button(:class     =>   'submit').click
     true
   end

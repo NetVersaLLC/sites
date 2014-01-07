@@ -60,7 +60,7 @@ class Runner
     try_do :select_value, 2, {:id => 'fstate'}, @data['state' ]
     txt_set( {:id => 'zip'}, @data[ 'zip' ])
 
-    try_do :fill_category, 5
+    try_do :fill_category, 2
 
     @brow.button(:id=> 'scannow').click
     @brow.elements(:css => "div[id*='err']").

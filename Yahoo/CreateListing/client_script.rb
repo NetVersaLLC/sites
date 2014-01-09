@@ -1,181 +1,147 @@
-require 'cgi'
+class Runner
+  attr_reader :data, :business_existed
 
-
-
-def goto_sign_up(data)
-  @browser.goto( 'http://smallbusiness.yahoo.com/local-listings/basic-listing/' )
-  sleep 2
-  @browser.link( :text => 'Sign up now' ).when_present.click
-  #sleep 2
-  #@browser.text_field(:id, 'username').when_present.set data['email']
-  #@browser.text_field(:id, 'passwd').set data['password']
-  sleep 4
-  #@browser.button(:id, '.save').click
-
-end
-
-
-def preview_and_submit( business )
-  puts 'Preview and close'
-  @browser.button( :id => 'preview-bottom-btn' ).click
-  sleep 10
-  Watir::Wait::until do @browser.button( :id => 'prcloser' ).exists? end
-  @browser.button( :id => 'prcloser' ).click
-
-  # require "deathbycaptcha"
-  puts 'Submit the business'
-sleep(2)
-retry_captcha2(business)
-sleep(2)
-
-Watir::Wait.until { @browser.text.include? 'Congratulations' }
-
-  if @browser.text.include? 'Congratulations' # 'Pending Verification', 'Get a Verification Code'
-    puts 'Congratulations, Yahoo! Local Listing Id: ' + @browser.label( :id => 'lc-listIdLabel' ).text
-  else
-    raise StandardError.new( "Problem to submit the business info!" )
-  end
-end
-
-def provide_business_info( business )
-  # Provide Your Business Information
-  @browser.text_field( :id => 'bizname' ).set business[ 'business_name' ]
-  @browser.text_field( :id => 'addr' ).set business[ 'business_address' ]
-   #@browser.text_field( :id => 'city' ).set business[ 'business_city' ]
-   #@browser.select_list( :id => 'state' ).select business[ 'business_state' ]
-  @browser.text_field( :id => 'zip' ).set business[ 'business_zip' ]
-  @browser.text_field( :id => 'phone' ).set business[ 'business_phone' ]
-  @browser.text_field(:id => 'acseccat1').set business['business_category']
-  sleep 2
-  Watir::Wait.until{@browser.li(:text => /#{business['business_category']}/).exists?}
-  @browser.li(:text => /#{business['business_category']}/).click
-
-  sleep 2
-  @browser.button(:id => 'scannow').click
-  sleep 2
-
-  Watir::Wait.until { @browser.button(:id => 'not-listed-button').exists? or @browser.checkbox(:name => 'tos').exists?}
-
-  if @browser.button(:id => 'not-listed-button').exists?
-    @browser.button(:id => 'not-listed-button').click
-  end
-
-#@browser.text_field(:name => 'accphone').set business['phone']
-  sleep 2
-  @browser.checkbox(:name => 'tos').when_present.click
-  sleep 2
-  @browser.button(:text => 'Submit information').click
-
-  sleep 2
-
-  @browser.radio(:id => 'opt-phone').when_present.click
-  sleep 2
-  @browser.button(:id => 'btn-phone').when_present.click
-  code = PhoneVerify.retrieve_code("Yahoo")
-  @browser.text_field(:id => 'txtCaptcha').set code
-  sleep 4
-  @browser.button(:id => 'btnverifychannel').click
-  sleep 5
-
-  if @browser.text.include? "The verification code you submitted was incorrect. Please enter the new verification code."
-    throw "Phone code was incorrect"
-  end
-
-sleep 2
-Watir::Wait.until {@browser.text.include? "Your Yahoo! Marketing Dashboard is ready for you to use, and your business information is being reviewed by Yahoo! Local."}
-
-true
-#preview_and_submit(business)
-  
-=begin
-  @browser.text_field( :id => 'cfirstname' ).when_present.set business[ 'first_name' ]
-  @browser.text_field( :id => 'clastname' ).set business[ 'last_name' ]
-  @browser.text_field( :id => 'email' ).set business[ 'email' ]
-  @browser.text_field( :id => 'phone' ).set business[ 'phone' ]
-
-  # Business Information
-  @browser.text_field( :id => 'coEmail' ).set business[ 'business_email' ]
- 
- 
-
-    # .. fill all the info because its blank
-    # TODO: add website @browser.text_field( :id => '?' ).set business[ 'business_website' ]
-
+  def main(data)
+    @data= data
+    @brow = Watir::Browser.new :firefox
+    try_do :login, 3
+    try_do :scan, 5
     
-      @browser.text_field( :id => 'acseccat1' ).send_keys business[ 'business_category' ]
-      
-    sleep 2  
-    Watir::Wait.until { @browser.p( :class => 'autocomplete-row-margins' ).exists? }
-    @browser.send_keys :enter
-    #@browser.div( :id => 'add-category-row-1' ).click # add the category to test it
-
-    @browser.button( :id => 'submitbtn' ).click
-
-    sleep(3)
-    Watir::Wait::until do @browser.text.include? 'Optional Business Information' end
-=end
-
-
-
-end
-=begin
-  # Optional Business Information
-  @browser.h3( :id => 'operationhours-collapsed' ).click
-  sleep(2)
-  @browser.radio(:id => 'hoo-detailed').click
-sleep(2)
-  hours = business['hours']
-
-  hours.each_pair do |thing, thang|
-
-    #puts(thing + " " + thang)
-
-    theday = thing[0..2]
-    if thang.to_s == "closed"
-      @browser.select_list(:id => theday+'0').select "Closed"
-      @browser.select_list(:id => theday+'1').select "Closed"
+    if @brow.url.include?("config/login") #business_not_exists 
+      txt_set({:id=> 'passwd'}, @data['yahoo_password'])
+      @brow.button(:id=> '.save').click
+      Watir::Wait.while{ @brow.text_field(:id => 'passwd').exists? }
+      try_do :register_business, 3
+    elsif
+      try_do :register_business, 3
     else
+      #calimlisting
+    end
+  ensure
+    @brow.close if @brow
+  end
 
-        openHour = thang['open']
-        closeHour = thang['close']
-        if openHour[0,1] == "0"
-          openHour = openHour[1..-1]
-        end
-        if closeHour[0,1] == "0"
-          closeHour = closeHour[1..-1]
-        end     
+  def login
+    signin_url=    'https://login.yahoo.com/config/login?.src=smbiz&.intl=us&.lang=en-US&.done=http://smallbusiness.yahoo.com/local-listings/sign-up/'
+    @brow.goto signin_url
+    ########################
+    txt_set({:id=> 'username'}, @data['yahoo_username'])
+    txt_set({:id=> 'passwd'}, @data['yahoo_password'])
+    @brow.button(:id=> '.save').click
+    Watir::Wait.while{ @brow.text_field(:id => 'username').exists? }
+    true
+  end
+  
+  def scan
+    wait_for_page_load
+    txt_set( {:id => 'bizname'}, @data['business_name'])
+    txt_set( {:id => 'phone'}, @data[ 'phone' ])
+    txt_set( {:id => 'addr'}, @data[ 'address' ])
+    txt_set( {:id => 'city'}, @data[ 'city' ])
+    try_do :select_value, 2, {:id => 'fstate'}, @data['state' ]
+    txt_set( {:id => 'zip'}, @data[ 'zip' ])
 
-      @browser.select_list(:id => theday+'0').select openHour
-      @browser.select_list(:id => theday+'1').select closeHour
+    try_do :fill_category, 1
 
+    @brow.button(:id=> 'scannow').click
+    @brow.elements(:css => "div[id*='err']").
+        select{|e| e.visible?}.
+        each{|e| puts "#{e.id}: #{e.text}"}
+    true
+  end
+
+  def register_business
+    wait_for_page_load
+    txt_set({:name        => 'bizemail'}, @data['bizemail'])
+    txt_set({:name        => 'bizurl'}, @data['bizurl'])
+    @brow.checkbox(:name    => 'tos').set
+    @brow.li(:id            => 'additional').click
+    txt_set({:name        => 'yearestablished'}, @data['yearestablished'])
+    @brow.radio(:name       => 'workduration', :value => 'DETAILED').set
+    txt_set({:name        => 'addlphone'}, @data['addlphone'])
+    txt_set({:name        => 'toll_free_phone'}, @data['toll_free_phone'])
+    txt_set({:name        => 'fax' }, @data['fax'])
+    @brow.textarea(:name    => 'products').set @data['products']
+    @brow.select(:name => 'payment').options.each{|op| op.select if @data['payment'].include?(op.value) }
+    ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].each do |day|
+      @brow.element(:css    =>   "li[data-id='#{day}']").click
+      try_do :select_value, 3, {:class=>'op-time-from'}, @data["#{day}_open"]
+      try_do :select_value, 3, {:class=>'op-time-to'  }, @data["#{day}_close"]
+      @brow.element( :css   =>   "[value='+ Add']").click
+    end
+    url= @brow.url
+    @brow.button(:class     =>   'submit').click
+    Watir::Wait.while{ @brow.url == url }
+    wait_for_page_load
+    data['listing_url']= @brow.url
+    true
+  end
+
+  def fill_category
+    i=0
+    @brow.text_field(:id => 'acseccat1').clear
+    @data['category'].each_char do |char|
+      @brow.text_field(:id => 'acseccat1').send_keys char
+      i+=1
+      sleep 2 if i > 3
+      if @brow.lis(:class=> 'yui3-aclist-item').count > 0 and i >= 5
+        @brow.lis(:class=> 'yui3-aclist-item').first.click
+        return true
+      end
+    end
+    false
+  end
+
+  def txt_set(selector, keys)
+    keys.is_a?(String) ? @brow.text_field(selector).set(keys) : 
+      @brow.text_field(selector).send_keys(keys)
+    true
+  end
+
+  def send_keys(selector, keys)
+    if keys.is_a? String
+      @brow.text_field(selector).clear
+      keys.each_char{ |char| @brow.text_field(selector).send_keys(char) }
+    else
+      @brow.text_field(selector).send_keys(keys)
     end
   end
 
-
-  # Primary Category and details
-  # @browser.text_field( :id => 'fax' ).set business[ 'fax_number' ]
-  sleep(2)
-  if @browser.h3( :id => 'otheroperationdetails-collapsed' ).exists?
-        @browser.h3( :id => 'otheroperationdetails-collapsed' ).click
-
-    @browser.text_field(:id => "established").set business['founded']
-
-    business[ 'payment_methods' ].each{ | method |
-            @browser.select_list( :id => 'payment' ).select method
-    }
-
+  def select_value selector, val
+    option= @brow.select(selector).option(:value=> val)
+    @brow.execute_script("return arguments[0].selected= 'selected'", option)
+    Watir::Wait.until{ 
+      @brow.select(selector).value == val 
+    } 
+    true
   end
+
+  def wait_for_page_load
+    until @brow.execute_script("return document.readyState == 'complete';")
+      sleep 1
+    end
+  end
+
+  def try_do func, n, *args
+    retries= 0
+    begin
+      if result= self.send(func, *args)
+        return result
+      end
+      puts  "retrying #{func}"
+      raise "retrying #{func}"
+    rescue Exception => e
+      retries+=1
+      retry if retries< n
+      puts  "exhauseted on retries in #{func} due to \n'#{e}'"
+      raise "exhauseted on retries in #{func} due to \n'#{e}'"
+    end
+  end
+
 end
 
-=end
-
-def main( business )
-  sign_in(business)
-
-  goto_sign_up(business)
-  provide_business_info( business )
-end
-
-main(data)
-
+runner= Runner.new
+runner.main(data)
+data= runner.data
+self.save_account('Yahoo',  {:listing_url => data['listing_url']})
 true

@@ -368,7 +368,7 @@ else
 	raise "Business not found!"
 end
 if @chained
-  self.start("Google/Notify")
+  self.start("Google/ClaimNotify")
 end
 puts "Done"
 self.success

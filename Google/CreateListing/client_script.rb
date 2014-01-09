@@ -130,8 +130,9 @@ def search_business( data )
     sleep(3)
   end
 
-  if @browser.element(:css => '.b-U-yd').present?
-    @browser.element(:css => '.b-U-yd').click
+  if @browser.element(:css => '.Am').present?
+    @browser.element(:css => '.b-U-N').click
+    @browser.element(:css => '.bu').click
     @browser.element(:css => '.Am').click
   end
   

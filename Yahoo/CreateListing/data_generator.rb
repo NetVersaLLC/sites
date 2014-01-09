@@ -54,7 +54,7 @@ data['country_code']    = '1'
 data['country']         = 'us'
 data['verification_country_code']    = '1'
 data['verification_country']         = 'us'
-credentials= Yahoo.where(:business_id=> 644).first
+credentials= Yahoo.where(:business_id=> business.id).first
 data['yahoo_username']         = credentials.email
 data['yahoo_password']         = credentials.password
 data

@@ -1,5 +1,5 @@
 class Runner
-  attr_reader :data, :business_existed
+  attr_reader :data
 
   def main(data)
     @data= data
@@ -12,8 +12,10 @@ class Runner
       @brow.button(:id=> '.save').click
       Watir::Wait.while{ @brow.text_field(:id => 'passwd').exists? }
       try_do :register_business, 3
+      send_postal_mail
     elsif
       try_do :register_business, 3
+      send_postal_mail
     else
       #calimlisting
     end
@@ -75,7 +77,15 @@ class Runner
     @brow.button(:class     =>   'submit').click
     Watir::Wait.while{ @brow.url == url }
     wait_for_page_load
-    data['listing_url']= @brow.url
+    puts @brow.url
+    true
+  end
+  
+  def send_postal_mail
+    wait_for_page_load
+    @brow.radio(:id=> 'opt-postcard').set
+    @brow.button(:id=> 'btn-postcard').when_present.click
+    Watir::Wait.until{ @brow.a(:id=> 'mybiz-link').present? }
     true
   end
 
@@ -101,6 +111,7 @@ class Runner
   end
 
   def send_keys(selector, keys)
+    sleep 1
     if keys.is_a? String
       @brow.text_field(selector).clear
       keys.each_char{ |char| @brow.text_field(selector).send_keys(char) }
@@ -119,9 +130,7 @@ class Runner
   end
 
   def wait_for_page_load
-    until @brow.execute_script("return document.readyState == 'complete';")
-      sleep 1
-    end
+    Watir::Wait.until{ @brow.execute_script("return document.readyState == 'complete';")}
   end
 
   def try_do func, n, *args
@@ -135,8 +144,9 @@ class Runner
     rescue Exception => e
       retries+=1
       retry if retries< n
-      puts  "exhauseted on retries in #{func} due to \n'#{e}'"
-      raise "exhauseted on retries in #{func} due to \n'#{e}'"
+      msg= "exhauseted on retries in #{func} due to \n'#{e}'"
+      puts msg 
+      raise msg
     end
   end
 
@@ -145,5 +155,4 @@ end
 runner= Runner.new
 runner.main(data)
 data= runner.data
-self.save_account('Yahoo',  {:listing_url => data['listing_url']})
 true

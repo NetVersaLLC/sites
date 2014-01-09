@@ -111,9 +111,7 @@ class Runner
   end
 
   def wait_for_page_load
-    until @brow.execute_script("return document.readyState == 'complete';")
-      sleep 1
-    end
+    Watir::Wait.until{ @brow.execute_script("return document.readyState == 'complete';")}
   end
 
   def try_do func, n, *args

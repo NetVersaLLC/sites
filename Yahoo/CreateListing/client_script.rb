@@ -38,17 +38,11 @@ class Runner
       @brow.goto 'http://smallbusiness.yahoo.com/local-listings/sign-up/' 
     end
     send_keys( {:id => 'bizname'}, @data['business_name'])
-    sleep 1
     send_keys( {:id => 'phone'}, @data[ 'phone' ])
-    sleep 1
     send_keys( {:id => 'addr'}, @data[ 'address' ])
-    sleep 1
     send_keys( {:id => 'city'}, @data[ 'city' ])
-    sleep 1    
     try_do :select_value, 2, {:id => 'fstate'}, @data['state' ]
-    sleep 1
     send_keys( {:id => 'zip'}, @data[ 'zip' ])
-    sleep 1
     try_do :fill_category, 1
 
     @brow.button(:id=> 'scannow').click

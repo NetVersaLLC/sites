@@ -8,8 +8,8 @@ data['category'] = YahooCategory.find(catty.category_id).name
   open=    business.send("#{day}_open".to_sym)
   close=   business.send("#{day}_close".to_sym)
   if enabled
-    data["#{day[0..2]}_open"]=  open.starts_with?('0') ? open.downcase[1..-1] : open.downcase
-    data["#{day[0..2]}_close"]= close.starts_with?('0') ? close.downcase[1..-1] : close.downcase
+    data["#{day[0..2]}_open"]=  (open.starts_with?('0') ? open.downcase[1..-1] : open.downcase).gsub(/0([ap])m/, '0 \1m')
+    data["#{day[0..2]}_close"]= (close.starts_with?('0') ? close.downcase[1..-1] : close.downcase).gsub(/0([ap])m/, '0 \1m')
   else
     data["#{day[0..2]}_open"]=  'Closed'
     data["#{day[0..2]}_close"]= 'Closed'

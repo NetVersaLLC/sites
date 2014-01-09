@@ -34,13 +34,21 @@ class Runner
   
   def scan
     wait_for_page_load
-    txt_set( {:id => 'bizname'}, @data['business_name'])
-    txt_set( {:id => 'phone'}, @data[ 'phone' ])
-    txt_set( {:id => 'addr'}, @data[ 'address' ])
-    txt_set( {:id => 'city'}, @data[ 'city' ])
+    if @brow.text_field(:id => 'bizname').value != ''
+      @brow.goto 'http://smallbusiness.yahoo.com/local-listings/sign-up/' 
+    end
+    send_keys( {:id => 'bizname'}, @data['business_name'])
+    sleep 1
+    send_keys( {:id => 'phone'}, @data[ 'phone' ])
+    sleep 1
+    send_keys( {:id => 'addr'}, @data[ 'address' ])
+    sleep 1
+    send_keys( {:id => 'city'}, @data[ 'city' ])
+    sleep 1    
     try_do :select_value, 2, {:id => 'fstate'}, @data['state' ]
-    txt_set( {:id => 'zip'}, @data[ 'zip' ])
-
+    sleep 1
+    send_keys( {:id => 'zip'}, @data[ 'zip' ])
+    sleep 1
     try_do :fill_category, 1
 
     @brow.button(:id=> 'scannow').click

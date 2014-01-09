@@ -4,18 +4,22 @@ class Runner
   def main(data)
     @data= data
     @brow = Watir::Browser.new :firefox
-    try_do :scan, 3
     try_do :signup, 3
     wait_for_page_load
     if @brow.element(:css => '#timer-message a').exists?
        @brow.element(:css => '#timer-message a').click            
        wait_for_page_load       
-    else
-       phone_verify
-       code = PhoneVerify.retrieve_code("Yahoo")
-       input_verification_sms(code)
+    else 
+      if @brow.element(:id=> 'captchaV5Answer').exists?
+        try_do :enter_captcha, 3
+        wait_for_page_load
+      end      
+      if @brow.element(:id => 'mobile').exists?
+        phone_verify
+        code = PhoneVerify.retrieve_code("Yahoo")
+        input_verification_sms(code)
+      end
     end
-    try_do :register_business, 3
   ensure
     @brow.close if @brow
   end
@@ -25,166 +29,91 @@ class Runner
     txt_set({:id => 'verification-code'}, code.to_s)
     @brow.button(:type => 'submit').click
   end
-
-  def register_business
-    wait_for_page_load false
-    txt_set({:name        => 'bizemail'}, @data['bizemail'])
-    txt_set({:name        => 'bizurl'}, @data['bizurl'])
-    @brow.checkbox(:name    => 'tos').set
-    @brow.li(:id            => 'additional').click
-    txt_set({:name        => 'yearestablished'}, @data['yearestablished'])
-    @brow.radio(:name       => 'workduration', :value => 'DETAILED').set
-    txt_set({:name        => 'addlphone'}, @data['addlphone'])
-    txt_set({:name        => 'toll_free_phone'}, @data['toll_free_phone'])
-    txt_set({:name        => 'fax' }, @data['fax'])
-    @brow.textarea(:name    => 'products').set @data['products']
-    @brow.select_list(:name => 'payment').options.each{|op| op.select if @data['payment'].include?(op.value) }
-    # ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].each do |day|
-    #   @brow.element(:css    =>   "li[data-id='#{day}']").click
-    #   try_do :select_value, 3, {:class=>'op-time-from'}, @data["#{day}_open"]
-    #   try_do :select_value, 3, {:class=>'op-time-to'  }, @data["#{day}_close"]
-    #   @brow.element( :css   =>   "[value='+ Add']").click
-    # end
-    @brow.button(:class     =>   'submit').click
-    true
-  end
-
-  def scan
-    @brow.goto('http://smallbusiness.yahoo.com/local-listings/sign-up/')
-    wait_for_page_load
-    @brow.execute_script("jQuery('form[name=\\'msb\\']').trigger('reset');")
-    txt_set( {:id => 'bizname'}, @data['business_name'])
-    txt_set( {:id => 'phone'}, @data[ 'phone' ])
-    txt_set( {:id => 'addr'}, @data[ 'address' ])
-    txt_set( {:id => 'city'}, @data[ 'city' ])
-    try_do :select_value, 2, {:id => 'fstate'}, @data['state' ]
-    txt_set( {:id => 'zip'}, @data[ 'zip' ])
-
-    try_do :fill_category, 2
-
-    @brow.button(:id=> 'scannow').click
-    @brow.elements(:css => "div[id*='err']").
-        select{|e| e.visible?}.
-        each{|e| puts "#{e.id}: #{e.text}"}
-    #if redirect to signup
-    if true
-      wait_for_page_load
-      @brow.a(:id=> 'signUpBtn').wait_until_present(20)
-      @brow.a(:id=> 'signUpBtn').click
-      #if redirec to claim listing
-    else
-
-    end
-    true
-  end
-
-  def txt_set(selector, keys)
-    sleep 5 until @brow.text_field(selector).exists?
-    if keys.is_a? String
-      @brow.text_field(selector).clear
-      @brow.text_field(selector).set keys
-    else
-      @brow.text_field(selector).send_keys keys
-    end
-
-    @brow.text_field(selector)
-  end
-
-
-  def send_keys(selector, keys)
-    sleep 5 until @brow.text_field(selector).exists?
-    if keys.is_a? String
-      @brow.text_field(selector).clear
-      keys.each_char do |char|
-        @brow.text_field(selector).send_keys char
-        sleep 0.1
-      end
-    else
-      @brow.text_field(selector).send_keys keys
-    end
-
-    @brow.text_field(selector).send_keys :tab
-
-    @brow.text_field(selector)
-  end
-
-
-  def select_value selector, val
-    @brow.select_list(selector).select_value(val)
-    @brow.select_list(selector).send_keys :tab
-    sleep 0.5
-    @brow.select_list(selector).selected_options.first.value == val
-  end
-
-  def fill_category
-    i=0
-    @brow.text_field(:id => 'acseccat1').clear
-    @data['category'].each_char do |char|
-      @brow.text_field(:id => 'acseccat1').send_keys char
-      i+=1
-      sleep 2 if i > 3
-      if @brow.lis(:class=> 'yui3-aclist-item').count > 0 and i >= 5
-        @brow.lis(:class=> 'yui3-aclist-item').first.click
-        return true
-      end
-    end
-    false
-  end
-
+  
   def signup
+    signup_url= "https://edit.yahoo.com/registration"
+    @brow.goto signup_url
     wait_for_page_load
-    txt_set({:name=> 'firstname'},       @data['firstname'])
-    txt_set({:name=> 'secondname'},      @data['lastname'])
+    txt_set({:name=> 'firstname'},            @data['firstname'])
+    txt_set({:name=> 'secondname'},           @data['lastname'])
     
     try_do :make_yahoo_id, 3
 
-    txt_set({:name=> 'password'},        @data['password'])
-    txt_set({:name=> 'mobileNumber'},    @data['mobile'])
-    try_do :select_value, 2, {:id=> 'year'},  @data['birthday'][0..3].to_s
-    try_do :select_value, 2, {:id=> 'month'}, @data['birthday'][5..6].to_i.to_s
-    try_do :select_value, 2, {:id=> 'day'},   @data['birthday'][8..9].to_i.to_s
-    @brow.radio(:name=> 'gender',:value => @data['gender']).set
+    txt_set({:name=> 'password'},             @data['password'])
+    txt_set({:name=> 'mobileNumber'},         @data['mobile'])
+    try_do :select_value, 3, {:id=> 'year'},  @data['birthday'][0..3].to_s
+    try_do :select_value, 3, {:id=> 'month'}, @data['birthday'][5..6].to_i.to_s
+    try_do :select_value, 3, {:id=> 'day'},   @data['birthday'][8..9].to_i.to_s
+    @brow.radio(:name=> 'gender',:value =>    @data['gender']).set
+    
     @brow.button(:type => 'submit').click
+    Watir::Wait.while { @brow.text_field(:name=> 'firstname').exists? }
     true
   end
 
   def make_yahoo_id
-    i=0
-    until @brow.execute_script("return jQuery('#suggestions li').length;") >= 1
-      if i<5 
-        sleep 1 
-      else
-        break
-      end
-      i+=1
-    end
-    ids= @brow.execute_script <<-JS
-     return jQuery('#suggestions li').map(function(){return jQuery(this).text();}).get();
-    JS
-    @data['username']= (ids.empty? ? nil : ids[0]) || (@data['username']+(rand(2**15)%941).to_s)
-    txt_set({:name=> 'yahooid'}, @data['username'])
-    txt_set({:name=> 'yahooid'}, :tab)
-    wait_for_page_load false
-    @brow.p(:id => 'user-name-validation-message').text.strip == ""
+    username= @data['username']+(rand(2**20)%941).to_s
+    txt_set({:name=> 'yahooid'}, username)    
+    sleep 3
+    Watir::Wait.until{ @brow.p(:id => 'user-name-validation-message').text.strip == "" }
+    @data['yahoo_username']= username
+    true
+  end
+
+  def solve_captcha
+    image = "#{ENV['USERPROFILE']}\\citation\\yahoo1_captcha.png"
+    obj = @brow.img(:class, 'captchaImage' )
+    puts "CAPTCHA source: #{obj.src}"
+    puts "CAPTCHA width: #{obj.width}"
+    obj.save image
+    return CAPTCHA.solve(image, :manual)
+  rescue Exception => e
+      puts(e.inspect)
+  end
+
+  def enter_captcha
+    captcha_code = solve_captcha 
+    @brow.text_field(:id=> 'captchaV5Answer').set captcha_code
+    sleep(5)
+    @brow.button(:type=> 'submit').click
+    sleep 15
+    return (not @brow.text_field(:id=> 'captchaV5Answer').exists?)
   end
 
   def phone_verify
     wait_for_page_load
     txt_set({:id => 'mobile'}, @data['verification_mobile'])
-    @brow.execute_script <<-script
-      return jQuery('#country-code option:first')
-               .attr('value', '#{@data['verification_country_code']}')
-               .attr('data-country-code', '#{@data['verification_country']}')
-               .attr('selected', 'selected').val();
-    script
     @brow.button(:type => 'submit').click
   end
 
-  def wait_for_page_load with_jquery= true
+  def txt_set(selector, keys)
+    keys.is_a?(String) ? @brow.text_field(selector).set(keys) : 
+      @brow.text_field(selector).send_keys(keys)
+    true
+  end
+
+  def send_keys(selector, keys)
+    if keys.is_a? String
+      @brow.text_field(selector).clear
+      keys.each_char{ |char| @brow.text_field(selector).send_keys(char) }
+    else
+      @brow.text_field(selector).send_keys(keys)
+    end
+  end
+
+  def select_value selector, val
+    option= @brow.select(selector).option(:value=> val)
+    @brow.execute_script("return arguments[0].selected= 'selected'", option)
+    Watir::Wait.until{ 
+      @brow.select(selector).value == val 
+    } 
+    true
+  end
+
+  def wait_for_page_load
     until @brow.execute_script("return document.readyState == 'complete';")
       sleep 1
     end
-    inject_jquery if with_jquery
   end
 
   def try_do func, n, *args
@@ -202,20 +131,14 @@ class Runner
       raise "exhauseted on retries in #{func} due to \n'#{e}'"
     end
   end
-
-  def inject_jquery
-    until @brow.execute_script('return !!window.jQuery')
-      @brow.execute_script <<-JS
-        (function(){var el=document.createElement('div'),b=document.getElementsByTagName('body')[0],otherlib=false,msg='';el.style.position='fixed';el.style.height='32px';el.style.width='220px';el.style.marginLeft='-110px';el.style.top='0';el.style.left='50%';el.style.padding='5px 10px';el.style.zIndex=1001;el.style.fontSize='12px';el.style.color='#222';el.style.backgroundColor='#f99';if(typeof jQuery!='undefined'){msg='This page already using jQuery v'+jQuery.fn.jquery;return showMsg()}else if(typeof $=='function'){otherlib=true}function getScript(url,success){var script=document.createElement('script');script.src=url;var head=document.getElementsByTagName('head')[0],done=false;script.onload=script.onreadystatechange=function(){if(!done&&(!this.readyState||this.readyState=='loaded'||this.readyState=='complete')){done=true;success();script.onload=script.onreadystatechange=null;head.removeChild(script)}};head.appendChild(script)}getScript('https://code.jquery.com/jquery.min.js',function(){if(typeof jQuery=='undefined'){msg='Sorry, but jQuery wasnt able to load'}else{msg='This page is now jQuerified with v'+jQuery.fn.jquery;if(otherlib){msg+=' and noConflict(). Use $jq(), not $().'}}return showMsg()});function showMsg(){el.innerHTML=msg;b.appendChild(el);window.setTimeout(function(){if(typeof jQuery=='undefined'){b.removeChild(el)}else{jQuery(el).fadeOut('slow',function(){jQuery(this).remove()});if(otherlib){$jq=jQuery.noConflict()}}},2500)}})();
-        JS
-    
-      sleep 1
-    end
-  end
+  
 end
 
 runner= Runner.new
 runner.main(data)
 data= runner.data
-self.save_account('Yahoo',  {:email => data['username'],:password => data['password']})
+self.save_account('Yahoo',  {:email => data['yahoo_username'],:password => data['password']})
+if @chained
+  self.start("Yahoo/CreateListing")
+end
 true

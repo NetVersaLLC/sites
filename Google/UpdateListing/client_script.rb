@@ -275,7 +275,14 @@ rescue => e
 end
 
 def update_business( data )
-  @browser.element(:css => '.rB').when_present.click
+  #@browser.element(:css => '.tB').when_present.click
+  Watir::Wait.until(60) { @browser.text.include? "Complete your business information" }
+  
+  unless @browser.url =~ /https:\/\/www\.google\.com\/local\/business\/edit/
+    url = @browser.url
+    url.sub!("business","business/edit")
+    @browser.goto url
+  end
 
   update_business_contact( data )
 

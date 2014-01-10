@@ -3,6 +3,7 @@ at_exit do
 	@browser.close
 end
 
+begin
 @browser.goto 'http://www.bizhwy.com/addlisting.php'
 @browser.text_field(:name => 'bus_name').set data['business_name']
 @browser.select_list(:name => 'category').select data['category']
@@ -10,7 +11,7 @@ end
 @browser.button(:name => 'submit').click
 @browser.select_list(:name => 'subcategory').select data['subcategory']
 @browser.text_field(:name => 'address').set data['address']
-@browser.select_list(:name => 'city').select data['city']
+@browser.select_list(:name => 'city').select /#{data['city']}/
 @browser.text_field(:name => 'zip').set data['zip']
 @browser.text_field(:name => 'url').set data['company_website']
 @browser.text_field(:name => 'email').set data['email']
@@ -26,3 +27,6 @@ end
 self.save_account('Bizhyw', { :email => data['email'], :password => data['password'] })
 
 true
+rescue Watir::Exception::NoValueFoundException
+	throw "Bizhwy does not support the listed city for this customer."
+end

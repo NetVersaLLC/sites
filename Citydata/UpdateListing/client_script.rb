@@ -44,6 +44,9 @@ end
 
 @browser.button(:value => 'Save changes').click
 
+if @browser.text.include? "Description must be at least 350 characters long."
+	raise "This customer's business description is too short, and cannot be supported by Citydata."
+
 sleep 4
 30.times{ break if @browser.status == "Done"; sleep 1}
 

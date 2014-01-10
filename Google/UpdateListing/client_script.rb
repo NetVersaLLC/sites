@@ -42,7 +42,9 @@ def get_to_business( data )
     @browser.goto "https://www.google.com/local/business"
   end
 
-  @browser.element(:text, data['business']).when_present.click
+  if not @browser.text.include? "Complete your business information"
+    @browser.element(:text, data['business']).when_present.click
+  end
 
 end
 

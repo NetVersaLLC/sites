@@ -2,7 +2,7 @@ class Runner
   attr_reader :data
 
   def main(data)
-    @data= data
+    @data = data
     @brow = Watir::Browser.new :firefox
     try_do :signup, 3
     wait_for_page_load
@@ -31,7 +31,7 @@ class Runner
   end
   
   def signup
-    signup_url= "https://edit.yahoo.com/registration"
+    signup_url = "https://edit.yahoo.com/registration"
     @brow.goto signup_url
     wait_for_page_load
     txt_set({:name=> 'firstname'},            @data['firstname'])
@@ -41,9 +41,10 @@ class Runner
 
     txt_set({:name=> 'password'},             @data['password'])
     txt_set({:name=> 'mobileNumber'},         @data['mobile'])
-    try_do :select_value, 3, {:id=> 'year'},  @data['birthday'][0..3].to_s
-    try_do :select_value, 3, {:id=> 'month'}, @data['birthday'][5..6].to_i.to_s
-    try_do :select_value, 3, {:id=> 'day'},   @data['birthday'][8..9].to_i.to_s
+
+    try_do :select_value, 3, {:id=> 'month'},  data['bday_month'].to_s
+    try_do :select_value, 3, {:id=> 'day'},    data['bday_day'].to_s
+    try_do :select_value, 3, {:id=> 'year'},   data['bday_year'].to_s
     @brow.radio(:name=> 'gender',:value =>    @data['gender']).set
     
     @brow.button(:type => 'submit').click

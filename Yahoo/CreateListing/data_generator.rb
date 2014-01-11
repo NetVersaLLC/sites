@@ -46,7 +46,6 @@ data['bizurl']          = business.company_website
 data['yearestablished'] = business.year_founded
 data['addlphone']       = business.alternate_phone
 data['fax']             = ""#business.fax_number # Yahoo field validation unsucessful
-data['fax']             = business.fax_number
 data['payment']         = payment
 data['products']        = business.business_description
 data['verification_mobile']= business.mobile_phone

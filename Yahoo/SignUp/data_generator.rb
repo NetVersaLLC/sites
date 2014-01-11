@@ -11,7 +11,9 @@ data['username']        = business.contact_first_name+'_'+business.contact_last_
 data['password']        = SecureRandom.urlsafe_base64(rand()*6 + 6)+"aA#{rand(10)}"
 data['mobile']          = business.mobile_phone
 
-data['birthday']        = business.contact_birthday
+data['bday_month']      = business.birthday.month
+data['bday_day']        = business.birthday.day
+data['bday_year']       = business.birthday.year
 data['gender']          = business.contact_gender[0].downcase
 data['verification_mobile']= business.mobile_phone
 data['country_code']    = '1'

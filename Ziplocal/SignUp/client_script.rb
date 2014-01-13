@@ -63,12 +63,15 @@ def main( data )
 	#enter the phone number
 	@browser.text_field( :id, 'lookupForm:tel').when_present.set data[ 'phone' ]
 	@browser.link( :id, 'lookupForm:submit').click
-
-	listing_url = @browser.div(:id=>'content_container_solid').link
 	
 	if @browser.text.include? 'We found the following'
-		puts ("Business already added.")
-		self.save_account(:Ziplocal,{:listing_url=>listing_url.href})
+        listing_url = @browser.div(:id=>'content_container_solid').link
+		puts ("Phone number already associated.")
+		if @browser.text.include? "#{data['business']}"
+			self.save_account("Ziplocal",{:listing_url => listing_url.href })
+		else
+			puts "Number associated with different business."
+		end
 	else
 		add_business(data)
 	end

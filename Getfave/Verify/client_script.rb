@@ -1,11 +1,24 @@
+@browser = Watir::Browser.new :firefox
+at_exit{
+    unless @browser.nil?
+        @browser.close
+    end
+}
+
 link = data['link']
-@browser.goto(link)
-30.times{ break if @browser.status == "Done"; sleep 1}
-if @browser.text.include? "Log Out"
-	if @chained
-  		self.start("Getfave/CreateListing")
-	end
-  	true
+if not link.nil?
+    @browser.goto(link)
+    if @browser.text.include? "Log Out"
+	   if @chained
+  		    self.start("Getfave/CreateListing")
+	   end
+  	   self.success
+    else
+	   puts "Error while email verification"
+    end
 else
-	puts "Error while email verification"
+    puts "Email not found, re-chaining..."
+    if @chained
+        self.start("Getfave/Verify", 1440)
+    end
 end

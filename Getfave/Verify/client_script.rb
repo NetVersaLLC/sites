@@ -14,7 +14,7 @@ if not link.nil?
 	   end
   	   self.success
     else
-	   puts "Error while email verification"
+	   self.failure("Log Out text not found")
     end
 else
     puts "Email not found, re-chaining..."

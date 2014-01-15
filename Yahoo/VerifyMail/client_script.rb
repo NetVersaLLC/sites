@@ -4,7 +4,6 @@ class Runner
   def main(data)
     @data= data
     @brow = Watir::Browser.new :firefox
-    binding.pry
     try_do :login, 3
     try_do :go_to_verify, 3
     try_do :enter_verification_code, 3

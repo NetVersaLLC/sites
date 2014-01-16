@@ -6,18 +6,23 @@ class Runner
     @brow = Watir::Browser.new :firefox
     try_do :login, 3
     try_do :scan, 5
-    
+
     if @brow.url.include?("config/login") #business_not_exists 
       txt_set({:id=> 'passwd'}, @data['yahoo_password'])
       @brow.button(:id=> '.save').click
       Watir::Wait.while{ @brow.text_field(:id => 'passwd').exists? }
       try_do :register_business, 3
       send_postal_mail
-    elsif
+    elsif @brow.url.include?("merchantsubmit/claimlisting")
+      wait_for_page_load
+      @brow.radios(:name=> 'listing').first.set
+      Watir::Wait.until{ @brow.button(:id=> 'claim-listing-button').enabled? }
+      @brow.button(:id=> 'claim-listing-button').click
+      try_do :register_business, 3
+      send_postal_mail      
+    else
       try_do :register_business, 3
       send_postal_mail
-    else
-      #calimlisting
     end
   ensure
     @brow.close if @brow
@@ -26,11 +31,11 @@ class Runner
   def login
     signin_url=    'https://login.yahoo.com/config/login?.src=smbiz&.intl=us&.lang=en-US&.done=http://smallbusiness.yahoo.com/local-listings/sign-up/'
     @brow.goto signin_url
-    ########################
-    txt_set({:id=> 'username'}, @data['yahoo_username'])
+    #if present
+    txt_set({:id=> 'username'}, @data['yahoo_username']) if @brow.text_field(:id=> 'username').exists?
     txt_set({:id=> 'passwd'}, @data['yahoo_password'])
     @brow.button(:id=> '.save').click
-    Watir::Wait.while{ @brow.text_field(:id => 'username').exists? }
+    Watir::Wait.while{ @brow.text_field(:id => 'passwd').exists? }
     true
   end
   
@@ -56,6 +61,7 @@ class Runner
 
   def register_business
     wait_for_page_load
+    Watir::Wait.until{ @brow.text_field(:name=> 'bizemail').exists? }
     txt_set({:name        => 'bizemail'}, @data['bizemail'])
     txt_set({:name        => 'bizurl'}, @data['bizurl'])
     @brow.checkbox(:name    => 'tos').set
@@ -95,9 +101,9 @@ class Runner
     @data['category'].each_char do |char|
       @brow.text_field(:id => 'acseccat1').send_keys char
       i+=1
-      sleep 2 if i > 3
-      if @brow.lis(:class=> 'yui3-aclist-item').count > 0 and i >= 5
-        @brow.lis(:class=> 'yui3-aclist-item').first.click
+      sleep 2 if i > (@data['category'].length/2)
+      if @brow.lis(:class=> 'yui3-aclist-item').count > 0
+        @brow.element(:xpath=> "//li[@data-text='#{@data['category']}']").click
         return true
       end
     end
@@ -144,7 +150,7 @@ class Runner
     rescue Exception => e
       retries+=1
       retry if retries< n
-      msg= "exhauseted on retries in #{func} due to \n'#{e}'"
+      msg= "exhauseted on retries in #{func} due to \n'#{e}' at #{@brow ? @brow.url : 'nowhere!' }"
       puts msg 
       raise msg
     end

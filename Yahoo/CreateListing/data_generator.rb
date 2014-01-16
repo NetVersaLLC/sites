@@ -35,8 +35,6 @@ data['state']           = business.state
 data['zip']             = business.zip
 data['firstname']       = business.contact_first_name
 data['lastname']        = business.contact_last_name
-data['username']        = business.contact_first_name+'_'+business.contact_last_name
-data['password']        = SecureRandom.urlsafe_base64(rand()*6 + 6)+"aA#{rand(10)}"
 data['mobile']          = business.mobile_phone
 
 data['birthday']        = business.contact_birthday

@@ -126,8 +126,9 @@ class Runner
     rescue Exception => e
       retries+=1
       retry if retries< n
-      puts  "exhauseted on retries in #{func} due to \n'#{e}'"
-      raise "exhauseted on retries in #{func} due to \n'#{e}'"
+      msg= "exhauseted on retries in #{func} due to \n'#{e}' at #{@brow ? @brow.url : 'nowhere!' }"
+      puts  msg
+      raise msg
     end
   end
   

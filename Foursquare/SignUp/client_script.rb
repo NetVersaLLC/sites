@@ -1,124 +1,91 @@
-@browser = Watir::Browser.new :firefox
-at_exit do
-	unless @browser.nil?
-		@browser.close
-	end
+class Runner
+  attr_reader :data
+
+  def main(data)
+    @data= data
+    @brow = Watir::Browser.new :firefox
+    try_do :claim, 3
+    try_do :check_results, 2
+    try_do :signup, 3
+  ensure
+    @brow.close if @brow
+  end
+  
+  def claim
+    claim_url= 'https://foursquare.com/venue/claim'
+    @brow.goto claim_url
+    txt_set({:name=> 'query'}, @data['business_name'])
+    txt_set({:name=> 'location'}, "#{@data['city']}, #{@data['state']}")
+    @brow.button(:id=> 'searchButton').click
+    @brow.execute_script("window.scrollBy(0,1000)")
+    wait_for_page_load
+    @brow.execute_script("window.scrollBy(0,1000)")
+    sleep 5
+    Watir::Wait.until{ @brow.a(:class=> 'addVenueLink').exists? }
+    true
+  end
+
+  def check_results
+    wait_for_page_load
+    @brow.execute_script('return document.getElementsByClassName("addVenueLink")[0].click();')
+    Watir::Wait.while{ @brow.a(:class=> 'addVenueLink').exists? }
+    wait_for_page_load
+    true
+  end
+  
+  def signup
+    wait_for_page_load
+    txt_set({:id => 'inputEmail'}, @data['email'])
+    txt_set({:id => 'inputPassword'}, @data['password'])
+    txt_set({:id => 'inputFirstName'}, @data['first_name'])
+    txt_set({:id => 'inputLastName'}, @data['last_name'])
+    txt_set({:name => 'birthMonth'}, @data['birth_month'])
+    txt_set({:id => 'inputBirthDate'}, @data['birth_day'])
+    txt_set({:name => 'birthYear'}, @data['birth_year'])
+    @brow.radio(:name=> 'gender', :value=> @data['gender']).set
+    @brow.button(:value => 'Sign Up').click
+    Watir::Wait.while{ @brow.text_field(:id => 'inputEmail').exists? }
+    true
+  end
+  
+  def txt_set(selector, keys)
+    keys.is_a?(String) ? @brow.text_field(selector).set(keys) : 
+      @brow.text_field(selector).send_keys(keys)
+    true
+  end
+  
+  def wait_for_page_load
+    Watir::Wait.until{ @brow.execute_script("return document.readyState == 'complete';")}
+  end
+
+  def try_do func, n, *args
+    retries= 0
+    begin
+      if result= self.send(func, *args)
+        return result
+      end
+      puts  "retrying #{func}"
+      raise "retrying #{func}"
+    rescue Exception => e
+      retries+=1
+      retry if retries< n
+      msg= "exhauseted on retries in #{func} due to \n'#{e}' at #{@brow ? @brow.url : 'nowhere!' }"
+      puts msg 
+      raise msg
+    end
+  end
+
 end
-
-@browser.goto 'https://foursquare.com/venue/claim'
-
-#@browser.goto(url)
-
-
-# The current version of Twebst Web Recorder does NOT support recording in frames/iframes.
-# You have to manually add browser.frame statements.
-# See: http://wiki.openqa.org/display/WTR/Frames 
-
-sleep 2
-@browser.text_field(:name => 'query').when_present.set data['business']
-@browser.text_field(:name => 'location').set data['citystate']
-@browser.button(:id => 'searchButton').click
-
-sleep 2
-@browser.link(:text => /here/).click
-# @browser.link(:class => 'addVenueLink').click
-
-sleep 2
-@browser.text_field(:id => 'inputEmail').set data['email']
-@browser.text_field(:id => 'inputPassword').set data['password']
-@browser.text_field(:id => 'inputFirstName').set data['first_name']
-@browser.text_field(:id => 'inputLastName').set data['last_name']
-@browser.text_field(:name => 'birthMonth').set data['birth_month']
-@browser.text_field(:id => 'inputBirthDate').set data['birth_day']
-@browser.text_field(:name => 'birthYear').set data['birth_year']
-@browser.button(:value => 'Sign Up').click
-
-sleep 2
-Watir::Wait.until{@browser.text_field(:id => 'venueAddress_field').exists?}
+ 
+runner= Runner.new
+runner.main(data)
+data= runner.data
+true
 
 self.save_account("Foursquare", {:email => data['email'],:password => data['password']})
 sleep 2
 if @chained
 	self.start("Foursquare/Verify")
+  self.start("Foursquare/AddListing")
 end
-
 true
-
-=begin
-@browser.text_field(:id => 'venueAddress_field').when_present.set data['address']
-
-browser.text_field(:id => 'venueZip_field').set data['zip']
-browser.text_field(:id => 'venueTwitterName_field').set data['twitter_page']
-browser.text_field(:id => 'venuePhone_field').set '4246662891'
-
-browser.select_list(:name => 'topLevelCategory').select 'Outdoors & Recreation'
-browser.select_list(:name => 'secondLevelCategory').select 'Island'
-
-
-5.times do |i|
-	@browser.link(:title => "Zoom in").click
-	sleep 3
-end 
-
-browser.image(:class => 'leaflet-tile leaflet-tile-loaded').click
-
-
-=begin
-
-
-browser.checkbox(:id => 'agree').set
-browser.span(:class => 'continueButton greenButton biggerButton').click
-browser.span(:class => 'continueButton greenButton biggerButton').click
-browser.div(:id => 'wrapper').click
-browser.text_field(:id => 'phoneField').set '4246662891'
-browser.span(:class => 'continueButton greenButton biggerButton').click
-browser.span(:class => 'continueButton biggerButton loadingButton disabledButton').click
-browser.text_field(:id => 'phoneField').set '4246662891'
-browser.span(:class => 'continueButton greenButton biggerButton').click
-browser.text_field(:id => 'phoneField').RightClick()
-browser.div(:id => 'wrapper').click
-
-
-#@browser = Watir::browser.start("https://foursquare.com/search?q=saigon&near=columbia%2C+mo")
-#@browser.text_field(:id, 'searchBox').set data['name']
-#@browser.text_field(:id, "locationInput").set data['city']+', '+data['state']
-#@browser.button( :id, 'searchButton').click
-#@browser.a(:class, "p.translate > input.greenButton.translate").click
-#@browser.a(:text, "Saigon Bistro").click
-#@browser.a(:text, "Claim here").click
-#@browser.a(:text, "Sign up for foursquare").click
-#@browser.a(:text, "Sign up with Email").click
-@browser.text_field(:id, "inputFirstName").set data['first_name']
-@browser.text_field(:id, "inputLastName").set data['last_name']
-#@browser.text_field(:class, "#emailWrapper > span.input-holder > span.input-default").click
-@browser.text_field(:id, "inputEmail").set data['email']
-@browser.text_field(:id, "inputPassword").set data['password']
-@browser.text_field(:id, "userPhone").set data['phone']
-@browser.text_field(:id, "userLocation").set data['city']
-@browser.select_list(:name, "birthMonth").select data['birth_month']
-@browser.select_list(:name, "birthDate").select data['birth_day']
-@browser.select_list(:name, "birthYear").select data['birth_year']
-#@browser.file_field(:class, "F221050266022QSTXN5").set data.profile_image
-@browser.file_field(:type => 'file').set data['logo']
-@browser.button(:value, "Join").click
-
-#RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'Foursquare'
-
-self.save_account("Foursquare", {:email => data['email'],:password => data['password']})
-
-sleep 2
-Watir::Wait.until{@browser.text.include? "Now you can check in!"}
-
-@browser.a(:id, "continueLink").click
-
-sleep 2
-Watir::Wait.until{@browser.text.include? "Welcome! Now let's find you some friends."}
-
-@browser.link(:id => 'done').click
-
-	if @chained
-		self.start("Foursquare/Verify")
-	end
-
-true
-=end

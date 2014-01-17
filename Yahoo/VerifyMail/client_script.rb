@@ -99,5 +99,5 @@ end
 
 runner= Runner.new
 runner.main(data)
-data= runner.data
+
 true

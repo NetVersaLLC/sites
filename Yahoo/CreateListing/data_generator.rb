@@ -1,7 +1,10 @@
 data = {}
 
-catty            = Yahoo.where(:business_id => business.id).first
-data['category'] = YahooCategory.find(catty.category_id).name
+yahoo            = business.yahoos.first
+data['category'] = YahooCategory.find(yahoo.category_id).name
+
+data['yahoo_username']  = yahoo.email
+data['yahoo_password']  = yahoo.password
 
 ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].each do |day|
   enabled= business.send("#{day}_enabled".to_sym)
@@ -51,7 +54,4 @@ data['country_code']    = '1'
 data['country']         = 'us'
 data['verification_country_code']    = '1'
 data['verification_country']         = 'us'
-credentials= Yahoo.where(:business_id=> business.id).first
-data['yahoo_username']         = credentials.email
-data['yahoo_password']         = credentials.password
 data

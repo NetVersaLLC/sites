@@ -160,5 +160,9 @@ end
 
 runner= Runner.new
 runner.main(data)
-data= runner.data
+
+if @chained
+  self.start("Yahoo/MailNotify", 4323) # Wait 3 days
+end
+
 true

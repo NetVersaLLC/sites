@@ -349,7 +349,35 @@ rescue => e
 end
 
 def claim_business( data )
-	@browser.h4(:text, "#{data['business']}").when_present.click
+  business_name = []
+  divsarray = []
+  data['business'].split(" ").each{ |word|
+    business_name.push(word)
+  }
+  @browser.element(:css => '.s7RQie').elements.each{ |element|
+    business_name.each{ |word|
+      next if not element.text.include? word
+      divsarray.push(element)
+    }
+  }
+  divsarray.uniq!
+  if divsarray.nil?
+    raise "Business not found!"
+  elsif divsarray.length > 6 # 6 elements per business
+    self.failure("Multiple listings for the business found")
+    throw "Multiple listings for the business found"
+  end
+    
+  chosen_one = divsarray.first
+  chosen_one.click
+
+  sleep 1
+
+  if @browser.text.include? "Someone else has already verified this listing"
+    self.failure("Someone else has already verified this listing")
+    throw "Someone else has already verified this listing"
+  end
+  
   @browser.element(:css => '.Up').when_present.click
 
   update_business( data )

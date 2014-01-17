@@ -81,28 +81,71 @@ end
 
 def check_scenarios( data )
   businessFound = false
+  business_name = []
+  address = []
+  data['business'].split(" ").each{ |word|
+    business_name.push(word)
+  }
+  weight = 0
   puts "Checking result scenarios..."
   # Check for different scenarios
   if @browser.text.include? "Is this your business?"
     # Scenario 1
     @scenario = 1
     puts "Single Business Scenario"
-    if @browser.h4(:text, "#{data['business']}").exists? then
-      puts "Match Found!"
-      businessFound = true
+    business_name.each{ |word|
+      if @browser.text.include? word
+        weight += 1
+      end
+    }
+    if weight >= (business_name.length / 2) then
+      if @browser.text.include? data['address'] then
+        puts "Match Found!"
+        businessFound = true
+      else
+        weight = 0
+        data['address'].split(" ").each{ |word|
+          address.push(word)
+        }
+        address.each{ |word|
+          if @browser.text.include? word
+            weight += 1
+          end
+        }
+        if weight >= (address.length / 2)
+          puts "Match Found!"
+          businessFound = true
+        end
+      end
     end
   elsif @browser.text.include? "Is one of these your business?"
     # Scenario 2
     @scenario = 2
     puts "Multiple Businesses Scenario"
-    count = 1
-    until count == 4 # From old code, unneeded, left for reference
-      if @browser.h4(:text, "#{data['business']}").exists? then
+    business_name.each{ |word|
+      if @browser.text.include? word
+        weight += 1
+      end
+    }
+    if weight >= (business_name.length / 2) then
+      if @browser.text.include? data['address'] then
         puts "Match Found!"
         businessFound = true
-        break
+      else
+        weight = 0
+        data['address'].split(" ").each{ |word|
+          address.push(word)
+        }
+        address.each{ |word|
+          if @browser.text.include? word
+            weight += 1
+          end
+        }
+        if weight >= (address.length / 2)
+          puts "Match Found!"
+          businessFound = true
+        end
       end
-      count += 1
     end
   elsif @browser.text.include? "We could not find"
     # Scenario 3

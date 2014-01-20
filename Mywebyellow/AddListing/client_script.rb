@@ -24,7 +24,6 @@ def enter_captcha( data )
 		@browser.text_field( :id, /CaptchaEntry/ ).set captcha_code
 		@browser.button( :id, 'ctl00_ContentPlaceHolder01_imgSubmit').click
 
-		30.times{ break if @browser.status == "Done"; sleep 1}
 		
 		if not @browser.text.include? "The characters you entered for the Captcha image are invalid."
 			capSolved = true

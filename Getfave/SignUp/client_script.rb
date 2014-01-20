@@ -11,6 +11,16 @@ def sign_in(data)
   @browser.text_field(:id => 'session_password').set data['password']
   @browser.button(:value => 'Log In').click
   # @browser.button(:xpath => '//*[@id="signin-container"]/form/input[3]').click
+rescue => e
+  unless @retries == 0
+    puts "Error caught in sign_in: #{e.inspect}"
+    puts "Retrying in two seconds. #{@retries} attempts remaining."
+    sleep 2
+    @retries -= 1
+    retry
+  else
+    raise "Error in sign_in could not be resolved. Error: #{e.inspect}"
+  end
 end
 
 # Launch url
@@ -18,6 +28,7 @@ url = 'https://www.getfave.com'
 @browser.goto url
 #Verify if the page is loaded successfully.
 
+@retries = 3
 sign_in data
 
 #~ throw("Login unsuccessful") if @sign_in.exist?

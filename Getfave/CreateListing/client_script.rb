@@ -11,6 +11,16 @@ def sign_in(data)
   @browser.text_field(:id => 'session_password').set data['password']
   @browser.button(:value => 'Log In').click
   # @browser.button(:xpath => '//*[@id="signin-container"]/form/input[3]').click
+rescue => e
+  unless @retries == 0
+    puts "Error caught in sign_in: #{e.inspect}"
+    puts "Retrying in two seconds. #{@retries} attempts remaining."
+    sleep 2
+    @retries -= 1
+    retry
+  else
+    raise "Error in sign_in could not be resolved. Error: #{e.inspect}"
+  end
 end
 
 def change_location(data)
@@ -21,6 +31,17 @@ def change_location(data)
 
   @browser.text_field(:id => 'g-text-field').send_keys :enter
   @browser.send_keys :enter
+rescue => e
+  unless @retries == 0
+    puts "Error caught in change_location: #{e.inspect}"
+    puts "Retrying in two seconds. #{@retries} attempts remaining."
+    sleep 2
+    @retries -= 1
+    @browser.refresh
+    retry
+  else
+    raise "Error in change_location could not be resolved. Error: #{e.inspect}"
+  end
 end
 
 def fill_business(data)
@@ -58,12 +79,24 @@ def fill_business(data)
   #puts('Debug: Changes Published')
 
   raise Exception, @browser.element(:class => 'error').text if @browser.element(:class => 'error').exist?
+rescue => e
+  unless @retries == 0
+    puts "Error caught in fill_business: #{e.inspect}"
+    puts "Retrying in two seconds. #{@retries} attempts remaining."
+    sleep 2
+    @retries -= 1
+    @browser.refresh
+    retry
+  else
+    raise "Error in fill_business could not be resolved. Error: #{e.inspect}"
+  end
 end
 
 #Search Business
 url = 'https://www.getfave.com/login'
 @browser.goto url
 
+@retries = 3
 sign_in data
 
 sleep 10

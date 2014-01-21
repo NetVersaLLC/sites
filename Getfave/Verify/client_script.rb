@@ -12,7 +12,7 @@ if not link.nil?
 	   if @chained
   		    self.start("Getfave/CreateListing")
 	   end
-	   self.save_account("Digabusiness", {:status => "Account verified successfully. Creating listing..."})
+	   self.save_account("Getfave", {:status => "Account verified successfully. Creating listing..."})
   	   self.success
     else
 	   raise "Error while email verification"

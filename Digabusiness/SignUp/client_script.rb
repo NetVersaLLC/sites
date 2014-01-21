@@ -58,5 +58,6 @@ else
 	if @chained
 		self.start("Digabusiness/AddListing")
   end
+  self.save_account("Digabusiness", {:status => "Account created, creating listing..."})
   true
 end

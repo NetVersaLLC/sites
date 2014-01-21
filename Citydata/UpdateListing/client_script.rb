@@ -50,4 +50,6 @@ if @browser.text.include? "Description must be at least 350 characters long."
 sleep 4
 30.times{ break if @browser.status == "Done"; sleep 1}
 
+self.save_account("Citydata", {:status => "Listing updated successfully!"})
+
 true

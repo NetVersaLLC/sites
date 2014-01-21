@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit{
+  unless @browser.nil?
+    @browser.close
+  end
+}
+
 @browser.goto("http://www.spoke.com/companies/new")
 @browser.button(:value,"Anonymous").click
 @browser.text_field(:id, "recaptcha_response_field").set("esodse moved")
@@ -12,3 +19,5 @@
 @browser.select_list(:id, "company_offices_attributes_0_state").select data['state_name']
 @browser.select_list(:id, "company_offices_attributes_0_country").select("United States")
 @browser.button(:value,"SAVE").click
+self.save_account("Spoke", {:status => "Listing posted successfully!"})
+self.success

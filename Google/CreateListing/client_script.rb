@@ -517,6 +517,7 @@ begin
   login( data )
   search_business( data )
   if check_scenarios( data ) == true
+    self.save_account("Google", {:status => "Pre-existing listing found! Claiming..."})
     if @chained
       self.start("Google/ClaimListing")
     end
@@ -541,6 +542,10 @@ begin
         raise "Dashboard could not be found!"
       end
     end
+    if @chained
+      self.start("Google/MailNotify", 10087) # Wait 7 days
+    end
+    self.save_account("Google", {:status => "Listing created, verify postcard will arrive in 1-2 weeks."})
   end
 
 rescue Timeout::Error
@@ -551,10 +556,6 @@ rescue Selenium::WebDriver::Error::ElementNotVisibleError => e
   puts "Error encountered. Trying to ride it out..."
   #sleep  
 
-end
-
-if @chained
-  self.start("Google/MailNotify", 10087) # Wait 7 days
 end
 
 puts "Payload Completed"

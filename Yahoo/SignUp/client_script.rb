@@ -137,7 +137,7 @@ end
 runner= Runner.new
 runner.main(data)
 data= runner.data
-self.save_account('Yahoo',  {:email => data['yahoo_username'],:password => data['password']})
+self.save_account('Yahoo',  {:email => data['yahoo_username'],:password => data['password'], :status => "Account created, creating listing..."})
 if @chained
   self.start("Yahoo/CreateListing")
 end

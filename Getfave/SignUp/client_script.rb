@@ -51,6 +51,7 @@ elsif @browser.label(:class, "error").present?
 	self.failure("Email already registered.")
 else
 	self.save_account("Getfave", {:email => data['email'], :password => data['password']})
+	self.save_account("Getfave", {:status => "Account created, creating listing..."})
 	puts "Signup successful. Verifying email to continue"
 	if @chained
   		self.start("Getfave/Verify")

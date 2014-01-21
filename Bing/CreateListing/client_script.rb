@@ -446,5 +446,6 @@ else
   if @chained
     self.start("Bing/ClaimListing")
   end
+  self.save_account("Bing", {:status => "Listing found, claiming..."})
   true
 end

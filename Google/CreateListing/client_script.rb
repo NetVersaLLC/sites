@@ -79,6 +79,8 @@ def photo_upload_pop(data)
   end
 end
 
+
+# Used to handle different elements later down the road
 def check_scenarios( data )
   businessFound = false
   business_name = []
@@ -184,6 +186,16 @@ def search_business( data )
   @browser.img(:src, /search-white/).click
   @browser.element(:css => '.I0vWDf').wait_until_present(60)
   sleep 3 # Just in case some elements haven't loaded yet
+rescue => e
+  unless @retries == 0
+    puts "Error caught in search_business: #{e.inspect}"
+    puts "Retrying in two seconds. #{@retries} attempts remaining."
+    sleep 2
+    @retries -= 1
+    retry
+  else
+    raise "Error in search_business could not be resolved. Error: #{e.inspect}"
+  end
 end
 
 def handle_scenarios()
@@ -205,6 +217,8 @@ end
 def initial_signup_form( data )
   unless @retries < 3
     @retries = 3
+  else
+    @browser.refresh
   end
   puts 'Creating business listing'
   # Basic Information, xpath used for reliability
@@ -234,7 +248,9 @@ def initial_signup_form( data )
   puts "Zip set"
   @browser.element(:css => 'input.Cj:nth-child(1)').send_keys data['phone']
   puts "Phone Set"
+  data['category'].gsub!(/\d\s?/, "") # Remove numbers
   @browser.element(:css => '.mg').send_keys data['category']
+  puts "Category Set"
   @browser.divs(:class, 'Ic-ed').each do |category|
     if category.b.exists?
       cat = category.text + category.b.text
@@ -246,6 +262,7 @@ def initial_signup_form( data )
     end
   end
   @browser.div(:text, 'Submit').click
+  Watir::Wait.until(10) { @browser.url != "https://www.google.com/local/business/add/info" }
 rescue => e
   unless @retries == 0
     puts "Error caught in initial_signup_form: #{e.inspect}"
@@ -309,8 +326,7 @@ end
 def add_hours( data )
   unless @retries < 3
     @retries = 3
-  end
-  if @retries < 3
+  else
     @browser.refresh
   end
   @browser.element(:css => 'div.wb:nth-child(5)').when_present.click
@@ -409,8 +425,7 @@ end
 def add_photos( data )
   unless @retries < 3
     @retries = 3
-  end
-  if @retries < 3
+  else
     @browser.refresh
   end
   @browser.element(:css => 'div.wb:nth-child(6)').when_present.click
@@ -461,8 +476,7 @@ end
 def add_business_description( data )
   unless @retries < 3
     @retries = 3
-  end
-  if @retries < 3
+  else
     @browser.refresh
   end
   @browser.element(:css => 'div.wb:nth-child(7)').when_present.click
@@ -559,4 +573,4 @@ rescue Selenium::WebDriver::Error::ElementNotVisibleError => e
 end
 
 puts "Payload Completed"
-true
+self.success

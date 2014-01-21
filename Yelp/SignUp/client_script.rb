@@ -99,6 +99,10 @@ if not businessListed
         puts "We came, we tried, we failed. Moving on."
     end
     
+    data['rootcat'].gsub!("and", "&")
+    data['parent'].gsub!("and", "&")
+    data['category'].gsub!("and", "&")
+    
     begin
         if data['rootcat'] == ""
 

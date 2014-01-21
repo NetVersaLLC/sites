@@ -67,6 +67,7 @@ def verify_business( data )
       end
 
       self.failure("Please verify that the business has verified.")
+      self.save_account("Google", {:status => "Listing claimed, verification status pending."})
 
     else
       puts "No PIN attempts left, verifying by postcard..."
@@ -78,6 +79,7 @@ def verify_business( data )
         self.start("Google/MailNotify", 10087) # Wait 7 days
       end
       self.success("Business is now in postcard verification process")
+      self.save_account("Google", {:status => "Listing claimed, verify postcard will arrive in 1-2 weeks."})
     end
 
 rescue => e

@@ -100,4 +100,6 @@ end
 runner= Runner.new
 runner.main(data)
 
+self.save_account("Yahoo", {:status => "Listing verified successfully!"})
+
 true

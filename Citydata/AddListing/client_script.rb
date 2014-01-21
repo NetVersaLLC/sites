@@ -45,6 +45,6 @@ Watir::Wait.until {
 
 listing_url = @browser.link(:text=>/here/).href
 
-self.save_account("Citydata", {:email => data['email'], :password => data['password'], :listing_url=>listing_url})
+self.save_account("Citydata", {:email => data['email'], :password => data['password'], :listing_url=>listing_url, :status => "Listing posted successfully!"})
 
 true

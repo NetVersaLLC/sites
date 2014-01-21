@@ -255,4 +255,5 @@ end
 update( data )
 
 puts("Debug: Mission Accomplished")
+self.save_account("Bing", {:status => "Listing updated successfully!"})
 true

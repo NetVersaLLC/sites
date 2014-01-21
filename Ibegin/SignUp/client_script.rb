@@ -1,3 +1,7 @@
+# Developer Notes
+# nil
+
+# Browser code
 @browser = Watir::Browser.new :firefox
 at_exit{
   unless @browser.nil?
@@ -5,42 +9,39 @@ at_exit{
   end
 }
 
-retries = 5
-begin
-@browser.goto('http://www.ibegin.com/account/register/')
-@browser.text_field( :name, 'name').set data[ 'username' ]
-@browser.text_field( :name, 'liame').set data[ 'email' ]
-@browser.text_field( :name, 'pw' ).set data[ 'password' ]
+# Methods
+def registration(data)
+  @browser.goto('http://www.ibegin.com/account/register/')
+  @browser.text_field( :name, 'name').set data[ 'username' ]
+  @browser.text_field( :name, 'liame').set data[ 'email' ]
+  @browser.text_field( :name, 'pw' ).set data[ 'password' ]
+  @browser.button( :value, /Register/i).click
 
-@browser.button( :value, /Register/i).click
-sleep 2
-Watir::Wait.until { @browser.text.include? "Business owners - over a million people view these listings every month" or @browser.lis(:style => 'color:red;').size > 0 }
-	
-	if @browser.lis(:style => 'color:red;').size > 0
-		@browser.lis(:style => 'color:red;').each do |error|
-			puts(error.text)
-		end
-		throw ("Handling errors")
-	end
+  Watir::Wait.until { @browser.text.include? "Business owners - over a million people view these listings every month" or @browser.lis(:style => 'color:red;').size > 0 }
 
-	RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'Ibegin'
-
-	if @chained
-		self.start("Ibegin/CreateListing")
-	end
-
-	true
-rescue
-	if retries > 0
-       puts "There was an error with the payload. Retrying in 5 seconds."
-       retries -= 1
-       sleep 5
-       retry
-   else
-       puts "After 5 retries the payload could not run. Data that was attempted:"
-       puts data['email']
-       puts data['password']
-       throw("Job failed.")
-   end
+  if @browser.lis(:style => 'color:red;').size > 0
+    @browser.lis(:style => 'color:red;').each do |error|
+      raise(error.text)
+    end
+  else
+    self.save_account("Ibegin", {:email => data['email'], :password => data['password']})
+    if @chained
+      self.start("Ibegin/CreateListing")
+    end
+    self.success
+  end
+rescue => e
+  unless @retries == 0
+    puts "Error caught in registration: #{e.inspect}"
+    puts "Retrying in two seconds. #{@retries} attempts remaining."
+    sleep 2
+    @retries -= 1
+    retry
+  else
+    raise "Error in registration could not be resolved. Error: #{e.inspect}"
+  end
 end
 
+# Main Controller
+@retries = 3
+registration(data)

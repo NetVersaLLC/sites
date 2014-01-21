@@ -165,4 +165,6 @@ if @chained
   self.start("Yahoo/MailNotify", 4323) # Wait 3 days
 end
 
+self.save_account("Yahoo", {:status => "Listing created, verify postcard will arrive within 1 week."})
+
 true

@@ -32,7 +32,8 @@ def enter_captcha( data )
 	end
 	if capSolved == true
 		Watir::Wait.until { @browser.text.include? "Your information has been submitted" }
-		true
+		self.save_account("Mywebyellow", {:status => "Listing posted successfully!"})
+		self.success
 	else
 		throw("Captcha was not solved")
 	end

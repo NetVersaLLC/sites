@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit{
+  unless @browser.nil?
+    @browser.close
+  end
+}
+
 retries = 5
 begin
 @browser.goto('http://www.ibegin.com/account/register/')

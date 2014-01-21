@@ -395,6 +395,7 @@ if check_scenarios( data ) == true then
 else
 	raise "Business not found!"
 end
+self.save_account("Google", {:status => "Listing caimed, verification status pending."})
 if @chained
   self.start("Google/ClaimNotify")
 end

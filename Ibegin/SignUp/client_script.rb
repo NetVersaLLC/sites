@@ -24,7 +24,7 @@ def registration(data)
       raise(error.text)
     end
   else
-    self.save_account("Ibegin", {:email => data['email'], :password => data['password']})
+    self.save_account("Ibegin", {:email => data['email'], :password => data['password'], :status => "Account created, creating listing..."})
     if @chained
       self.start("Ibegin/CreateListing")
     end

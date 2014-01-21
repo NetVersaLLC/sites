@@ -115,9 +115,9 @@ if @browser.text.include? "We couldn't find any matches."
   @browser.link(:href => 'https://www.getfave.com/businesses/new').click
   fill_business data
 
-  self.save_account("Digabusiness", {:status => "Listing created successfully!"})
+  self.save_account("Getfave", {:status => "Listing created successfully!"})
   self.success
 elsif @browser.div(:id => 'business-results').span(:text => "#{data['business']}").exist?
-  self.save_account("Digabusiness", {:status => "Listing status pending."})
+  self.save_account("Getfave", {:status => "Listing status pending."})
   self.failure("Business is already listed.")
 end

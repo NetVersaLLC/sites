@@ -41,8 +41,8 @@ def signup data
 
 	listing_url = @browser.element(:css,'.list > h2:nth-child(1)').link.when_present.href
 
-	self.save_account('Listwns',{:username=>data['email'],:password=>data['password'],:listing_url=>listing_url})
-	true
+	self.save_account('Listwns',{:username=>data['email'],:password=>data['password'],:listing_url=>listing_url, :status => "Listing posted successfully!"})
+	self.success
 end
 
 signup data

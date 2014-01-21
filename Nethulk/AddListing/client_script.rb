@@ -27,7 +27,8 @@ response = RestClient.post( "http://www.nethulk.com/business_sign_up.php",
     )
 
 if response.to_s.include? "Business Update Successful"
-    true
+    self.save_account("Nethulk", {:status => "Posted, takes 2-3 weeks to appear."})
+    self.success
 else
     raise "Payload did not submit"
 end

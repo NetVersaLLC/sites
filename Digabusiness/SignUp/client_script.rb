@@ -66,10 +66,9 @@ else
   enter_captcha_signup( data )
 
   Watir::Wait.until { @browser.text.include? "Thank you for registering. Your account has been created." } #effectively an IF
-	self.save_account("Digabusiness", {:username => data['username'], :email => data['email'], :password => data['password']})
+	self.save_account("Digabusiness", {:username => data['username'], :email => data['email'], :password => data['password'], :status => "Account created, creating Listing..."})
 	if @chained
 	  self.start("Digabusiness/AddListing")
-    end
-  self.save_account("Digabusiness", {:status => "Account created, creating Listing..."})
+  	end
   self.success
 end

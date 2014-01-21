@@ -64,4 +64,5 @@ sleep 2
 @browser.execute_script("ValidateAndPerformAjaxCall('SubmitVerificationPIN', '#enterPinForm')")
 
 sleep 10
+self.save_account("Bing", {:status => "Listing verified successfully!"})
 true

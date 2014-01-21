@@ -60,5 +60,5 @@ end
 # Main Controller
 sign_in( data )
 do_the_thing( data )
-self.save_account
+self.save_account("Ibegin", { :status => "Listing verified successfully!" })
 self.success

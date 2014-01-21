@@ -315,4 +315,5 @@ login( data )
 get_to_business( data )
 update_business( data )
 puts "Done"
+self.save_account("Google", {:status => "Listing updated successfully!"})
 self.success("Business updated successfully.")

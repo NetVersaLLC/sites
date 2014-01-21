@@ -126,4 +126,6 @@ if @chained
 	self.start("Bing/MailNotify", 4323) # Wait 3 days
 end
 
+self.save_account("Bing", {:status => "Listing created, verify postcard arrives within 1 week."})
+
 true

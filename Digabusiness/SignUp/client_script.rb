@@ -5,7 +5,6 @@ at_exit {
 	end
 }
 
-# Temporary methods from Shared.rb 
 def solve_captcha_signup
   image = "#{ENV['USERPROFILE']}\\citation\\digabusiness_captcha.png"
   obj = @browser.img( :xpath, '//*[@id="padding"]/form/table/tbody/tr[8]/td[2]/img' )
@@ -32,32 +31,45 @@ def enter_captcha_signup( data )
   if capSolved == true
     true
   else
-    throw("Captcha was not solved")
+    self.failure("Captcha was not solved")
   end
 end
-# End Temporary Methods from Shared.rb
+
+def signup(data)
+    @browser.goto("http://www.digabusiness.com/profile.php?mode=register&agreed=true")
+
+    @browser.text_field(:name => 'LOGIN').when_present.set data['username']
+    @browser.text_field(:name => 'NAME').set data['fname'] + " " + data['lname']
+    @browser.text_field(:name => 'PASSWORD').set data['password']
+    @browser.text_field(:name => 'PASSWORDC').set data['password']
+    @browser.text_field(:name => 'EMAIL').set data['email']
+    @browser.checkbox(:name => 'AGREE').set
+rescue => e
+  unless @retries == 0
+    puts "Error caught in signup: #{e.inspect}"
+    puts "Retrying in two seconds. #{@retries} attempts remaining."
+    sleep 2
+    @retries -= 1
+    retry
+  else
+    raise "Error in signup could not be resolved. Error: #{e.inspect}"
+  end
+end
 
 if data[ 'website' ].nil? || data['website'] == ""
   self.success("Client does not have a website")
 else
+  @retries = 3
 
-  @browser.goto("http://www.digabusiness.com/profile.php?mode=register&agreed=true")
-
-  @browser.text_field(:name => 'LOGIN').set data['username']
-  @browser.text_field(:name => 'NAME').set data['fname'] + " " + data['lname']
-  @browser.text_field(:name => 'PASSWORD').set data['password']
-  @browser.text_field(:name => 'PASSWORDC').set data['password']
-  @browser.text_field(:name => 'EMAIL').set data['email']
-  @browser.checkbox(:name => 'AGREE').set
+  signup(data)
 
   enter_captcha_signup( data )
 
-
   Watir::Wait.until { @browser.text.include? "Thank you for registering. Your account has been created." } #effectively an IF
-	RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['username'], 'account[email]' => data['email'], 'account[password]' => data['password'], 'model' => 'Digabusiness'
+	self.save_account("Digabusiness", {:username => data['username'], :email => data['email'], :password => data['password']})
 	if @chained
-		self.start("Digabusiness/AddListing")
-  end
-  self.save_account("Digabusiness", {:status => "Account created, creating listing..."})
-  true
+	  self.start("Digabusiness/AddListing")
+    end
+  self.save_account("Digabusiness", {:status => "Account created, creating Listing..."})
+  self.success
 end

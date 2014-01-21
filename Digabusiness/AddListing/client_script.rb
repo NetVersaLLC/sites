@@ -1,6 +1,6 @@
 @browser = Watir::Browser.new :firefox
 at_exit {
-	unless @browser.nil
+	unless @browser.nil?
 		@browser.close
 	end
 }
@@ -38,7 +38,9 @@ def enter_captcha( data )
 		sleep(2)
 		if not @browser.text.include? "Invalid code."
 			capSolved = true
-		end	  
+		elsif @browser.text.include? "The URL could not be validated. Either the page does not exist or the server cound not be contacted."
+			raise "Website provided is invalid."
+		end		  
 	count+=1
 	end
 	if capSolved == true
@@ -103,4 +105,5 @@ end
 enter_captcha( data )
 sleep 2
 Watir::Wait.until { @browser.text.include? "We got your submission!"}
+self.save_account("Digabusiness", {:status => "Listing created successfully!"})
 true

@@ -93,5 +93,6 @@ end
 @retries = 5
 login( data )
 enter_pin( data )
+self.save_account("Google", {:status => "Listing verified successfully."})
 
 true

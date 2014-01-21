@@ -104,6 +104,7 @@ def update_business(data, page)
     form.field_with(:name => /visitor_email/).value = data['email']
     enter_captcha(page)
     @update = true
+    self.save_account("Cylex", {:status => "Pre-existing listing updated successfully."})
 end
 
 page = agent.get("http://admin.cylex-usa.com/firma_default.aspx?step=0&d=cylex-usa.com")
@@ -193,52 +194,6 @@ if @update == false then
     else
         puts "[Payment Methods] Something went wrong, continuing anyway."
     end
-=begin
-    page = page.link_with(:id => /btn_home/).click
-    # Update company logo
-    unless self.logo.nil? || self.logo == ""
-        begin
-            page = page.link_with(:href => /action=companylogo/).click
-            form = page.form_with("aspnetForm")
-            form.file_upload_with(:name => /FileUpload1/).file_name = self.logo
-            sleep 20 # File takes time to upload, couldn't verify upload
-            page = form.click_button(form.button_with(:name => /ButtonSaveChanges/))
-            sleep 10 # Couldn't verify that the image saved correctly
-            page = page.link_with(:id => /btn_home/).click
-            puts "[Logo] Appears to have updated successfully."
-        rescue
-            page = page.link_with(:id => /btn_home/).click
-            logo_error = true
-            throw "[Logo] Something went wrong, continuing anyway."
-        end
-    end
-    if not logo_error.nil? || logo_error == true
-        catch "[Logo] Something went wrong, continuing anyway."
-    end
-    # Update company gallery
-    unless self.images.nil? || self.images == ""
-        page = page.link_with(:href => /action=companygallery/).click
-        form = page.form_with("aspnetForm")
-        self.images.each do |image|
-            count = 0
-            count += 1
-            form.field_with(:name => /tb_title/).value = count.to_s
-            form.file_upload_with(:name => /FileUpload1/).file_name = image
-            page = form.click_button(form.button_with(:name => /Upload_Image/))
-            sleep 20 
-            if page.body =~ /Saving was successful./
-                puts "[Images] Image #{count} uploaded successfully."
-            else
-                page = page.link_with(:id => /btn_home/).click
-                images_error = true
-                throw "[Images] Image #{count} did not upload successfully."
-            end
-        end
-    end
-    if not images_error.nil? || images_error == true
-        catch "[Images] Image #{count} did not upload successfully."
-    end
-=end
-    # TODO - There's a few unsupported features on this site
+    self.save_account("Cylex", {:status => "Listing created successfully."})
 end
 true

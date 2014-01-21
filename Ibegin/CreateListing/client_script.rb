@@ -111,4 +111,5 @@ if @chained
   self.start("Ibegin/Notify")
 end
 
+self.save_account("Ibegin", { :status => "Listing created successfully!" })
 self.success

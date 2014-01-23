@@ -18,6 +18,16 @@ def sign_in( data )
   @browser.button( :value, /Login/i).click
 
   Watir::Wait.until { @browser.link(:text => 'Logout').exists? }
+rescue => e
+  unless @retries == 0
+    puts "Error caught in sign_in: #{e.inspect}"
+    puts "Retrying in two seconds. #{@retries} attempts remaining."
+    sleep 2
+    @retries -= 1
+    retry
+  else
+    raise "Error in sign_in could not be resolved. Error: #{e.inspect}"
+  end
 end
 
 def initial_signup(data)
@@ -27,11 +37,26 @@ def initial_signup(data)
   sleep(3)
   @browser.select_list( :id, 'region').select data['state_name']
   sleep(3)
-  @browser.select_list( :id, 'city').option(:text => /#{data['city']}/i).click
+  begin
+    @browser.select_list( :id, 'city').option(:text => /#{data['city']}/i).click
+  rescue
+    city = data['city'].gsub(" ", "").capitalize
+    @browser.select_list( :id, 'city').option(:text => /#{city}/i).click
+  end
   @browser.text_field( :name, 'address').set data['address']
   @browser.text_field( :name, 'zip').set data['zip']
   @browser.text_field( :name, 'phone').set data['phone']
   @browser.text_field( :name, 'fax').set data['fax']
+rescue => e
+  unless @retries == 0
+    puts "Error caught in initial_signup: #{e.inspect}"
+    puts "Retrying in two seconds. #{@retries} attempts remaining."
+    sleep 2
+    @retries -= 1
+    retry
+  else
+    raise "Error in initial_signup could not be resolved. Error: #{e.inspect}"
+  end
 end
 
 def loop_cats(data)
@@ -80,6 +105,16 @@ def set_category(data)
       loop_cats(data)
     end   
   end
+rescue => e
+  unless @retries == 0
+    puts "Error caught in set_category: #{e.inspect}"
+    puts "Retrying in two seconds. #{@retries} attempts remaining."
+    sleep 2
+    @retries -= 1
+    retry
+  else
+    raise "Error in set_category could not be resolved. Error: #{e.inspect}"
+  end
 end
 
 def set_socialmedia(data)
@@ -90,15 +125,36 @@ def set_socialmedia(data)
   @browser.text_field( :name, 'brands').set data['brands']
   @browser.text_field( :name, 'products').set data['products']
   @browser.text_field( :name, 'services').set data['services']
+rescue => e
+  unless @retries == 0
+    puts "Error caught in set_socialmedia: #{e.inspect}"
+    puts "Retrying in two seconds. #{@retries} attempts remaining."
+    sleep 2
+    @retries -= 1
+    retry
+  else
+    raise "Error in set_socialmedia could not be resolved. Error: #{e.inspect}"
+  end
 end
 
 def set_pay_methods(data)
   data[ 'payment_methods' ].each{ | method |
     @browser.checkbox( :id => /#{method}/ ).click
   }
+rescue => e
+  unless @retries == 0
+    puts "Error caught in set_pay_methods: #{e.inspect}"
+    puts "Retrying in two seconds. #{@retries} attempts remaining."
+    sleep 2
+    @retries -= 1
+    retry
+  else
+    raise "Error in set_pay_methods could not be resolved. Error: #{e.inspect}"
+  end
 end
 
 # Main Controller
+@retries = 3
 sign_in(data)
 initial_signup(data)
 set_category(data)

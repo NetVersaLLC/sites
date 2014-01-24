@@ -152,8 +152,16 @@ def search_for_business( data )
 end
 
 def claim_it()
-
-  watir_must do @browser.button( :value , 'Select' ).click end
+  retries = 3
+  begin
+    watir_must do @browser.button( :value , 'Select' ).click end
+    Watir::Wait.until { @browser.text.include? "Tell us about your business" }
+  rescue
+    unless retries == 0
+      retries -= 1
+      retry
+    end
+  end
 =begin
   count = 1
   begin

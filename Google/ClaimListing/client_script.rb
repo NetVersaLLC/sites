@@ -60,7 +60,7 @@ def search_business( data )
   end
   
   puts "Searching for business..."
-  @browser.element(:css => '.b-Ca').when_present.send_keys data['business'] + ", " + data['state'] + ' ' + data['city']
+  @browser.element(:css => '.b-Ca').when_present.send_keys data['phone']
   @browser.img(:src, /search-white/).click
   @browser.element(:css => '.I0vWDf').wait_until_present(60)
   sleep 3 # Just in case some elements haven't loaded yet
@@ -68,33 +68,42 @@ end
 
 def check_scenarios( data )
   businessFound = false
-  puts "Checking result scenarios..."
-  # Check for different scenarios
-  if @browser.text.include? "Is this your business?"
-    # Scenario 1
-    @scenario = 1
-    puts "Single Business Scenario"
-    if @browser.h4(:text, "#{data['business']}").exists? then
-      puts "Selecting business..."
-      businessFound = true
-    end
-  elsif @browser.text.include? "Is one of these your business?"
-    # Scenario 2
-    @scenario = 2
-    puts "Multiple Businesses Scenario"
-    count = 1
-    until count == 4 # From old code, unneeded, left for reference
-      if @browser.h4(:text, "#{data['business']}").exists? then
-        puts "Selecting business..."
-        businessFound = true
-        break
-      end
-      count += 1
-    end
-  elsif @browser.text.include? "We could not find"
-    # Scenario 3
-    @scenario = 3
+  if @browser.text.include? "We could not find"
     puts "Business not found?"
+  else
+    area_code = data['phone'].split("-")[0]
+    phone1 = data['phone'].split("-")[1]
+    phone2 = data['phone'].split("-")[2]
+    number = "(#{area_code}) #{phone1}-#{phone2}"
+    if @browser.text.include? number
+      puts "Number located."
+      businessFound = true
+      @chosen_one = @browser.element(:css,'div.Id:nth-child(2)')
+    else
+      # The below method is flawed and needs work, commented for now
+=begin
+      business_name = []
+      divsarray = []
+      data['business'].split(" ").each{ |word|
+        business_name.push(word)
+      }
+      @browser.element(:css => '.s7RQie').elements.each{ |element|
+        business_name.each{ |word|
+          next if not element.text.include? word
+          divsarray.push(element)
+        }
+      }
+      divsarray.uniq!
+      puts "Length: #{divsarray.length}"
+      if divsarray.length > 6 # 6 elements per business
+        self.failure("Multiple listings for the business found")
+        throw "Multiple listings for the business found"
+      elsif not divsarray.nil?
+        @chosen_one = divsarray.first
+        businessFound = true
+      end
+=end
+    end
   end
   return businessFound
 end
@@ -349,27 +358,8 @@ rescue => e
 end
 
 def claim_business( data )
-  business_name = []
-  divsarray = []
-  data['business'].split(" ").each{ |word|
-    business_name.push(word)
-  }
-  @browser.element(:css => '.s7RQie').elements.each{ |element|
-    business_name.each{ |word|
-      next if not element.text.include? word
-      divsarray.push(element)
-    }
-  }
-  divsarray.uniq!
-  if divsarray.nil?
-    raise "Business not found!"
-  elsif divsarray.length > 6 # 6 elements per business
-    self.failure("Multiple listings for the business found")
-    throw "Multiple listings for the business found"
-  end
-    
-  chosen_one = divsarray.first
-  chosen_one.click
+ 
+  @chosen_one.click
 
   sleep 1
 

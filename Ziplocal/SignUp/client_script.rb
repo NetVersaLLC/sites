@@ -87,14 +87,23 @@ def main( data )
 	@browser.link( :id, 'lookupForm:submit').click
 	
 	if @browser.text.include? 'We found the following'
-        listing_url = @browser.div(:id=>'content_container_solid').link
 		puts ("Phone number already associated.")
-		if @browser.text.include? "#{data['business']}"
-			self.save_account("Ziplocal",{:listing_url => listing_url.href })
-			self.success("Pre-existing business link grabbed successfully.")
-		else
-			self.failure("Phone number associated with a different business.")
-		end
+		@browser.div(:id, "content_container_solid").links.each{ |result|
+			next if result.text.nil?
+			puts "Result: #{result.text}"
+			rtext = result.text.to_s
+			rtext = rtext.strip
+			rtext = rtext.downcase
+			rtext = rtext.gsub(" ", "")
+			if rtext.include? data[ 'business' ].downcase.gsub(" ","")
+				listing_url = result
+				self.save_account("Ziplocal",{:listing_url => listing_url.href })
+				self.success("Pre-existing business link grabbed successfully.")
+				break
+			else
+				self.failure("Phone number associated with a different business.")
+			end
+		}
 	else
 		add_business(data)
 	end

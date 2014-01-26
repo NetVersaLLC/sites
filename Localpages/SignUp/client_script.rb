@@ -1,3 +1,10 @@
+@browser = Watir::Browser.new :firefox
+at_exit do
+	unless @browser.nil?
+		@browser.close
+	end
+end
+
 @browser.goto('http://www.localpages.com/signup/')
 
 @browser.execute_script("

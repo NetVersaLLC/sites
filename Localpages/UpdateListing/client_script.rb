@@ -1,4 +1,18 @@
-sign_in(data)
+@browser = Watir::Browser.new :firefox
+at_exit do
+	unless @browser.nil?
+		@browser.close
+	end
+end
+
+@browser.goto('http://www.localpages.com/signup/')
+@browser.execute_script("
+oFormObject = document.forms['login'];
+oFormObject.elements['username'].value = '#{data['username']}';
+oFormObject.elements['password'].value = '#{data['password']}';
+")
+
+@browser.link( :text => 'Login').click
 
 @browser.goto("http://www.localpages.com/my_listing.php")
 
@@ -24,8 +38,9 @@ sleep(3)
 @browser.text_field( :name => 'phone').set data['phone']
 @browser.text_field( :name => 'website').set data['website']
 
-data['logo'] == '' unless File.exist? data['logo']
-@browser.file_field(:id => 'photo1').value = data['logo']
+if not self.logo.nil? then
+@browser.file_field(:id => 'photo1').value = self.logo
+end
 
 @browser.link( :text => /Update Changes/i).click
 

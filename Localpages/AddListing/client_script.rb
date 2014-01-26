@@ -1,4 +1,19 @@
-sign_in(data)
+@browser = Watir::Browser.new :firefox
+at_exit do
+	unless @browser.nil?
+		@browser.close
+	end
+end
+
+@browser.goto('http://www.localpages.com/signup/')
+@browser.execute_script("
+oFormObject = document.forms['login'];
+oFormObject.elements['username'].value = '#{data['username']}';
+oFormObject.elements['password'].value = '#{data['password']}';
+")
+
+@browser.link( :text => 'Login').click
+
 
 @browser.goto('http://www.localpages.com/add_edit_business_info.php')
 
@@ -23,6 +38,11 @@ if not self.logo.nil? then
 @browser.file_field(:id => 'photo1').value = self.logo
 end
 
+
 @browser.link( :text => /Save Changes/i).click
+
+Watir::Wait.until {
+	@browser.text.include? "#{data['business']}"
+}
 
 true

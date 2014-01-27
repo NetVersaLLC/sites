@@ -41,7 +41,8 @@ begin
                     businessListed = true
                     break
                 else
-                    throw "Business already claimed!"
+                    self.failure("Business already claimed.")
+                    exit
                 end
             end
         end
@@ -154,7 +155,7 @@ if not businessListed
 	    if @chained
 		  self.start("Yelp/Verify")
 	    end
-	true
+	self.success
     else
         throw "Error while adding business"
     end
@@ -163,6 +164,6 @@ else
     if @chained
         self.start("Yelp/Notify")
     end
-    true
+    self.success
 end
 

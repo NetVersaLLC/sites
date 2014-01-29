@@ -187,7 +187,7 @@ def search_business( data )
   end
   
   puts "Searching for business..."
-  @browser.element(:css => '.b-Ca').when_present.send_keys data['business'] + ", " + data['state'] + ' ' + data['city']
+  @browser.element(:css => '.b-Ca').when_present.send_keys data['phone']#data['business'] + ", " + data['state'] + ' ' + data['city']
   @browser.img(:src, /search-white/).click
   @browser.element(:css => '.I0vWDf').wait_until_present(60)
   sleep 3 # Just in case some elements haven't loaded yet

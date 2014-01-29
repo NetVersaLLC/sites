@@ -292,6 +292,14 @@ def postcard_verify( data )
     @browser.element(:css => '.d-Cb-Ba').click
   end
   puts "Page Successfully Created"
+rescue
+  unless @retries < 3
+    @retries = 3
+  end
+  unless @retries = 0
+    @retries -= 1
+    retry
+  end
 end
 
 def add_business_contact( data)

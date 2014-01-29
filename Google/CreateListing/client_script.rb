@@ -41,6 +41,9 @@ def login ( data )
   else
     raise StandardError.new("You must provide both a username AND password for gplus_login!")
   end
+rescue
+  self.failure("Login failure!")
+  exit
 end
 
 # No longer used, left for reference
@@ -158,6 +161,8 @@ def check_scenarios( data )
 end
 
 def search_business( data )
+  
+  login (data)
 
   unless @browser.url =~ /https:\/\/www\.google\.com\/local\/business\/add/
     @browser.goto "https://www.google.com/local/business/add"
@@ -528,8 +533,8 @@ end
 #Main Steps
 @retries = 3
 begin
-  login( data )
-  search_business( data )
+  #login( data ) 
+  search_business( data ) # Also logs in, so the rescue can handle it
   if check_scenarios( data ) == true
     self.save_account("Google", {:status => "Pre-existing listing found! Claiming..."})
     if @chained

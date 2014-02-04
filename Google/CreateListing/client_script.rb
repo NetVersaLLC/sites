@@ -1,5 +1,132 @@
 #require 'rautomation'
 
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'ffi'
+
+module Win
+  extend FFI::Library
+
+  ffi_lib 'user32'
+  ffi_convention :stdcall
+
+  # BOOL CALLBACK EnumWindowProc(HWND hwnd, LPARAM lParam)
+  callback :enum_callback, [ :pointer, :long ], :bool
+
+  # BOOL WINAPI EnumDesktopWindows(HDESK hDesktop, WNDENUMPROC lpfn, LPARAM lParam)
+  attach_function :enum_desktop_windows, :EnumDesktopWindows,
+                  [ :pointer, :enum_callback, :long ], :bool
+
+  # BOOL WINAPI EnumWindows( WNDENUMPROC lpEnumFunc, LPARAM lParam )
+  attach_function :enum_windows, :EnumWindows,
+    [ :enum_callback, :long ], :bool
+
+  # DWORD WINAPI GetWindowThreadProcessId( HWND hWnd, LPDWORD lpdwProcessId )
+  attach_function :get_window_thread_process_id, :GetWindowThreadProcessId,
+    [ :pointer, :pointer ], :long
+
+  # HDESK WINAPI OpenDesktop(                      
+  # _In_  LPTSTR lpszDesktop,                      
+  # _In_  DWORD dwFlags,                           
+  # _In_  BOOL fInherit,                           
+  # _In_  ACCESS_MASK dwDesiredAccess              
+  # );                                             
+                                                          
+  attach_function :open_desktop, :OpenDesktopA, [  
+    :pointer,                                      
+    :ulong,                                        
+    :bool,                                         
+    :ulong], :pointer                              
+
+  # int GetWindowTextA(HWND hWnd, LPTSTR lpString, int nMaxCount)
+  attach_function :get_window_text, :GetWindowTextA,
+                  [ :pointer, :pointer, :int ], :int
+
+  # int WINAPI GetClassName(                        
+  # _In_   HWND hWnd,                               
+  # _Out_  LPTSTR lpClassName,                      
+  # _In_   int nMaxCount                            
+  # );                                              
+                                                          
+  attach_function :get_class_name, :GetClassNameA, [
+    :pointer,                                       
+    :pointer,                                       
+    :int], :int
+
+  # HWND WINAPI GetDlgItem(
+  #     _In_opt_  HWND hDlg,
+  #         _In_      int nIDDlgItem
+  # );
+
+  attach_function :get_dlg_item, :GetDlgItem, [:pointer, :long], :pointer
+
+  # LRESULT WINAPI SendMessage(                    
+  #  _In_  HWND hWnd,                              
+  # _In_  UINT Msg,                                
+  # # _In_  WPARAM wParam,                           
+  # # _In_  LPARAM lParam                            
+  # # );                                             
+  attach_function :send_message, :SendMessageA, [  
+    :pointer,
+    :uint,
+    :long,
+    :pointer], :pointer
+
+  # BOOL WINAPI PostMessage(
+  #   _In_opt_  HWND hWnd,
+  #     _In_      UINT Msg,
+  #     _In_      WPARAM wParam,
+  #   _In_      LPARAM lParam
+  # );
+  attach_function :post_message, :PostMessageA, [  
+    :pointer,
+    :uint,
+    :long,
+    :long], :bool
+
+
+  Win::WM_SETTEXT = 12
+
+  def self.find_upload_window(window_name = 'File Upload')
+    win_count = 0
+    title = FFI::MemoryPointer.new :char, 512
+    class_name = FFI::MemoryPointer.new :char, 512
+
+    handles = []
+    enumWindowCallback = Proc.new do |wnd, param|
+      title.clear
+      Win.get_window_text(wnd, title, title.size)
+      Win.get_class_name(wnd, class_name, class_name.size)
+      if title.get_string(0) == window_name
+        puts "[%03i] Found '%s' of class '%s'" % [ win_count += 1, title.get_string(0), class_name.get_string(0) ]
+        pid = FFI::MemoryPointer.new :long, 1
+        Win.get_window_thread_process_id wnd, pid
+        if class_name.get_string(0) == '#32770'
+          handles.push wnd
+        end
+        puts "Process id: #{pid.get_long(0)}"
+      end
+      true
+    end
+    @desktop_name = 'citation'
+    @desktop_handle = Win.open_desktop(@desktop_name, 1, false, 268435456)
+    Win.enum_desktop_windows(@desktop_handle, enumWindowCallback, 0)
+    Win.enum_windows(enumWindowCallback, 0)
+    title.free
+    class_name.free
+    return handles.first
+  end
+  def self.set_upload(file, window_name='File Upload')
+    fp = FFI::MemoryPointer.from_string(file)
+    wnd = Win.find_upload_window(window_name)
+    text_area = Win.get_dlg_item(wnd, 1148)
+    ret = Win.send_message(text_area, Win::WM_SETTEXT, 0, fp)
+    open_button = Win.get_dlg_item(wnd, 1)
+    Win.post_message(open_button, 245, 0, 0)
+  end
+end
+
 # Used for proper exception handling
 
 class InvalidDashboard < StandardError
@@ -227,7 +354,7 @@ def initial_signup_form( data )
   end
   puts 'Creating business listing'
   # Basic Information, xpath used for reliability
-  @browser.element(:css => 'input.Cj:nth-child(2)').when_present.send_keys data['business']
+  @browser.element(:css => '.Fd-fb > div:nth-child(2) > label:nth-child(1) > div:nth-child(2) > input:nth-child(1)').when_present.send_keys data['business']
   puts "Business set"
   #Skip Country/Region
   @browser.element(:css => 'div.Xq:nth-child(2) > input:nth-child(2)').send_keys data['address']
@@ -444,26 +571,20 @@ def add_photos( data )
   @browser.element(:css => 'div.wb:nth-child(6)').when_present.click
   puts "Adding Business Photos..."
   @browser.element(:css => '.a-kb-vA > div:nth-child(4) > div:nth-child(1)').when_present.click
-  data['logo'] = self.logo
-  if data['logo'] > 0
+  if not self.logo.nil?
     sleep 1
-    photo_upload_pop = RAutomation::Window.new :title => /File Upload/
-    photo_upload_pop.text_field(:class => "Edit").set(data['logo'])
-    photo_upload_pop.button(:value => "&Open").click
+    Win.set_upload(self.logo)
     @browser.element(:css => '#picker:ap:2').wait_until_present(120)
   end
 
   # Additional images
   photos = self.images
-  data[ 'images' ] = photos
   @browser.element(:css => '#picker:ap:2').click
   sleep 1
   if photos.length > 0
     image_index = ""
     for image_index in (0..photos.length-1)
-      photo_upload_pop = RAutomation::Window.new :title => /File Upload/
-      photo_upload_pop.text_field(:class => "Edit").set(photos[image_index])
-      photo_upload_pop.button(:value => "&Open").click
+      Win.set_upload()
       @browser.element(:css => '#picker:ap:2').wait_until_present(120)
     end
   end
@@ -484,6 +605,7 @@ rescue => e
     @browser.refresh
     sleep 3
   end
+end
 end
 
 def add_business_description( data )

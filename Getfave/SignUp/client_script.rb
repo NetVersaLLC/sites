@@ -5,51 +5,23 @@ at_exit {
 	end
 }
 
-def sign_in(data)
-  @browser.link(:text => 'Log In/Join').click
-  @browser.text_field(:id => 'session_email').set data['email']
-  @browser.text_field(:id => 'session_password').set data['password']
-  @browser.button(:value => 'Log In').click
-  # @browser.button(:xpath => '//*[@id="signin-container"]/form/input[3]').click
-rescue => e
-  unless @retries == 0
-    puts "Error caught in sign_in: #{e.inspect}"
-    puts "Retrying in two seconds. #{@retries} attempts remaining."
-    sleep 2
-    @retries -= 1
-    retry
-  else
-    raise "Error in sign_in could not be resolved. Error: #{e.inspect}"
-  end
-end
-
-# Launch url
-url = 'https://www.getfave.com'
+url = 'https://www.getfave.com/login'
 @browser.goto url
-#Verify if the page is loaded successfully.
 
-@retries = 3
-sign_in data
+@browser.link(:text,'create a new one,').click
 
-#~ throw("Login unsuccessful") if @sign_in.exist?
+@browser.text_field(:id,'user_name').set data[ 'name' ]
+@browser.text_field(:id,'user_email').set data[ 'email' ]
+@browser.text_field(:id,'user_password').set data[ 'password' ]
+@browser.button(:value,'Join Us').click
 
-# Check for login error
-@login_error = @browser.div(:class,'container error')
-
-#Sign up if user doesn't exist
-if @login_error.exist? 
-	@browser.link(:text,'create a new one,').click
-	@browser.text_field(:id,'user_name').set data[ 'name' ]
-	@browser.text_field(:id,'user_email').set data[ 'email' ]
-	@browser.text_field(:id,'user_password').set data[ 'password' ]
-	@browser.button(:value,'Join Us').click
-end
-
-if @browser.text.include? 'Please correct the errors and try again.' 
-	throw "There is an error while creating the account"	
-elsif @browser.label(:class, "error").present?
+if @browser.text.include? 'Email is already taken'
 	self.failure("Email already registered.")
-else
+elsif @browser.text.include? "can't be blank"
+	self.failure("Required fields can not be blank.") 
+elsif @browser.label(:class, "error").present?
+	throw "There is an error while creating the account"	
+else 
 	self.save_account("Getfave", {:email => data['email'], :password => data['password']})
 	self.save_account("Getfave", {:status => "Account created, verifying account..."})
 	puts "Signup successful. Verifying email to continue"

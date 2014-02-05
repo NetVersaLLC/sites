@@ -105,8 +105,8 @@ change_location data
 
 sleep 10
 
-queryurl = "https://www.getfave.com/search?utf8=%E2%9C%93&q=#{data['bus_name_fixed']}"
-@browser.goto queryurl
+@browser.text_field(:id => "q").set data['business']
+@browser.button(:value => "Get").click
 
 Watir::Wait.until { @browser.div(:id => 'results').exists? }
 
@@ -114,10 +114,18 @@ if @browser.text.include? "We couldn't find any matches."
   #Add business
   @browser.link(:href => 'https://www.getfave.com/businesses/new').click
   fill_business data
-
   self.save_account("Getfave", {:status => "Listing created successfully!"})
+
+  if @browser.div(:id => 'business-results').span(:text => "#{data['business']}").exist?
+    listing_url = @browser.div(:id => 'business-results').span(:text => "#{data['business']}").parent.href
+    self.save_account("Getfave", {:listing_url => listing_url})
+  end
+
   self.success
 elsif @browser.div(:id => 'business-results').span(:text => "#{data['business']}").exist?
-  self.save_account("Getfave", {:status => "Listing status pending."})
+  listing_url = @browser.div(:id => 'business-results').span(:text => "#{data['business']}").parent.href
+    
+  self.save_account("Getfave", {:listing_url => listing_url, :status => "Listing status pending."})
   self.failure("Business is already listed.")
 end
+

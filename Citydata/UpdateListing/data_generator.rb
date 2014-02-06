@@ -15,5 +15,5 @@ data['ccaccepted']	= if business.accepts_mastercard or business.accepts_visa or 
 #skipping this as we don't have the data
 data['employees']	= 'skipped'
 data['category']	= CitydataCategory.find(business.citydata.first.category_id).name
-data['description']	= business.status_message+" "+business.tag_line + " " + business.business_description + " \n " + data['hours'] + business.company_website.to_s
+data['description']	=  "#{business.business_description}  \n #{business.status_message} #{business.tag_line} #{business.services_offered} #{data['hours']} #{business.company_website}"
 data

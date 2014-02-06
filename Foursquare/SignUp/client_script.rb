@@ -42,9 +42,9 @@ class Runner
     txt_set({:name => 'birthMonth'}, @data['birth_month'])
     txt_set({:id => 'inputBirthDate'}, @data['birth_day'])
     txt_set({:name => 'birthYear'}, @data['birth_year'])
-    @brow.radio(:name=> 'gender', :value=> @data['gender']).set
+    #@brow.radio(:name=> 'gender', :value=> @data['gender']).set
     @brow.button(:value => 'Sign Up').click
-    Watir::Wait.while{ @brow.text_field(:id => 'inputEmail').exists? }
+    Watir::Wait.while{ @brow.button(:value => 'Sign Up').present? }
     true
   end
   
@@ -80,7 +80,6 @@ end
 runner= Runner.new
 runner.main(data)
 data= runner.data
-true
 
 self.save_account("Foursquare", {:email => data['email'],:password => data['password']})
 sleep 2

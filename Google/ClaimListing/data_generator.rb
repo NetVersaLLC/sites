@@ -11,8 +11,8 @@ data[ 'hours'   ]         = Google.get_hours(business)
 data[ 'city' ]      = business.city
 data[ 'website']    = business.company_website
 data[ 'description'] = business.business_description
-catty = Facebook.where(:business_id => business.id).first
-data['category']    = GoogleCategory.find(catty.category_id).name
+#catty = Facebook.where(:business_id => business.id).first
+data['category']    = business.category1
 data['country'] = 'United States'
 data[ 'fax' ] = business.fax_number
 data[ 'mobile?' ] = business.mobile_appears

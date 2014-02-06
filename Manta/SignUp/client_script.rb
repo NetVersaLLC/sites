@@ -1,70 +1,44 @@
-#Add a company
-
-def add_company( data )
-
-  #select the country
-  @browser.select_list( :id => 'co_Country').when_present.select data[ 'country' ]
-  #select the state
-  @browser.select_list( :id => 'co_State' ).when_present.select data[ 'state' ]
-
-  #enter the rest of the company information
-  @browser.text_field( :id, 'co_City').when_present.set data[ 'city' ]
-  @browser.text_field( :id, 'co_Name').set data[ 'business' ]
-  @browser.text_field( :id, 'co_Address').set data[ 'address' ]
-  @browser.text_field( :id, 'co_Phone').set data[ 'phone' ]
-  @browser.text_field( :id, 'co_Zip').set data[ 'zip' ]
-
-  #Select the What is your relationship to this company radio group
-  @browser.radio( :value, 'owner').set
-  @browser.button( :id, 'SUBMIT').fire_event("onClick")
-  @browser.button( :id, 'SUBMIT').click
-
-  #fill out member form
-  sleep(5)
-
-Watir::Wait.until { @browser.text_field( :id, 'member-firstname').exists? }
-
-  @browser.text_field( :id, 'member-firstname-preroll').send_keys :enter
-  @browser.text_field( :id, 'member-firstname').when_present.set data[ 'first_name' ]
-  @browser.text_field( :id, 'member-lastname-preroll').send_keys :enter
-  @browser.text_field( :id, 'member-lastname').when_present.set data[ 'last_name' ]
-  @browser.text_field( :id, 'member-email').focus
-  @browser.text_field( :id, 'member-email').set data[ 'email' ]
-  @browser.text_field( :id, 'member-email_confirm').focus
-  @browser.text_field( :id, 'member-email_confirm').set data[ 'email' ]
-  @browser.text_field( :id, 'member-password').focus
-  @browser.text_field( :id, 'member-password').set data[ 'password' ]
-  @browser.text_field( :id, 'member-confirm_password').focus
-  @browser.text_field( :id, 'member-confirm_password').set data[ 'password']
+@browser = Watir::Browser.new :firefox
+at_exit {
+	unless @browser.nil?
+		@browser.close
+	end
+}
 
 
-  #uncheck the newsletters
-  @browser.checkbox( :id, 'manta-smb' ).clear
-  @browser.checkbox( :id, 'over-quota' ).clear
-  @browser.link(:class, 'btn-join btn-continue').click
+def signup(data) 
+  @browser.goto('http://www.manta.com')
 
-  self.save_account("Manta", { :email => data['email'], :password => data['password']})
-  puts data['email']
-  puts data['password']
+  @browser.link(:id => "signup-nav-header").click 
 
-  @browser.link(:text, /Continue to my profile/).when_present.click
-  @browser.link(:text, /I'll do it later/).when_present.click
-  # TODO - Products not yet supported
-  #@browser.text_field(:id, "product-selector-autocomplete").when_present.set data['product']
-  #@browser.text_field(:id, "product-selector-autocomplete").send_keys :enter
-  #@browser.li(:class => "user", :text => data['category']).when_present.click
-  @browser.span(:class => "ui-button-text", :text => "Done").when_present.click
-  if @chained
-    self.start("Manta/Verify")
-  end
+  Watir::Wait.until{ @browser.text.include?("Join Manta")} 
+
+  @browser.text_field(:id => "firstname").set data['first_name']
+  @browser.text_field(:id => "lastname").set data['last_name']
+  @browser.text_field(:id => "member-email").set data['email']
+  @browser.text_field(:id => "new-password").set data['password']
+
+  @browser.button(:id => "SUBMIT").click
+  
+  if @browser.text.include?("already registered") 
+    puts "Already registered"
+    return :already_registered
+  end 
+
+  if @browser.text.include?("Get The Most out of Manta") 
+    self.save_account("Manta", {:email=>data['email'], :password => data['password'], :status => 'Account created.'})
+    puts "success"
+    return :success
+  end 
+
+  throw "There was an error while creating the account."
+end 
+
+signup(data)
+
+if @chained
+  self.start("Manta/CreateListing")
 end
+self.success
 
-def main( data )
-  #load the browser and navigate to the business search page
-  @browser.goto('http://www.manta.com/profile/my-companies/select?add_driver=home-getstarted')
-  add_company( data )
-end
-
-#Main Steps
-main( data )
 true

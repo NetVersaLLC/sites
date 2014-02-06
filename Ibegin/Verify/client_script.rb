@@ -58,6 +58,7 @@ rescue => e
 end
 
 # Main Controller
+@retries = 3
 sign_in( data )
 do_the_thing( data )
 self.save_account("Ibegin", { :status => "Listing verified successfully!" })

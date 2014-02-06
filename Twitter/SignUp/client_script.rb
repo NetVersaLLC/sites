@@ -325,6 +325,7 @@ end
 
 # Controller
 create_account(data)
+self.save_account("Twitter", {:listing_url => "https://twitter.com/#{data['username']}"})
 follow_other_tweeters(data)
 bypass_interests(data)
 setup_profile_basics(data)

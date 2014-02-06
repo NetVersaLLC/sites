@@ -43,7 +43,7 @@ def get_to_business( data )
   end
 
   if not @browser.text.include? "Complete your business information"
-    @browser.element(:text, data['business']).when_present.click
+    @browser.element(:css, 'div.mu:nth-child(1) > div:nth-child(1) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(2) > a:nth-child(1) > div:nth-child(1)').when_present.click
   end
 
 end

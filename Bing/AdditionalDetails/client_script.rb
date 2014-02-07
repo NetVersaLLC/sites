@@ -80,7 +80,7 @@ retries = 3
 begin
   @browser.h5(:text => 'Images and Videos').click
   unless self.logo.nil?
-    @browser.file_field(:id, 'imageFiles1').set "C:\\Users\\Work\\Desktop\\Jellyfish.jpg"#self.logo
+    @browser.file_field(:id, 'imageFiles1').set self.logo
     @browser.button(:id, 'uploadPhoto1').click
     sleep 2
     @browser.img(:src, /loading.gif/).wait_while_present

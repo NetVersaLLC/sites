@@ -75,6 +75,35 @@ rescue Selenium::WebDriver::Error::ElementNotVisibleError
 	end
 end
 
+sleep 2
+retries = 3
+begin
+  @browser.h5(:text => 'Images and Videos').click
+  unless self.logo.nil?
+    @browser.file_field(:id, 'imageFiles1').set "C:\\Users\\Work\\Desktop\\Jellyfish.jpg"#self.logo
+    @browser.button(:id, 'uploadPhoto1').click
+    sleep 2
+    @browser.img(:src, /loading.gif/).wait_while_present
+    @browser.img(:src, /https:\/\/bpprodstorage\.blob\.core\.windows\.net/).wait_until_present
+  end
+
+  unless self.images.length < 1
+    for image in self.images
+      @browser.file_field(:id, 'imageFiles2').set "#{ENV['USERPROFILE']}\\citation\\#{@bid}\\images\\#{image}"
+      @browser.button(:id, 'uploadPhoto2').click
+      sleep 2
+      Watir::Wait.until { @browser.button(:id, 'uploadPhoto2').enabled? }
+    end
+  end
+rescue => e
+  if retries > 0
+    retries -= 1
+    retry
+  else
+    puts(e)
+  end
+end
+
 retries = 3
 begin
 	@browser.h5(:text => "Other Contact Information").click

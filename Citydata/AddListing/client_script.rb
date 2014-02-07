@@ -4,6 +4,20 @@ at_exit do
 		@browser.close
 	end
 end
+
+def upload_images(data)
+  images.each do |p|
+    f = File.join("#{ENV['USERPROFILE']}\\citation\\#{@bid}\\images", p)
+    puts "file #{f}"
+    @browser.button(:value => "Add photo").click
+
+    @browser.file_field(:name => 'photo').value= f
+    @browser.text_field(:name => 'descr').set data["business"]
+    @browser.button(:value => "Add photo").click
+    sleep 1 # tap the brake
+  end
+end 
+
 @browser.goto 'http://www.city-data.com/profiles/add'
 
 
@@ -44,6 +58,9 @@ Watir::Wait.until {
 }
 
 listing_url = @browser.link(:text=>/here/).href
+
+@browser.goto "http://www.city-data.com/profiles/account"
+upload_images(data)
 
 self.save_account("Citydata", {:email => data['email'], :password => data['password'], :listing_url=>listing_url, :status => "Listing created successfully!"})
 

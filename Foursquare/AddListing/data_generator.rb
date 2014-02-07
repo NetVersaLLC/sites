@@ -11,11 +11,11 @@ data[ 'address']        = business.address +
                            (((business.address2 || '') != '') ? ", #{business.address2}" : '')
 data[ 'business_name' ] = business.business_name
 data[ 'associated_as'] 	= 'Owner'
-data[ 'birth_month' ]   = business.contact_birthday.split("/")[0]
-data[ 'birth_day' ]	    = business.contact_birthday.split("/")[1]
-data[ 'birth_year' ]    = business.contact_birthday.split("/")[2]
+data[ 'birth_year' ]   = business.contact_birthday.split("-")[0]
+data[ 'birth_month' ]	    = business.contact_birthday.split("-")[1]
+data[ 'birth_day' ]    = business.contact_birthday.split("-")[2]
 
-data['twitter_page']    = business.twitters.first.nil? ? '' : business.twitters.first.twitter_page
+data['twitter_page']    = business.twitters.first.nil? ? '' : business.twitters.first.username
 
 foursq                  = business.foursquares.first
 catty                   = FoursquareCategory.find(foursq.category_id)

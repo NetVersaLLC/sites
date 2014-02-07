@@ -10,13 +10,13 @@ data[ 'address' ]		= business.address + ' ' + business.address2
 data[ 'zip' ]			= business.zip
 data[ 'phone' ]			= business.local_phone
 data[ 'fax' ]			= business.fax_number
-data[ 'category1' ] = catty.ibegin_category.name.gsub("\n", "")
+data[ 'category' ] = IbeginCategory.find(business.ibegins.first.category_id).name.chomp
 data[ 'url' ]			= business.company_website
 data[ 'facebook' ]		= ""#business.facebooks.first.email
 data[ 'twitter_name' ]		= ""#business.twitters.first.username
 data[ 'desc' ]			= business.business_description[0 .. 245]
 data[ 'brands' ]		= business.get_brands
 data[ 'products' ]		= ""#business.get_products
-data[ 'services' ]		= business.category1 + ', ' +business.category2 + ', ' +business.category3 + ', ' +business.category4 + ', ' +business.category5
+data[ 'services' ]		= business.services_offered
 data[ 'payment_methods' ]	= Ibegin.payment_methods( business )
 data

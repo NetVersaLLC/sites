@@ -11,13 +11,13 @@ data['location'] = data['city'] +', '+data['state']
 data['zip'] = business.zip
 data['category'] = business.category1
 data['company_details'] = business.business_description
-data['keywords'] = business.category1 + ' ' + business.category2 + ' ' + business.category3 + ' ' + business.category4 + ' ' + business.category5
+data['keywords'] = business.keywords
 data['year'] = business.year_founded
 data['business_email'] = business.bings.first.email
 data['business_hours'] = Getfave.consolidate_hours( business )
-data['tagline'] = business.category1 + ' ' + business.category2
+data['tagline'] = business.tag_line
 data['user_type'] = 'new'
-data['discription'] = business.business_description + "new"
+data['discription'] = business.business_description
 data['url'] = business.company_website
 data['bus_name_fixed'] = business.business_name.gsub(" ", "+")
 data

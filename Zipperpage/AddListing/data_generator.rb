@@ -9,5 +9,5 @@ data[ 'zip' ]			= business.zip
 data[ 'email' ]			= business.bings.first.email
 data[ 'website' ]		= business.company_website
 data[ 'state' ]			= business.state_name
-data[ 'category' ]		= business.category1 + ', ' + business.category2 + ', ' + business.category3 + ', ' + business.category4 + ', ' + business.category5
+data[ 'category' ]		= ZipperpageCategory.find( business.zipperpages.first.category_id ).name
 data

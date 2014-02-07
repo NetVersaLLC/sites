@@ -38,7 +38,7 @@ def enter_captcha( data )
   capSolved = false
   count = 1
   until capSolved or count > 5 do
-  captcha_code = solve_captcha
+  captcha_code = solve_captcha.upcase
   @browser.text_field( :name, 'get_sign_crypt').set captcha_code
   @browser.button(:src => /final-design2.png/).click
   sleep(4)

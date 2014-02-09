@@ -142,7 +142,7 @@ if @update == false then
     form.field_with(:name => /tb_keywords/).value = data['keywords']
     form.field_with(:name => /tb_shortdesc/).value = data['description']
     page = form.click_button(form.button_with(:name => /b_save/))
-    if page.body =~ /Logged as/
+    if page.body =~ /Logged in as/
         puts "[Listing] Added successfully."
         profile_url = page.link_with(:id=>/ctl00_CompanyFeatures_lit_cmp_name/).href
         self.save_account('Cylex',{:email=>data['email'],:password=>data['password'],:listing_url=> profile_url})

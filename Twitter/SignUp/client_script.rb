@@ -311,10 +311,11 @@ def setup_profile_basics(data)
     retries ||= 3
     @browser.goto("https://twitter.com/welcome/profile")
     @browser.textarea(:id, 'welcomeProfileBio').when_present.set data['bio']
-    # Image upload, to do
-    #@browser.div(:class, 'image-selector').click
-    #Win.set_upload("C:\\Users\\Work\\Desktop\\Jellyfish.jpg")
-    #Watir::Wait.until { @browser.img(:src, /data\:image/).exists? }
+
+    imagepath = "#{ENV['USERPROFILE']}\\citation\\#{@bid}\\images\\#{self.logo}"
+    @browser.file_field.set(imagepath) unless logo.nil?
+    Watir::Wait.until { @browser.img(:src, /data\:image/).exists? }
+
     @browser.link(:text, 'Done').when_present.click
 rescue => e
     retry unless (retries -= 1).zero?

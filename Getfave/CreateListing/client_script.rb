@@ -45,6 +45,14 @@ rescue => e
 end
 
 def fill_business(data)
+  unless self.images.length < 1
+    for image in self.images
+      @browser.text_field(:id,'hype_title').when_present.set 'Promotional Image'
+      imagepath = "#{ENV['USERPROFILE']}\\citation\\#{@bid}\\images\\#{image}"
+      @browser.file_field(:id,'hype_image').set imagepath
+      @browser.link(:id,'create-hype').click
+    end
+  end
   @browser.text_field(:id => 'business_name').set data['business']
   #puts('Debug: Name Set')
   @browser.text_field(:id => 'business_location').set data['address']

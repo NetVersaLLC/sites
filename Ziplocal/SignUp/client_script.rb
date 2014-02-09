@@ -94,8 +94,8 @@ def main( data )
 			rtext = result.text.to_s
 			rtext = rtext.strip
 			rtext = rtext.downcase
-			rtext = rtext.gsub(" ", "")
-			if rtext.include? data[ 'business' ].downcase.gsub(" ","")
+			rtext = rtext.gsub(/[^0-9a-z]/i, '')
+			if rtext.include? data[ 'business' ].gsub(/[^0-9a-z]/i, '').downcase
 				listing_url = result
 				self.save_account("Ziplocal",{:listing_url => listing_url.href })
 				self.success("Pre-existing business link grabbed successfully.")

@@ -49,7 +49,7 @@ def update_listing(data)
   @browser.select_list( :id, 'country').select data['country']
   Watir::Wait.until{ @browser.select(:id => 'region').options.count >= 50 } 
   @browser.select_list( :id, 'region').select data['state_name']
-  Watir::Wait.until{ @browser.select(:id => 'city').options.count >= 10 } 
+  Watir::Wait.until{ @browser.select(:id => 'city').options.count >= 5 } 
 
   @browser.select_list( :id, 'city').select data['city']
   @browser.text_field( :name, 'address').set data['address']
@@ -84,9 +84,42 @@ def update_listing(data)
   @browser.link(:text => 'instantly live on iBegin').when_present.click
   @browser.url   
 end 
+def remove_existing_images(data)
+  if @browser.link(:text => "Delete Photo").exists?
+    @browser.link(:text => "Delete Photo").click
+    @browser.alert.ok
+    Watir::Wait.until{ @browser.text.include? "Photo was successfully deleted" }
+
+    remove_existing_images
+  end 
+end 
+
+def upload_images(data)
+  images.each do |p| 
+    f = File.join("#{ENV['USERPROFILE']}\\citation\\#{@bid}\\images", p)
+    puts "file #{f}"
+    @browser.link(:text => /Upload a Photo/).click 
+
+
+    @browser.file_field(:name => 'userfile').value= f
+    @browser.text_field(:name => 'caption').set data['business_name']
+    @browser.form(:name => "form_avatar").button.click
+
+    sleep 1 # simply to prevent raising any red flags. 
+  end 
+end 
+
+def sync_images(data)
+  @browser.goto "http://www.ibegin.com/business-center/"
+  @browser.link(:text => "Add/Edit Photos").click
+
+  remove_existing_images(data)
+  upload_images(data)
+end 
 
 sign_in(data)
 listing_url = update_listing(data)
+sync_images(data)
 
 self.save_account("Ibegin", { :status => "Listing updated successfully!", :listing_url => listing_url})
 self.success

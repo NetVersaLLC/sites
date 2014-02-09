@@ -4,14 +4,17 @@ at_exit do
 		@browser.close
 	end
 end
-
-def update(data)
+def sign_in(data) 
   @browser.goto "http://www.city-data.com/profiles/account"
 
   @browser.text_field(:name => 'login').set data['email']
   @browser.text_field(:name => 'pass').set data['pass']
 
   @browser.button(:value => 'Login').click
+end 
+
+
+def update(data) 
 
   @browser.button(:value => 'Edit profile').when_present.click
 
@@ -41,14 +44,51 @@ def update(data)
   @browser.textarea(:name => 'descr').set description
 
   @browser.button(:value => 'Save changes').click
-  if @browser.text.include? "Description must be at least 350 characters long."
-    raise "This customer's business description is too short, and cannot be supported by Citydata."
-  end 
 
   @browser.button(:value => 'Edit profile').wait_until_present
-end
 
+  # click home 
+
+  #search for item 
+  #
+  # if stuff equals then click link, and get the url of the opened window. 
+
+
+end 
+
+def remove_existing_images
+  if @browser.button(:value => "Del").exists? 
+    @browser.button(:value => "Del").click 
+    @browser.button(:value => "Delete").click 
+    remove_existing_images
+  end 
+end 
+
+def upload_images(data)
+  images.each do |p| 
+    f = File.join("#{ENV['USERPROFILE']}\\citation\\#{@bid}\\images", p)
+    puts "file #{f}"
+    @browser.button(:value => "Add photo").click 
+
+    @browser.file_field(:name => 'photo').value= f
+    @browser.text_field(:name => 'descr').set data["business"]
+    @browser.button(:value => "Add photo").click 
+    sleep 1 # tap the brake
+  end 
+end 
+
+def sync_images(data)
+  @browser.goto "http://www.city-data.com/profiles/account"
+
+  remove_existing_images 
+  upload_images(data)
+
+end 
+
+sign_in(data)
 update(data)
+sync_images(data)
+
 self.save_account("Citydata", {:status => "Listing updated successfully!"})
 
 true

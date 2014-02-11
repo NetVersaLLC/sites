@@ -1,3 +1,4 @@
 data = {}
-data['password'], data['email']		= Magicyellow.check_email(business)
+data['email']  = business.bings.first.email
+data['bing_password'] = business.bings.first.password
 data

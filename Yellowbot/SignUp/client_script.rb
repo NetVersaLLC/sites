@@ -4,7 +4,7 @@ at_exit do
     @browser.close
   end
 end
-#BEGIN CAPTCHA
+
 def solve_captcha( obj )
   image = ["#{ENV['USERPROFILE']}",'\citation\site_captcha.png'].join
   puts "CAPTCHA source: #{obj.src}"
@@ -15,61 +15,39 @@ def solve_captcha( obj )
 end
 
 
-def enter_captcha( button, field, image, successTrigger, failureTrigger=nil )
-  capSolved = false
-  count = 1
-  until capSolved or count > 5 do
-    captcha_code = solve_captcha(image)
-    field.set captcha_code
-    button.click
+def sign_up(data)
+  @browser.goto( "https://www.yellowbot.com/signin/register" )
 
-    30.times{ break if @browser.status == "Done"; sleep 1}
-    
-    unless failureTrigger.nil? or @browser.text.include? failureTrigger
-      capSolved = true
-    end
-    
-  count+=1  
+  @browser.text_field( :id => 'reg_email' ).set data[ 'email' ]
+  @browser.text_field( :id => 'reg_email_again' ).set data[ 'email' ]
+  @browser.text_field( :id => 'reg_name' ).set data[ 'username' ]
+  @browser.checkbox( :name => 'tos' ).set
+  @browser.checkbox( :name => 'opt_in' ).clear
+
+  5.times do 
+    captcha_text = solve_captcha( @browser.div(:id=>"recaptcha_image").image )
+
+    @browser.text_field(:id => "recaptcha_response_field").set captcha_text
+    @browser.text_field( :id => 'reg_password' ).set data[ 'password' ]
+    @browser.text_field( :id => 'reg_password2' ).set data[ 'password' ]
+
+    @browser.button(:name => "subbtn").click
+
+    break if @browser.h2(:text => "Welcome to YellowBot!").exist?
   end
-  if capSolved == true
-    Watir::Wait.until { @browser.text.include? successTrigger }
-    true
-  else
-    throw("Captcha was not solved")
-  end
+
+   @browser.h2(:text => "Welcome to YellowBot!").exist?
 end
-#END CAPTCHA
+ 
 
-@browser.goto( "https://www.yellowbot.com/signin/register" )
-
-@browser.text_field( :id => 'reg_email' ).set data[ 'email' ]
-@browser.text_field( :id => 'reg_email_again' ).set data[ 'email' ]
-
-@browser.text_field( :id => 'reg_name' ).set data[ 'username' ]
-@browser.text_field( :id => 'reg_password' ).set data[ 'password' ]
-@browser.text_field( :id => 'reg_password2' ).set data[ 'password' ]
-
-@browser.checkbox( :name => 'tos' ).set
-@browser.checkbox( :name => 'opt_in' ).clear
-
-button = @browser.button(:class => "submitBtnSignin")
-image = @browser.div(:id=>"recaptcha_image").image
-field = @browser.text_field(:id => "recaptcha_response_field")
-
-begin
-  enter_captcha(button,field,image,"Welcome to YellowBot!")
-rescue
-  if @browser.text.include? "Please correct the errors below"
+if sign_up(data)
+  self.save_account("Site", { :email => data['email'],:username => data['username'], :password => data['password']})
+  if @chained
+    self.start("Yellowbot/Verify")
+  end
+else
+  if @chained
     self.start("Yellowbot/SignUp")
-    throw "Incorrect CAPTCHA, retrying"
   end
+  throw "Incorrect CAPTCHA, retrying"
 end
-
-
-self.save_account("Site", { :email => data['email'], :password => data['password']})
-if @chained
-  self.start("Yellowbot/Verify")
-end
-
-
-true

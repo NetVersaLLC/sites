@@ -1,105 +1,62 @@
+# Developer's Notes
+# nil
+
+# Browser Code
 @browser = Watir::Browser.new :firefox
-at_exit do
-	unless @browser.nil?
-		@browser.close
-	end
-end
+at_exit{
+  unless @browser.nil?
+    @browser.close
+  end
+}
 
-# Temporary methods from Shared.rb
-
-def solve_captcha2
-  begin
-  image = "#{ENV['USERPROFILE']}\citation\bing1_captcha.png"
-  obj = @browser.img( :xpath, '//div/table/tbody/tr/td/img[1]' )
+# Methods
+def solve_captcha
+  image = "#{ENV['USERPROFILE']}\\citation\\discoverourtown_captcha.png"
+  obj = @browser.image( :src, /recaptcha/ )
   puts "CAPTCHA source: #{obj.src}"
   puts "CAPTCHA width: #{obj.width}"
   obj.save image
-
-    return CAPTCHA.solve image, :manual
-  rescue Exception => e
-    puts(e.inspect)
-  end
+  CAPTCHA.solve image, :manual
 end
 
 def enter_captcha
-  captcharetries = 5
-  capSolved = false
- until capSolved == true
-	  captcha_code = solve_captcha2	
-    @browser.execute_script("
-      function getRealId(partialid){
-        var re= new RegExp(partialid,'g')
-        var el = document.getElementsByTagName('*');
-        for(var i=0;i<el.length;i++){
-          if(el[i].id.match(re)){
-            return el[i].id;
-            break;
-          }
-        }
-      }
-      
-      _d.getElementById(getRealId('wlspispSolutionElement')).value = '#{captcha_code}';
-
-      ")
-      sleep(5)
-
-      @browser.execute_script('
-        jQuery("#SignUpForm").submit()
-      ')
-
-      sleep 15
-
-    if @browser.url =~ /https:\/\/account.live.com\/summarypage.aspx/i
-      capSolved = true
-    else
-      captcharetries -= 1
-    end
-    if capSolved == true
-      break
-    end
-
+  capRetries ||= 3
+  @browser.text_field(:name, 'recaptcha_response_field').set solve_captcha
+  @browser.button(:value, 'Submit').click
+  if @browser.url.include? 'failed=true'
+    raise "Captcha failed"
   end
-
-  if capSolved == true
-    return true
-  else
-    throw "Captcha could not be solved"
-  end
+rescue => e
+    retry unless (capRetries -= 1).zero?
+    self.failure(e)
 end
 
-# End Temporary Methods from Shared.rb
-def add_listing(data)
-	@browser.text_field(:name => 'ListContact').when_present.set data[ 'full_name' ]
-	@browser.text_field(:name => 'ReqEmail').when_present.set data[ 'email' ]
-	@browser.text_field(:name => 'ListOrgName').set data[ 'business' ]
-	@browser.text_field(:name => 'ListAddr1').set data[ 'address' ]
-	@browser.text_field(:name => 'ListCity').set data[ 'city' ]
-	@browser.text_field(:name => 'ListState').set data[ 'state' ]
-	@browser.text_field(:name => 'ListZip').set data[ 'zip' ]
-	@browser.text_field(:name => 'ListPhone').set data[ 'phone' ]
-	@browser.text_field(:name => 'ListWebAddress').set data[ 'website' ]
-	@browser.text_field(:name => 'ListStatement').set data[ 'business_description' ]
-
-	#Enter Decrypted captcha string here
-	enter_captcha
-
-	@browser.link(:href => 'thankyou.php').when_present.click
-        @browser.wait()
-	@confirmation_msg = 'Your submission was successful and has now been sent to our review department.'
-        
-	if @browser.text.include?(@confirmation_msg)
-		puts "Initial registration Successful"
-		RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[email]' => data[ 'email' ],'model' => 'Discoverourtown'
-		true
-		else
-		throw "Initial registration not successful"
-	end
+def post_listing(data)
+  retries ||= 3
+  @browser.goto('http://www.discoverourtown.com/add/')
+  # Fillout form
+  @browser.text_field(:name, 'ListContact' ).set     data['name']
+  @browser.text_field(:name, 'ReqEmail' ).set        data['email']
+  @browser.text_field(:name, 'ListOrgName' ).set     data['business']
+  @browser.text_field(:name, 'ListAddr1' ).set       data['address']
+  @browser.text_field(:name, 'ListCity' ).set        data['city']
+  @browser.text_field(:name, 'ListState' ).set       data['state']
+  @browser.text_field(:name, 'ListZip' ).set         data['zip']
+  @browser.text_field(:name, 'ListPhone' ).set       data['phone']
+  @browser.text_field(:name, 'ListTollFree' ).set    data['tollfree']
+  @browser.text_field(:name, 'ListWebAddress' ).set  data['website']
+  @browser.textarea(:name, 'ListStatement' ).set     data['description']
+  # Captcha
+  enter_captcha()
+  @browser.link(:href => 'thankyou.php').when_present.click
+  Watir::Wait.until { @browser.text.include? 'Thank you for Your Submission' }
+rescue => e
+  puts e
+  retry unless (retries -= 1).zero?
+  self.failure(e)
+else
+  self.save_account("Discoverourtown", {:status => "Listing posted!" })
+  self.success
 end
-
-# Main Steps
-
-# Launch url
-url = 'http://www.discoverourtown.com/add/'
-@browser.goto(url)
-#Add listing
-add_listing(data)
+# Controller
+post_listing(data)

@@ -9,7 +9,7 @@ def search_by_phone(data)
   @browser.text_field(:name => 'phone').set data[ 'phone' ]
   @browser.button(:value=> 'Search').click
   Watir::Wait.until do 
-    @browser.html.include?("<i>No matches found for <b>") || @browser.link(:href => /add-your-business/).exist?
+    @browser.text.include?("No matches found for") || @browser.link(:href => /add-your-business/).exist?
   end
   @browser.link(:href => /add-your-business/).exist?
 end

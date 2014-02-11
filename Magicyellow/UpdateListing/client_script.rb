@@ -45,7 +45,7 @@ def update_listing(data)
   end 
   @browser.goto "http://www.magicyellow.com/bizcenter.cfm"
 
-  "http://www.magicyellow.com" + @browser.link(:href => /\/profile/).href
+  @browser.link(:href => /\/profile/).href
 end 
 
 sign_in(data)

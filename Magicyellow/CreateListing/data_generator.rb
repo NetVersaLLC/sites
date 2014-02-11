@@ -1,7 +1,6 @@
 data = {}
 #seed = Random.new.rand(1000..2000).to_s
-catty                       = Magicyellow.where(:business_id => business.id).first
-data[ 'business_category' ]       = catty.magicyellow_category.name
+data[ 'business_category' ] = MagicyellowCategory.find(business.magicyellows.first.category_id).name
 data[ 'phone' ] = business.local_phone
 data[ 'email' ] = business.bings.first.email
 data[ 'business' ] = business.business_name
@@ -13,11 +12,11 @@ data[ 'first_name' ] = business.contact_first_name
 data[ 'last_name' ] = business.contact_last_name
 data[ 'claim_business'] = 'yes'
 data[ 'fullname' ] = data[ 'first_name' ] + " " + data[ 'last_name' ]
-data[ 'business_description']  = (business.business_description + business.category1 + " " + business.category2 + " " + business.category3 + " " + business.category4 + " " + business.category5)[0..200]
-data[ 'payment_option'] = Yahoo.payment_methods(business)
+data[ 'business_description']  = (business.business_description + business.category_description)[0..200]
+data[ 'payment_option'] = Magicyellow.payments(business)
 data[ 'relation_to_business' ] = 'Agent'
 data[ 'is_owner'] = 'Yes'
-data[ 'additional_services' ] = ' '
+data[ 'additional_services' ] = business.services_offered
 data[ 'additional_products' ] = ' '
-data[ 'additional_brands' ] = ' '
+data[ 'additional_brands' ] = business.brands
 data

@@ -41,7 +41,7 @@ end
  
 
 if sign_up(data)
-  self.save_account("Site", { :email => data['email'],:username => data['username'], :password => data['password']})
+  self.save_account("YellowBot", { :email => data['email'],:username => data['username'], :password => data['password']})
   if @chained
     self.start("Yellowbot/Verify")
   end

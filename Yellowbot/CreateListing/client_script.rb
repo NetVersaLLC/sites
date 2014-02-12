@@ -45,6 +45,7 @@ def add_business(data)
     @browser.text_field( :name, 'recaptcha_response_field').set( solve_captcha() )
     @browser.button( :name, 'subbtn').click
     break if @browser.strong(:text => /Thank you/).exist?
+  end
 end
 
 

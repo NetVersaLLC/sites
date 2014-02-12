@@ -1,4 +1,20 @@
+@browser = Watir::Browser.new :firefox
+at_exit do
+	unless @browser.nil?
+		@browser.close
+	end
+end
+
+def sign_in(data)
+  @browser.goto("https://adsolutions.yp.com/SSO/Login")
+  @browser.text_field(:id => 'Email').set data['email']
+  @browser.text_field(:id => 'Password').set data['password']
+  @browser.button(:src => 'https://si.yellowpages.com/D49_ascp-button-signup-blue_V1.png').click
+  Watir::Wait.until { @browser.text.include? "Welcome to Your Online Account Services" }
+end
+
 sign_in(data)
+
 
 begin
 	# Clicking is hit or miss. This workaround works.

@@ -22,7 +22,7 @@ elsif @browser.link( :text => 'Claim' ).exists?
 
 	puts("Business exists, claiming")
 	if @chained
-	  self.start("Yellowbot/ClaimListing")
+	  self.start("Yellowbot/Notify")
 	end
 	true
 else

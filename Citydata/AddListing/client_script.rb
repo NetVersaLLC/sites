@@ -53,9 +53,10 @@ end
 
 sleep 4
 
-Watir::Wait.until {
+Watir::Wait.until do
+	raise "Account already exists" if @browser.span(:text => /allready/).exist?
 	@browser.text.include? "Thank you, your profile has been successfully added! It is now live on our site"
-}
+end
 
 listing_url = @browser.link(:text=>/here/).href
 

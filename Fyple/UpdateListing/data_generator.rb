@@ -18,3 +18,4 @@ data['url']      = business.company_website
 data['desc']     = business.business_description
 data['payments'] = Fyple.payments(business)
 data
+

@@ -74,8 +74,7 @@ def create_listing(data)
 
   @browser.link(:href => /edit-photos/).click
   remove_images
-  self.images.each do |p| 
-    f = File.join("#{ENV['USERPROFILE']}\\citation\\#{@bid}\\images", p)
+  self.images.each do |f| 
     puts "uploading #{f}"
     @browser.file_field(:id => "CPL_ctl_ctl_editPhotos1_FileUpload1").value= f
     @browser.button(:id => "CPL_ctl_ctl_editPhotos1_Button1").click
@@ -90,4 +89,5 @@ listing_url = create_listing(data)
 
 self.save_account("Fyple", {:listing_url => listing_url, :status => "Listing created."})
 self.success
+
 

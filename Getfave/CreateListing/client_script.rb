@@ -10,49 +10,20 @@ def sign_in(data)
   @browser.text_field(:id => 'session_email').set data['email']
   @browser.text_field(:id => 'session_password').set data['password']
   @browser.button(:value => 'Log In').click
-  # @browser.button(:xpath => '//*[@id="signin-container"]/form/input[3]').click
-rescue => e
-  unless @retries == 0
-    puts "Error caught in sign_in: #{e.inspect}"
-    puts "Retrying in two seconds. #{@retries} attempts remaining."
-    sleep 2
-    @retries -= 1
-    retry
-  else
-    raise "Error in sign_in could not be resolved. Error: #{e.inspect}"
-  end
+ 
+  Watir::Wait.until{ @browser.div(:id => "footer-links").text =~ /Log Out/ }
 end
 
 def change_location(data)
-  @browser.link(:id => 'change-location').when_present.click
+  @browser.link(:id => 'change-location').wait_until_present
+  @browser.link(:id => 'change-location').click
   @browser.text_field(:id => 'g-text-field').set data['city'] + ", " + data['state']
-
-  sleep 3
-
   @browser.text_field(:id => 'g-text-field').send_keys :enter
-  @browser.send_keys :enter
-rescue => e
-  unless @retries == 0
-    puts "Error caught in change_location: #{e.inspect}"
-    puts "Retrying in two seconds. #{@retries} attempts remaining."
-    sleep 2
-    @retries -= 1
-    @browser.refresh
-    retry
-  else
-    raise "Error in change_location could not be resolved. Error: #{e.inspect}"
-  end
+
+  Watir::Wait.until{ !@browser.div(:id => "location").text.empty? }
 end
 
 def fill_business(data)
-  unless self.images.length < 1
-    for image in self.images
-      @browser.text_field(:id,'hype_title').when_present.set 'Promotional Image'
-      imagepath = "#{ENV['USERPROFILE']}\\citation\\#{@bid}\\images\\#{image}"
-      @browser.file_field(:id,'hype_image').set imagepath
-      @browser.link(:id,'create-hype').click
-    end
-  end
   @browser.text_field(:id => 'business_name').set data['business']
   #puts('Debug: Name Set')
   @browser.text_field(:id => 'business_location').set data['address']
@@ -107,11 +78,7 @@ url = 'https://www.getfave.com/login'
 @retries = 3
 sign_in data
 
-sleep 10
-
 change_location data
-
-sleep 10
 
 @browser.text_field(:id => "q").set data['business']
 @browser.button(:value => "Get").click
@@ -123,8 +90,6 @@ if @browser.text.include? "We couldn't find any matches."
   @browser.link(:href => 'https://www.getfave.com/businesses/new').click
   fill_business data
   self.save_account("Getfave", {:status => "Listing created successfully!"})
-  
-  @browser.div(:id => 'business-results').wait_until_present
 
   if @browser.div(:id => 'business-results').span(:text => "#{data['business']}").exist?
     listing_url = @browser.div(:id => 'business-results').span(:text => "#{data['business']}").parent.href
@@ -138,4 +103,4 @@ elsif @browser.div(:id => 'business-results').span(:text => "#{data['business']}
   self.save_account("Getfave", {:listing_url => listing_url, :status => "Listing status pending."})
   self.failure("Business is already listed.")
 end
-
+sleep(120)

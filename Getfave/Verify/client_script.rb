@@ -12,6 +12,7 @@ def check_email data
 
   if @browser.ul(:class => "InboxTableBody").link(:text => /Activate Your Fave Account/).exist?
     @browser.ul(:class => "InboxTableBody").link(:text => /Activate Your Fave Account/).click
+    @browser.link(:text => "go here").wait_until_present
     @browser.link(:text => "go here").href
   else 
     nil
@@ -37,3 +38,4 @@ else
       raise "Error while email verification"
     end
 end
+

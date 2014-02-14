@@ -16,17 +16,19 @@ url = 'https://www.getfave.com/login'
 @browser.button(:value,'Join Us').click
 
 if @browser.text.include? 'Email is already taken'
-	self.failure("Email already registered.")
+	if @chained
+  		self.start("Getfave/Verify")
+	end
 elsif @browser.text.include? "can't be blank"
-	self.failure("Required fields can not be blank.") 
+	raise "Required fields can not be blank."
 elsif @browser.label(:class, "error").present?
-	throw "There is an error while creating the account"	
+	raise "There is an error while creating the account"	
 else 
-	self.save_account("Getfave", {:email => data['email'], :password => data['password']})
-	self.save_account("Getfave", {:status => "Account created, verifying account..."})
+	self.save_account("Getfave", {:email => data['email'], :password => data['password'], :status => "Account created, verifying account..."})
 	puts "Signup successful. Verifying email to continue"
 	if @chained
   		self.start("Getfave/Verify")
 	end
-	self.success
 end
+
+self.success

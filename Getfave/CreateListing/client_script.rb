@@ -123,6 +123,8 @@ if @browser.text.include? "We couldn't find any matches."
   @browser.link(:href => 'https://www.getfave.com/businesses/new').click
   fill_business data
   self.save_account("Getfave", {:status => "Listing created successfully!"})
+  
+  @browser.div(:id => 'business-results').wait_until_present
 
   if @browser.div(:id => 'business-results').span(:text => "#{data['business']}").exist?
     listing_url = @browser.div(:id => 'business-results').span(:text => "#{data['business']}").parent.href

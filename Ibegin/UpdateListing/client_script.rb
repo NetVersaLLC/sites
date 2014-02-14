@@ -81,7 +81,8 @@ def update_listing(data)
 
   @browser.button( :value => /Update Business/).click
 
-  @browser.link(:text => 'instantly live on iBegin').when_present.click
+  @browser.link(:text => 'instantly live on iBegin').wait_until_present
+  @browser.link(:text => 'instantly live on iBegin').click
   @browser.url   
 end 
 def remove_existing_images(data)

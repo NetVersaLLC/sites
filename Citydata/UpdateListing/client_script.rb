@@ -65,6 +65,9 @@ def remove_existing_images
 end 
 
 def upload_images(data)
+  root_path = "#{ENV['USERPROFILE']}\\citation\\#{@bid}\\images"
+  return unless File.exist?(root_path)
+
   images.each do |p| 
     f = File.join("#{ENV['USERPROFILE']}\\citation\\#{@bid}\\images", p)
     puts "file #{f}"

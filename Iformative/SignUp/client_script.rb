@@ -38,6 +38,9 @@ if signup data
     "email"     => data["email"],
     "password"  => data["password"]
   })
+  if @chained
+    self.start("Iformative/CreateListing")
+  end
   self.success
 else
   self.failure

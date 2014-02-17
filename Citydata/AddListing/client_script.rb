@@ -6,8 +6,11 @@ at_exit do
 end
 
 def upload_images(data)
+  root_path = "#{ENV['USERPROFILE']}\\citation\\#{@bid}\\images"
+  return unless File.exist?(root_path)
+
   images.each do |p|
-    f = File.join("#{ENV['USERPROFILE']}\\citation\\#{@bid}\\images", p)
+    f = File.join(root_path, p)
     puts "file #{f}"
     @browser.button(:value => "Add photo").click
 
@@ -53,10 +56,9 @@ end
 
 sleep 4
 
-Watir::Wait.until do
-	raise "Account already exists" if @browser.span(:text => /allready/).exist?
+Watir::Wait.until {
 	@browser.text.include? "Thank you, your profile has been successfully added! It is now live on our site"
-end
+}
 
 listing_url = @browser.link(:text=>/here/).href
 

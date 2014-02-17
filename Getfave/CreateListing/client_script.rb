@@ -90,11 +90,9 @@ if @browser.text.include? "We couldn't find any matches."
   @browser.link(:href => 'https://www.getfave.com/businesses/new').click
   fill_business data
   self.save_account("Getfave", {:status => "Listing created successfully!"})
-
-  if @browser.div(:id => 'business-results').span(:text => "#{data['business']}").exist?
-    listing_url = @browser.div(:id => 'business-results').span(:text => "#{data['business']}").parent.href
-    self.save_account("Getfave", {:listing_url => listing_url})
-  end
+  if @chained
+    self.start("Getfave/ClaimListing") 
+  end 
 
   self.success
 elsif @browser.div(:id => 'business-results').span(:text => "#{data['business']}").exist?
@@ -103,4 +101,3 @@ elsif @browser.div(:id => 'business-results').span(:text => "#{data['business']}
   self.save_account("Getfave", {:listing_url => listing_url, :status => "Listing status pending."})
   self.failure("Business is already listed.")
 end
-sleep(120)

@@ -1,3 +1,8 @@
+@browser = Watir::Browser.new
+at_exit do 
+  @browser.close unless @browser.nil?
+end
+
 def login(data)
   $login_success = false
   @browser.text_field( :id => 'user_id').set data[ 'username' ]
@@ -55,18 +60,18 @@ def Add_listing(data)
 	@browser.button(:title => 'Complete the registration').when_present.click
 	puts "Business Listing is successfull"
   end
+  @browser.image(:class => "website_thumbnail").parent.href 
 end
 
 #Main Steps
 url = 'http://www.freebusinessdirectory.com/login.php?'
 @browser.goto(url)
 if login(data)
-  puts "Login is successful"
-  Add_listing(data)
+  listing_url = Add_listing(data)
+  self.save_account("Freebusinessdirectory", {:listing_url => listing_url})
 else
   puts "Login failed"
 end
-
 true
 
 

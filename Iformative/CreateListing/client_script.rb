@@ -50,6 +50,10 @@ if login(data) and add_listing(data)
       "status" => "Listing successfully created.",
       "listing_url" => @browser.url
     })
+  if @chained
+    self.start("Iformative/Verify")
+  end
+  
   self.success
 else
   self.failure

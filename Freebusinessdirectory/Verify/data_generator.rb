@@ -1,6 +1,5 @@
 data = {}
-data[ 'url' ]		= Freebusinessdirectory.check_email( business )
-data[ 'username' ]	= business.freebusinessdirectories.first.username
+data[ 'email' ]	= business.freebusinessdirectories.first.email
 data[ 'password' ]	= business.freebusinessdirectories.first.password
-
+data[ 'bing_password']  = business.bings.first.password
 data

@@ -5,43 +5,23 @@ at_exit {
 	end
 }
 
-def solve_captcha
-  image = "#{ENV['USERPROFILE']}\\citation\\mywebyellow_captcha.png"
-  obj = @browser.image( :id, /Captcha01_img/ )
-  puts "CAPTCHA source: #{obj.src}"
-  puts "CAPTCHA width: #{obj.width}"
-  obj.save image
+def find_listing(data)
+  @browser.goto "http://www.mywebyellow.com/"
 
-  CAPTCHA.solve image, :manual
-end
+  @browser.text_field(:id => "ctl00_ContentPlaceHolder01_SearchOptions01_fldSearch").set data['bu_name']
+  @browser.text_field(:id => "ctl00_ContentPlaceHolder01_SearchOptions01_fldLocation").set data['zip']
+  @browser.button(:id => "ctl00_ContentPlaceHolder01_SearchOptions01_butSearch").click
 
+  links = @browser.links(:class => "Link01")
 
-def enter_captcha( data )
-	capSolved = false
-	count = 1
-	until capSolved or count > 5 do
-		captcha_code = solve_captcha
-		@browser.text_field( :id, /CaptchaEntry/ ).set captcha_code
-		@browser.button( :id, 'ctl00_ContentPlaceHolder01_imgSubmit').click
-		
-		if not @browser.text.include? "The characters you entered for the Captcha image are invalid."
-			capSolved = true
-		end
-		
-	count+=1	
-	end
-	if capSolved == true
-		Watir::Wait.until { @browser.text.include? "Your information has been submitted" }
-		self.save_account("Mywebyellow", {:status => "Listing posted successfully!"})
-		self.success
-	else
-		throw("Captcha was not solved")
-	end
-end
+  return nil if links.length == 0 || !links.first.text.include?(data['bu_name'])
+
+  links.first.click
+  @browser.url
+end 
+
 
 def fillout_fields( data )
-    #TODO: Rewrite this so that it's cleaner
-    @browser.goto('http://www.mywebyellow.com/AddListing.aspx')
     @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldContactName').set data['pe_name']
     unless data['pe_phone'].nil?
     	@browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldContactPhone').set data['pe_phone']
@@ -74,32 +54,23 @@ def fillout_fields( data )
     @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldHours02').set data['h_line2']
     @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldHours03').set data['h_line3']
     @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldHours04').set data['h_line4']
-rescue => e
-  unless @retries == 0
-    puts "Error caught in fillout_fields: #{e.inspect}"
-    puts "Retrying in two seconds. #{@retries} attempts remaining."
-    sleep 2
-    @retries -= 1
-    retry
-  else
-    raise "Error in fillout_fields could not be resolved. Error: #{e.inspect}"
-  end
-end
 
-def payment_methods( data )
     data[ 'payments' ].each{ | pay |
         @browser.checkbox( :id => pay ).click
       }
-rescue => e
-  unless @retries == 0
-    puts "Error caught in payment_methods: #{e.inspect}"
-    puts "Retrying in two seconds. #{@retries} attempts remaining."
-    sleep 2
-    @retries -= 1
-    retry
-  else
-    raise "Error in payment_methods could not be resolved. Error: #{e.inspect}"
-  end
+    @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldLinkURL').set data['url']
+
+    3.times do 
+      @browser.text_field( :id, /CaptchaEntry/ ).set solve_captcha
+      @browser.button( :id, 'ctl00_ContentPlaceHolder01_imgSubmit').click
+
+      Watir::Wait.until do 
+        @browser.span.text(:text => "has been submitted").exist? || 
+        @browser.span(:text => /Captcha image are invalid/).exist? 
+      end 
+      break if @browser.span.text(:text => "has been submitted").exist?
+    end
+    @browser.span.text(:text => "has been submitted").exist?
 end
 
 def upload_logo( data )
@@ -107,44 +78,38 @@ def upload_logo( data )
     	@browser.file_field(:name,"ctl00$ContentPlaceHolder01$fldLogoNew").set self.logo
     end
     sleep (1)
-rescue => e
-  unless @retries == 0
-    puts "Error caught in upload_logo: #{e.inspect}"
-    puts "Retrying in two seconds. #{@retries} attempts remaining."
-    sleep 2
-    @retries -= 1
-    retry
-  else
-    raise "Error in upload_logo could not be resolved. Error: #{e.inspect}"
-  end
 end
 
-def social_media( data )
-    @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldLinkURL').set data['url']
-    @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldLinkMenu').set data['menu']
-    @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldLinkECommerce').set data['e_cs']
-    @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldLinkCoupon').set data['coupon']
-    @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldLinkYouTube').set data['yt_emblink']
-    @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldLinkFacebook').set data['facebook']
-    @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldLinkLinkedIn').set data['linkedin']
-    @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldLinkTwitter').set data['twitter']
-    sleep(1)
-rescue => e
-  unless @retries == 0
-    puts "Error caught in social_media: #{e.inspect}"
-    puts "Retrying in two seconds. #{@retries} attempts remaining."
-    sleep 2
-    @retries -= 1
-    retry
-  else
-    raise "Error in social_media could not be resolved. Error: #{e.inspect}"
-  end
+
+def solve_captcha
+  image = "#{ENV['USERPROFILE']}\\citation\\mywebyellow_captcha.png"
+  obj = @browser.image( :id, /Captcha01_img/ )
+  puts "CAPTCHA source: #{obj.src}"
+  puts "CAPTCHA width: #{obj.width}"
+  obj.save image
+
+  CAPTCHA.solve image, :manual
 end
 
-# Main Controller
-@retries = 3
-fillout_fields( data )
-payment_methods( data )
-upload_logo( data )
-social_media( data )
-enter_captcha( data )
+
+listing_url = find_listing(data)
+
+if listing_url 
+  self.save_account("Mywebyellow", {:listing_url => listing_url}) 
+  @browser.goto listing_url 
+  @browser.link(:text => /Correct Listing/).click 
+  @browser.span(:text => /existing listing/).wait_until_present
+else 
+  @browser.goto "http://www.mywebyellow.com/AddListing.aspx" 
+  @browser.span(:text => /new listing/).wait_until_present
+end
+
+if fillout_fields( data )
+  self.save_account("Mywebyellow", {:status => "Listing updated sucessfully"})
+  if listing_url.nil? && @chained 
+    self.start("Mywebyellow/Verify", 60 * 24 )
+  end 
+  self.success
+else 
+  self.failure("Captcha failure")
+end

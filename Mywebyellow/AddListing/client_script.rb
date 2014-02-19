@@ -60,17 +60,17 @@ def fillout_fields( data )
       }
     @browser.text_field( :name, 'ctl00$ContentPlaceHolder01$fldLinkURL').set data['url']
 
-    3.times do 
+    5.times do 
       @browser.text_field( :id, /CaptchaEntry/ ).set solve_captcha
       @browser.button( :id, 'ctl00_ContentPlaceHolder01_imgSubmit').click
 
       Watir::Wait.until do 
-        @browser.span.text(:text => "has been submitted").exist? || 
+        @browser.span(:text => /has been submitted/).exist? || 
         @browser.span(:text => /Captcha image are invalid/).exist? 
       end 
-      break if @browser.span.text(:text => "has been submitted").exist?
+      break if @browser.span(:text => /has been submitted/).exist?
     end
-    @browser.span.text(:text => "has been submitted").exist?
+    @browser.span(:text => /has been submitted/).exist?
 end
 
 def upload_logo( data )
@@ -88,7 +88,7 @@ def solve_captcha
   puts "CAPTCHA width: #{obj.width}"
   obj.save image
 
-  CAPTCHA.solve image, :manual
+  CAPTCHA.solve image
 end
 
 

@@ -24,6 +24,7 @@ def solve_captcha2
   puts "CAPTCHA source: #{obj.src}"
   puts "CAPTCHA width: #{obj.width}"
   obj.save image
+  sleep(3)
 
     return CAPTCHA.solve image, :manual
   rescue Exception => e

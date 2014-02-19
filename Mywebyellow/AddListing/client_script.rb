@@ -14,6 +14,7 @@ def find_listing(data)
 
   links = @browser.links(:class => "Link01")
 
+  return nil if @browser.span(:text => /No results/).exist?
   return nil if links.length == 0 || !links.first.text.include?(data['bu_name'])
 
   links.first.click
@@ -87,6 +88,7 @@ def solve_captcha
   puts "CAPTCHA source: #{obj.src}"
   puts "CAPTCHA width: #{obj.width}"
   obj.save image
+  sleep(3)
 
   CAPTCHA.solve image
 end
@@ -100,6 +102,7 @@ if listing_url
   @browser.link(:text => /Correct Listing/).click 
   @browser.span(:text => /existing listing/).wait_until_present
 else 
+  puts 'creating listing'
   @browser.goto "http://www.mywebyellow.com/AddListing.aspx" 
   @browser.span(:text => /new listing/).wait_until_present
 end

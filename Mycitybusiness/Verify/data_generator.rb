@@ -1,3 +1,4 @@
-data = {}
-data['url'] = Mycitybusiness.check_email(business)
-data
+data = {
+  :email => business.bings.first.email,
+  :bing_password => business.bings.first.password
+}

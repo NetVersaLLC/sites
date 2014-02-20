@@ -7,6 +7,7 @@ at_exit{
 def solve_captcha
   image = "#{ENV['USERPROFILE']}\\citation\\allthelocal_captcha.png"
   @browser.img(:id, "phoca-captcha").save  image
+  sleep(3)
   CAPTCHA.solve image, :manual
 end
 

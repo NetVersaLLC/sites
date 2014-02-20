@@ -7,11 +7,12 @@ at_exit {
 
 def solve_captcha_signup
   image = "#{ENV['USERPROFILE']}\\citation\\digabusiness_captcha.png"
-  obj = @browser.img( :xpath, '//*[@id="padding"]/form/table/tbody/tr[8]/td[2]/img' )
+  obj = @browser.img(:title => "Visual Confirmation Security Code")
   puts "CAPTCHA source: #{obj.src}"
   puts "CAPTCHA width: #{obj.width}"
 
   obj.save image
+  sleep(3)
   CAPTCHA.solve image, :manual
 end
 

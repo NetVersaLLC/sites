@@ -10,7 +10,7 @@ def solve_captcha( obj )
   puts "CAPTCHA source: #{obj.src}"
   puts "CAPTCHA width: #{obj.width}"
   obj.save image
-
+  sleep(3)
   CAPTCHA.solve image, :manual
 end
 
@@ -47,7 +47,8 @@ if sign_up(data)
   end
 else
   if @chained
-    self.start("Yellowbot/SignUp")
+    self.start("Yellowbot/SignUp", 15)
   end
   throw "Incorrect CAPTCHA, retrying"
 end
+self.success

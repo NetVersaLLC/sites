@@ -29,7 +29,7 @@ def solve_captcha
   puts "CAPTCHA source: #{obj.src}"
   puts "CAPTCHA width: #{obj.width}"
   obj.save image
-
+  sleep(3)
   CAPTCHA.solve image, :manual
 end
 

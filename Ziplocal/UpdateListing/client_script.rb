@@ -1,96 +1,86 @@
-# Developer's Notes
-# Uncertain how long it takes the business to appear
-
-# Browser Code
 @browser = Watir::Browser.new :firefox
-at_exit{
-  unless @browser.nil?
-    @browser.close
-  end
+at_exit {
+	unless @browser.nil?
+		@browser.close
+	end
 }
 
-# Classes
-class BusinessNotFound < StandardError
+def set_category( data )
+	@browser.button( :id, 'listingForm:addTest2' ).fire_event("onClick")
+
+	#wait until category text field loads
+	Watir::Wait.until { @browser.text_field( :id, 'listingForm:newSic1').present? }
+
+	#focus the field so we can get the javascript happy
+	@browser.text_field( :id, 'listingForm:newSic1').focus
+	@browser.text_field( :id, 'listingForm:newSic1').set data[ 'categoryKeyword' ]
+
+	@browser.button( :value, 'Add new').wait_until_present
+	@browser.button( :value, 'Add new').click
+	sleep(3)	
 end
 
-# Methods
-
-# This method enters the business' local phone number
-# and searches for them. If found, it'll continue to
-# update the listing, otherwise report back that
-# it was not found and try again in 24 hours, on the
-# thought that the listing hasn't appeared yet.
-
-def search_business(data)
-  retries ||= 3
-  @browser.goto('http://www.ziplocal.com/olc/lookup.faces')
-  @browser.text_field(:id, 'lookupForm:tel').set data['phone']
-  @browser.link(:id, 'lookupForm:submit').click
-  # Iterate through all links on the page to be safe
-  links = @browser.links
-  max = links.length
-  count = 0
-  links.each do |link|
-    link_text = link.text.gsub(/[^0-9a-z]/i, '').downcase
-    puts "Link: " + link_text
-    business = data['business'].gsub(/[^0-9a-z]/i, '').downcase
-    puts "Business: " + business
-    if link_text == business
-      @listing = link.href
-      @listing.sub!('listing.faces', 'edit_listing.faces')
-    else
-      count += 1
-    end
-  end
-  if count == max
-    raise BusinessNotFound
-  end
-rescue BusinessNotFound
-  if @chained
-    self.start("Ziplocal/UpdateListing", 1440)
-  end
-  self.failure("Business not found, trying again in 24 hours")
-
-rescue => e
-  retry unless (retries -= 1).zero?
-  self.failure(e)
-  return false
-else
-  puts "Business found."
-  return true
-end
-
-# This method updates the listing. It does not update categories.
-# Some listings already have nicer categories than we can provide,
-# and for that reason we leave them alone. Also, categories are finicky.
-# CreateListing should set correct categories.
-
-def update_business(data)
-  retries ||= 3
-  @browser.goto(@listing)
-  # Add business information
+def add_business( data )
   @browser.text_field( :id, 'listingForm:disp').when_present.set data[ 'business' ]
+
+  if @browser.text_field( :id, 'listingForm:StrAdr').exist?
+    @browser.text_field( :id, 'listingForm:StrAdr').set data[ 'streetnumber' ]
+    @browser.text_field( :id, 'listingForm:city').set data[ 'citystate' ]
+    @browser.text_field( :id, 'listingForm:zip').set data[ 'zip' ]
+  end
+
   @browser.text_field( :id, 'listingForm:web').set data[ 'website' ]
   @browser.text_field( :id, 'listingForm:email').set data[ 'business_email' ]
   @browser.text_field( :id, 'listingForm:_id154').set data[ 'first_name' ] + ' ' + data[ 'last_name' ] 
   @browser.text_field( :id, 'listingForm:_id159').set data[ 'email' ]
   @browser.radio( :value, 'O').set
-  @browser.text_field(:id, "listingForm:_id157").set data['prefix']
-  # Add Contact information
-  contact_fields = @browser.text_fields(:id => /listingForm:_id/, :type => 'text')
-  contact_fields[0].set data[ 'first_name' ] + ' ' + data[ 'last_name' ] 
-  contact_fields[2].set data['email']
-  @browser.radio(:name => 'listingForm:contact_type', :value => 'O').click
-  @browser.link(:id, /listingForm:_id/).click
-  Watir::Wait.until { @browser.text.include? 'Thank you for updating our directory.' }
-rescue => e
-  retry unless (retries -= 1).zero?
-  self.failure(e)
-else
-  self.success("Business updated successfully.")
+  @browser.text_field(:id, "listingForm:_id157").set data['prefix'] 
 end
 
-# Controller
-if search_business(data) == true
-  update_business(data)
+def main( data )
+  @browser.goto('http://www.ziplocal.com/#rl')
+  @browser.span(:id => "rlTab").wait_until_present
+
+  @browser.text_field( :id => 'tel_rl').set data[ 'phone' ]
+  @browser.form(:id => 'form_rl').link(:class => 'submit_link').click
+
+  10.times do 
+    break if @browser.link(:class => "url").exist? 
+    break if @browser.div(:id => "content_container_white").exist?
+    sleep(1)
+  end 
+
+  if @browser.link(:class => "url").exist?
+    @browser.link(:class => "url").click
+
+    @browser.link(:text => /Update/).wait_until_present
+    self.save_account("Ziplocal",{:listing_url => @browser.url})
+
+    @browser.link(:text => /Update/).click
+
+    @browser.link(:text => /Update or add more information/).wait_until_present
+    @browser.link(:text => /Update or add more information/).click
+  else
+    @browser.goto "http://www.ziplocal.com/olc/edit_listing.faces"
+  end
 end
+
+main( data )
+add_business(data)
+#set_category(data)
+
+@browser.link( :text, 'Save').click
+
+if @browser.text.include? "We apologize but your order can not be submitted"
+  if @chained
+    self.start("Ziplocal/UpdateListing", 2880)
+  end
+  self.failure("Only one submission permitted per day.")
+else
+  Watir::Wait.until { @browser.text.include? "Thank you for updating our directory." }
+  if @chained 
+    self.start("Ziplocal/Verify", 3 * 24 * 60)
+  end
+  self.success
+end
+

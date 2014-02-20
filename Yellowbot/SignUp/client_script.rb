@@ -51,3 +51,4 @@ else
   end
   throw "Incorrect CAPTCHA, retrying"
 end
+self.success

@@ -9,7 +9,10 @@ end
 @browser.text_field( :id => 'search-field' ).set data[ 'phone' ]
 @browser.button( :value => 'Find my business' ).click #, :type => 'submit'
 
-sleep(5)
+Watir::Wait.until do 
+  @browser.link( :text => 'submit a new business').exists? || 
+  @browser.link( :text => 'Claim' ).exists?
+end 
 
 if @browser.link( :text => 'submit a new business').exists?
 
@@ -28,4 +31,4 @@ elsif @browser.link( :text => 'Claim' ).exists?
 else
  throw( "Problem with locating link to continue YellowBot registration!" )
 end
-true
+self.success

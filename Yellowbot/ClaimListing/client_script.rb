@@ -1,4 +1,16 @@
-sign_in(data)
+@browser = Watir::Browser.new :firefox
+at_exit do
+  unless @browser.nil?
+    @browser.close
+  end
+end
+
+def sign_in(data)
+  @browser.goto("https://www.yellowbot.com/signin")
+  @browser.text_field( :name => 'login').set data['email']
+  @browser.text_field( :name => 'password').set data['password']
+  @browser.button( :name => 'subbtn').click
+end
 
 @browser.goto( "http://www.yellowbot.com/" )
 @browser.text_field( :id => 'search-field' ).set data[ 'phone' ]

@@ -18,7 +18,7 @@ def solve_captcha
   puts "CAPTCHA source: #{obj.src}"
   puts "CAPTCHA width: #{obj.width}"
   obj.save image
-  sleep(3)
+
   CAPTCHA.solve image, :manual
 end
 
@@ -52,5 +52,7 @@ end
 sign_in(data)
 add_business(data)
 raise( 'Errors trying to create business') unless @browser.strong(:text => /Thank you/).exist?
-  
-true
+if @chained 
+  self.start("Yellowbot/CheckCreated", 1440) 
+end 
+self.success

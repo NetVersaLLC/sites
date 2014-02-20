@@ -47,7 +47,7 @@ if sign_up(data)
   end
 else
   if @chained
-    self.start("Yellowbot/SignUp")
+    self.start("Yellowbot/SignUp", 15)
   end
   throw "Incorrect CAPTCHA, retrying"
 end

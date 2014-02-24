@@ -145,3 +145,4 @@ if @chained
 end
 
 self.success
+

@@ -18,16 +18,6 @@ def sign_in( data )
   @browser.button( :value, /Login/i).click
 
   Watir::Wait.until { @browser.link(:text => 'Logout').exists? }
-rescue => e
-  unless @retries == 0
-    puts "Error caught in sign_in: #{e.inspect}"
-    puts "Retrying in two seconds. #{@retries} attempts remaining."
-    sleep 2
-    @retries -= 1
-    retry
-  else
-    raise "Error in sign_in could not be resolved. Error: #{e.inspect}"
-  end
 end
 
 def do_the_thing(data)

@@ -47,6 +47,7 @@ def solve_captcha(image_element)
 end
 
 if signup(data) 
+  self.save_account('Mysheriff', {:email => data['email'], :password => data['password'], :status => "Account created, posting listing..."})
   if @chained
     self.start("Mysheriff/CreateListing")
   end 

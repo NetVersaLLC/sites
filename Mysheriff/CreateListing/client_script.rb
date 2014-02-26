@@ -1,64 +1,89 @@
+# Developer's Notes
+# Good idea for listing site: mydeputy.net
+
+# Setup
 @browser = Watir::Browser.new :firefox
+@browser.goto 'mysheriff.net/users'
+at_exit{ @browser.close unless @browser.nil? }
 
-at_exit {
-  unless @browser.nil?
-    @browser.close
+# Classes
+class InvalidCredentials; end
+
+def fill_form parent, vals
+  fields = parent.text_fields.each{} + parent.selects.each{}
+  fields.each do |field|
+    case field
+    when Watir::TextField
+      field.set vals[field.name] rescue nil
+    when Watir::Select
+      field.select vals[field.name] rescue nil
+    end
   end
-}
-
-def signup(data) 
-  @browser.goto "http://www.mysheriff.net/users/"
-
-  @browser.radio(:value => data['gender']).set
-
-  add_user_form = @browser.form(:id => 'AddUser') 
-
-  @browser.text_field(:name => 'firstname').set     data['first_name']
-  @browser.text_field(:name => 'lastname').set      data['last_name']
-  @browser.text_field(:name => 'email_address').set data['email']
-
-  @browser.select_list(:name=>'cmbmonth').select    data['birthday_month']
-  @browser.select_list(:name=>'cmbday').select      data['birthday_day']
-  @browser.select_list(:name=>'cmbyear').select     data['birthday_year']
-
-  # city displays a drop down that you need to select from
-  @browser.text_field(:name => 'City').set          data['city']
-  @browser.div(:class => 'ac_results', :text => /#{data['city']}/).wait_until_present
-  @browser.div(:class => 'ac_results').li(:text => /#{data['state']}/).click
-
-  3.times do 
-    add_user_form.text_field(:id   => 'password').set      data['password']
-    @browser.text_field(:name => 'verif_box').set     solve_catcha( @browser.form(:id => 'AddUser').image )
-    @browser.button(:value => 'Sign Up').click
-
-    break if @browser.h1(:text => /Nice to see you/).exist?
-    break if @browser.li(:text => /email address has already been used/).exist?
-  end 
-  @browser.h1(:text => /Nice to see you/).exist? || @browser.li(:text => /email address has already been used/).exist?
-end 
-
-def solve_captcha(image_element)
-  image_file = "#{ENV['USERPROFILE']}\\citation\\mysheriff_captcha.png"
-  puts "CAPTCHA width: #{image_element.width}"
-  image_element.save image_file
-  sleep(3)
-
-  return CAPTCHA.solve image_file, :manual
 end
 
-if signup(data) 
-  if @chained
-    self.start("Mysheriff/CreateListing")
-  end 
-  self.success
-else 
-  reg_error = @browser.div('reg_error')
-  if reg_error.exist? && reg_error.lis.count == 1 && reg_error.text.include?('image Correctly') 
-    if @chained
-      self.start("Mysheriff/SignUp", 1440) 
-    end 
-    self.failure "captcha failed. trying again later"
+def login data
+  if @browser.text.include? "Logout"
+    puts "Already logged in. Proceeding."
+    true
   else
-    raise "Error filling out form" 
+    vals = {
+      "username" => data["email"],
+      "password" => data["password"]
+    }
+    login_form = @browser.form(:id,"loginForm")
+    fill_form login_form, vals
+    login_form.button.click
+    raise InvalidCredentials if @browser.text.include? "Invalid Login"
+    @browser.text.include? "Logout"
   end
+end
+
+def search_listing data
+  sleep 3
+  @browser.link(:text,/add new business/).click
+  vals = {
+    "business" => data["business_name"],
+    "location" => data["zip"]
+  }
+  fill_form @browser.div(:id,'content'), vals
+  @browser.div(:id,'content').button.click
+  @browser.text.include? "Thank you, your business isn't listed"
+end
+
+def create_listing data
+  form = @browser.div(:id,'content')
+  @browser.link(:text,/Add your business now/).click
+  vals = {
+    "CompanyName" => data["business_name"],
+    "Address" => data["address1"],
+    "Address2" => data["address2"],
+    "zip" => data["zip"],
+    "phone1" => data["phone"][0],
+    "phone2" => data["phone"][1],
+    "phone3" => data["phone"][2],
+    "WebsiteAddress" => data["website"],
+    "EmailAddress" => data["email"]
+  }
+  fill_form form, vals
+  form.text_field(:name,'City').set data["city"]
+  sleep 1
+  @browser.div(:class,'ac_results').li(:text,/#{data["state"]}/).click
+  form.text_field(:name,'searchDescription').set data["category"]
+  sleep 2
+  @browser.strong(:text,/#{data["category"]}/).when_present.click
+  form.button.click
+  if @browser.text.include? "View Listing"
+    self.save_account('Mysheriff', {
+        "listing_url" => @browser.link(:text,/View Listing/).href,
+        "status" => "Listing successfully created."
+      })
+    true
+  else
+    false
+  end
+end
+
+# Controller
+if login(data) and search_listing(data) and create_listing(data)
+  self.success
 end

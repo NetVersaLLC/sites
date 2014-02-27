@@ -4,14 +4,15 @@ at_exit {
     @browser.close
   end
 }
-
+# td this is your business
+#
 def search_by_phone(data)
   @browser.text_field(:name => 'phone').set data[ 'phone' ]
   @browser.button(:value=> 'Search').click
   Watir::Wait.until do 
-    @browser.text.include?("No matches found for") || @browser.link(:href => /add-your-business/).exist?
+    @browser.td(:text => /No matches found/).exist? || @browser.td(:text => /this is your business/).exist?
   end
-  @browser.link(:href => /add-your-business/).exist?
+  @browser.td(:text => /this is your business/).exist?
 end
 
 #Claim business
@@ -41,6 +42,16 @@ def captcha_text(image_element)
 end 
 
 def add_new_business(data)
+  @browser.link(:href => "#searchbox").click 
+  sleep(2) 
+  @browser.text_field(:id => "keyword").set data['business_category']
+  @browser.button(:id => "searchsubmit").click
+  sleep(2)
+
+  @browser.b(:text => data['business_category']).checkbox.set
+  @browser.button(:value => "Select").click
+  sleep(1)
+
   @browser.text_field(:name => 'regNameRelation').set 'Owner'
   @browser.text_field(:name => 'OwnerNameFirst').set data[ 'first_name']
   @browser.text_field(:name => 'OwnerNameLast').set data[ 'last_name']
@@ -54,16 +65,8 @@ def add_new_business(data)
   @browser.select_list(:name => 'lState').select data[ 'state']
   @browser.text_field(:name => 'lZip').set data[ 'zip']
   @browser.text_field(:name => "websiteURL").set data['url']
-  #@browser.execute_script("window.open('add-your-business-cat.cfm')")
-  #sleep(5)
 
-  #attach new window
-  #@browser.window(:url,/add-your-business-cat/i).use do
-  #  @browser.text_field(:id=> "search").when_present.set data[ 'business_category']
-  #  @browser.button(:value => 'Search').click
-  #  @browser.link(:text => "#{data[ 'business_category' ]}").click	
-  #end
-  
+
   @browser.text_field(:name => 'describebiz').set data[ 'business_description']
   @browser.checkbox(:name => 'optin').set
 

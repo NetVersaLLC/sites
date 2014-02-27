@@ -17,9 +17,9 @@ def signup(data)
   @browser.text_field(:name => 'lastname').set      data['last_name']
   @browser.text_field(:name => 'email_address').set data['email']
 
-  @browser.select_list(:name=>'cmbmonth').select    data['birthday_month']
-  @browser.select_list(:name=>'cmbday').select      data['birthday_day']
-  @browser.select_list(:name=>'cmbyear').select     data['birthday_year']
+  @browser.select_list(:name=>'cmbmonth').select    data['birthday']['month']
+  @browser.select_list(:name=>'cmbday').select      data['birthday']['day']
+  @browser.select_list(:name=>'cmbyear').select     data['birthday']['year']
 
   # city displays a drop down that you need to select from
   @browser.text_field(:name => 'City').set          data['city']
@@ -28,7 +28,7 @@ def signup(data)
 
   3.times do 
     add_user_form.text_field(:id   => 'password').set      data['password']
-    @browser.text_field(:name => 'verif_box').set     solve_catcha( @browser.form(:id => 'AddUser').image )
+    @browser.text_field(:name => 'verif_box').set     solve_captcha( @browser.form(:id => 'AddUser').image )
     @browser.button(:value => 'Sign Up').click
 
     break if @browser.h1(:text => /Nice to see you/).exist?
@@ -63,3 +63,4 @@ else
     raise "Error filling out form" 
   end
 end
+

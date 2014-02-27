@@ -3,7 +3,7 @@
 
 # Setup
 @browser = Watir::Browser.new :firefox
-@browser.goto 'mysheriff.net/users'
+@browser.goto 'www.mysheriff.net'
 at_exit{ @browser.close unless @browser.nil? }
 
 # Classes
@@ -39,38 +39,44 @@ def login data
 end
 
 def search_listing data
-  sleep 3
+  sleep(3)
   @browser.link(:text,/add new business/).click
-  vals = {
-    "business" => data["business_name"],
-    "location" => data["zip"]
-  }
-  fill_form @browser.div(:id,'content'), vals
-  @browser.div(:id,'content').button.click
-  @browser.text.include? "Thank you, your business isn't listed"
+  sleep(3)
+
+  form = @browser.form(:name => "formSearch") 
+
+  form.text_field(:id => 'business').set data["business_name"]
+  form.text_field(:id => 'location').set data['zip']
+
+  form.button(:value => "Search").click
+
+  @browser.link(:text => /Add your business now/).exist?
 end
 
 def create_listing data
-  form = @browser.div(:id,'content')
-  @browser.link(:text,/Add your business now/).click
-  vals = {
-    "CompanyName" => data["business_name"],
-    "Address" => data["address1"],
-    "Address2" => data["address2"],
-    "zip" => data["zip"],
-    "phone1" => data["phone"][0],
-    "phone2" => data["phone"][1],
-    "phone3" => data["phone"][2],
-    "WebsiteAddress" => data["website"],
-    "EmailAddress" => data["email"]
-  }
-  fill_form form, vals
+  @browser.link(:text => /Add your business now/).click
+
+  form = @browser.form(:name => "formAdd") 
+
+  @browser.text_field(:id => "CompanyName").set data["business_name"] 
+  @browser.text_field(:id => "Address").set data["address1"] 
+  @browser.text_field(:id => "Address2").set data["address2"]
+  @browser.text_field(:id => "zip").set data["zip"] 
+  @browser.text_field(:id => "phone1").set data["phone"][0]
+  @browser.text_field(:id => "phone2").set data["phone"][1]
+  @browser.text_field(:id => "phone3").set data["phone"][2]
+  @browser.text_field(:id => "WebsiteAddress").set data["website"] 
+  @browser.text_field(:id => "EmailAddress").set data["email"]
+
   form.text_field(:name,'City').set data["city"]
-  sleep 1
-  @browser.div(:class,'ac_results').li(:text,/#{data["state"]}/).click
+  @browser.div(:class => 'ac_results', :text => /#{data['city']}/).wait_until_present
+  @browser.div(:class => 'ac_results').li(:text => /#{data['state']}/).click
+
   form.text_field(:name,'searchDescription').set data["category"]
-  sleep 2
-  @browser.strong(:text,/#{data["category"]}/).when_present.click
+  Watir::Wait.until { @browser.divs(:class => 'ac_results').length == 2 } 
+  categories = @browser.divs(:class => 'ac_results')[1]
+  categories.li(:text => /#{data['category']}/i).click
+
   form.button.click
   if @browser.text.include? "View Listing"
     self.save_account('Mysheriff', {
@@ -79,11 +85,11 @@ def create_listing data
       })
     true
   else
-    false
+    raise 'failed to create listing' 
   end
 end
 
 # Controller
-if login(data) and search_listing(data) and create_listing(data)
-  self.success
-end
+login(data) and search_listing(data) and create_listing(data)
+self.success
+

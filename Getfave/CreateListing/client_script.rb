@@ -7,6 +7,8 @@ at_exit{
 
 def sign_in(data)
   @browser.link(:text => 'Log In/Join').click
+  @browser.text_field(:id => 'session_email').wait_until_present
+
   @browser.text_field(:id => 'session_email').set data['email']
   @browser.text_field(:id => 'session_password').set data['password']
   @browser.button(:value => 'Log In').click
@@ -101,3 +103,4 @@ elsif @browser.div(:id => 'business-results').span(:text => "#{data['business']}
   self.save_account("Getfave", {:listing_url => listing_url, :status => "Listing status pending."})
   self.failure("Business is already listed.")
 end
+

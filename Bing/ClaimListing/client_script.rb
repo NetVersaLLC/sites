@@ -26,15 +26,7 @@ def search_and_claim_business( data )
   @browser.text_field(:name => 'City').set data['city'] + ", " + data['state_short']
   @browser.button(:value => 'Search').click
 
-  puts @browser.ready_state 
-  puts @browser.status 
-  3.times do 
-    sleep(10)
-    puts @browser.ready_state 
-    puts @browser.status 
-    break if @browser.h5(:text => "Search Results").exist? 
-    break if @browser.span(:text => /found no businesses/).exist? 
-  end 
+  @browser.link(:text => "Try a new search").wait_until_present(60) 
 
   if @browser.h5(:text => "Search Results").exist? 
     @browser.ul(:class => "sideMenu").lis.each do |li|
@@ -68,11 +60,17 @@ def update_listing( data )
   @browser.text_field(:name => 'BasicBusinessInfo.WebSite').set data['website']
 
   category = data['category'] 
-  set_checkbox_for_category = "document.evaluate(\"//text()[contains(.,'#{category}')]\",document, null, XPathResult.ANY_TYPE, null).iterateNext().parentElement.previousElementSibling.checked = true;"
+  set_checkbox_for_category = "document.evaluate(\"//text()[contains(.,'#{category}')]\",document, null, XPathResult.ANY_TYPE, null).iterateNext().previousSibling.checked = true;"
 
   @browser.text_field(:id => "categoryInputTextBox").set category
+  sleep(10)
   @browser.button(:id => "categoryAddButton").click 
   @browser.execute_script( set_checkbox_for_category )  # set a checkbox that is not visible, which watir does not allow
+
+
+  sleep(120)
+
+
   @browser.button(:text => "Add").click 
 
   sleep(60)

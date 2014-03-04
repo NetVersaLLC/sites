@@ -6,39 +6,35 @@ at_exit{
 }
 
 def sign_in( data )
-
   @browser.goto( 'https://login.live.com/' )
-
-  email_parts = {}
-  email_parts = data[ 'hotmail' ].split( '.' )
-
-  @browser.input( :name, 'login' ).send_keys email_parts[ 0 ]
-  @browser.input( :name, 'login' ).send_keys :decimal
-  @browser.input( :name, 'login' ).send_keys email_parts[ 1 ]
-  # TODO: check that email entered correctly since other characters may play a trick
-  @browser.text_field( :name, 'passwd' ).set data[ 'password' ]
-  # @browser.checkbox( :name, 'KMSI' ).set
+  sleep(15)
+ 
+  @browser.text_field(:name => 'login').set data['hotmail'] 
+  @browser.text_field( :name => 'passwd' ).set data[ 'password' ]
   @browser.button( :name, 'SI' ).click
-
+  sleep(15)
 end
 
 sign_in( data )
-if @browser.url =~ /mail\.live\.com\/default\.aspx/ 
-    # Continue
-else
-    @browser.goto('mail.live.com')
-    sleep 5
-end
-options = @browser.url + "#!/mail/options.aspx"
-@browser.goto(options)
+@browser.goto('mail.live.com')
+sleep(30)
 
-@opt_frame = @browser.frame( :id, 'appFrame')
-@opt_frame.link( :text, /Rules for sorting new messages/i).when_present.click
-@opt_frame.button( :id, 'NewFilter').when_present.click
+if @browser.link(:text => 'continue to your inbox').exist? 
+  @browser.link(:text => 'continue to your inbox').click
+  sleep(30)
+end 
+live_com = @browser.url.match(/(\Ahttps:\/\/\w*\.mail.live.com)/)[1]
+@browser.goto "#{live_com}/mail/options.aspx"
+sleep(30)
 
-@opt_frame.select_list( :id, 'VerbDropDown').select "contains"
-@opt_frame.text_field( :id, 'MatchString').set "@"
-@opt_frame.button( :value, /Save/).click
+@browser.link( :text, /Rules for sorting new messages/i).click
+@browser.button( :id, 'NewFilter').wait_until_present
+@browser.button( :id, 'NewFilter').click
+sleep(15)
+@browser.select_list( :id, 'VerbDropDown').select "contains"
+@browser.text_field( :id, 'MatchString').set "@"
+@browser.button( :value, /Save/).click
+sleep(15)
 
 puts "Rule set"
 
@@ -46,4 +42,4 @@ if @chained
 	self.start("Bing/CreateListing")
 end
 
-true
+self.success

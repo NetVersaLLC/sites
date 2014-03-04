@@ -7,7 +7,7 @@ data = {
   "password" => Mysheriff.make_password,
   "birthday" =>  {
     "month" => Date::ABBR_MONTHNAMES[business.birthday.month],
-    "day" => business.birthday.day.to_s,
+    "day" => "%02d" % business.birthday.day,
     "year" => business.birthday.year.to_s
     },
   "address1" => business.address,

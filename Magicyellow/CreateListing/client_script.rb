@@ -96,7 +96,7 @@ def add_new_business(data)
   end 
   
   @browser.button(:value => 'Submit').click
-  @success_msg = 'Thank you for claiming'
+  @success_msg = 'Thank you for'
   if @browser.text.include?(@success_msg)
     puts "Initial registration is Successful"
 

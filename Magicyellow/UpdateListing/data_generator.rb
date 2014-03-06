@@ -1,5 +1,5 @@
 data = {}
-#seed = Random.new.rand(1000..2000).to_s
+data[ 'heap'] = business.magicyellows.first.heap
 data[ 'business_category' ] = MagicyellowCategory.find(business.magicyellows.first.category_id).name
 data[ 'phone' ] = business.local_phone
 data[ 'email' ] = business.bings.first.email
@@ -20,5 +20,5 @@ data[ 'is_owner'] = 'Yes'
 data[ 'additional_services' ] = business.services_offered
 data[ 'additional_products' ] = ' '
 data[ 'additional_brands' ] = business.brands
+data['bing_password'] = business.bings.first.password
 data
-

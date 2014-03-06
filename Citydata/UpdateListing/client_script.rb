@@ -133,15 +133,15 @@ end
 
 @heap = JSON.parse( data['heap'] ) 
 
-if @heap[:listing_created]
-  @heap[:listing_updated]  = update_listing(data) 
+if @heap['listing_created']
+  @heap['listing_updated']  = update_listing(data) 
   self.save_account("Citydata", {"heap" => @heap.to_json})
 else 
-  @heap[:listing_created] = create_listing(data)        
+  @heap['listing_created'] = create_listing(data)        
   self.save_account("Citydata", {"heap" => @heap.to_json})
 end 
 
-unless @heap[:listing_created] && @heap[:listing_updated] 
+unless @heap['listing_created'] && @heap['listing_updated'] 
   self.start("Citydata/UpdateListing", 1440)
 end 
 

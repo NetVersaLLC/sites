@@ -209,27 +209,27 @@ end
 
 @heap = JSON.parse( data['heap'] ) 
 
-unless @heap[:signed_up] 
-  @heap[:signed_up] = sign_up(data)        
+unless @heap['signed_up'] 
+  @heap['signed_up'] = sign_up(data)        
   self.save_account("Getfave", {"heap" => @heap.to_json})
 end 
 
-unless @heap[:account_verified]
-  @heap[:account_verified] = verify_account(data) 
+unless @heap['account_verified']
+  @heap['account_verified'] = verify_account(data) 
   self.save_account("Getfave", {"heap" => @heap.to_json})
 end 
 
-if @heap[:account_verified] && !@heap[:listing_created]
-  @heap[:listing_created]  = create_listing(data) 
+if @heap['account_verified'] && !@heap['listing_created']
+  @heap['listing_created']  = create_listing(data) 
   self.save_account("Getfave", {"heap" => @heap.to_json})
 end 
 
-if @heap[:listing_created]
-  @heap[:listing_updated]  = update_listing(data) 
+if @heap['listing_created']
+  @heap['listing_updated']  = update_listing(data) 
   self.save_account("Getfave", {"heap" => @heap.to_json})
 end 
 
-unless @heap[:signed_up] && @heap[:account_verified] && @heap[:listing_created] && @heap[:listing_updated] 
+unless @heap['signed_up'] && @heap['account_verified'] && @heap['listing_created'] && @heap['listing_updated']
   self.start("Getfave/UpdateListing", 60)
 end 
 self.success

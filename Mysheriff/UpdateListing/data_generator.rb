@@ -1,4 +1,9 @@
 data = {
+  "heap" => business.mysheriffs.first.heap, 
+
+  "new_email" => business.bings.first.email,
+  "new_password" => Mysheriff.make_password,
+
   "images_synced" => business.completed_jobs.where(:name => 'Utils/ImageSync').first.present?,
   "business_name" => business.business_name,
   "gender" => business.contact_gender,
@@ -8,7 +13,7 @@ data = {
   "password" => business.mysheriffs.first.password,
   "birthday" =>  {
     "month" => Date::ABBR_MONTHNAMES[business.birthday.month],
-    "day" => business.birthday.day.to_s,
+    "day" => "%02d" % business.birthday.day,
     "year" => business.birthday.year.to_s
     },
   "address1" => business.address,
@@ -22,6 +27,5 @@ data = {
   "description" => business.business_description,
   "hours" => Mysheriff.get_hours(business),
   "payment_methods" => Mysheriff.payment_methods(business)
-  
 }
 data

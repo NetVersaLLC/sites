@@ -1,19 +1,30 @@
+@browser = Watir::Browser.new :firefox
+at_exit {
+	unless @browser.nil?
+	  @browser.close
+	end
+}
 # Developer's Notes
 # Good idea for listing site: mydeputy.net
 
-# Setup
-at_exit{ @browser.close unless @browser.nil? }
-
-def prerequisites(data)
-  unless data['images_synced'] 
-    self.start("Mysheriff/UpdateListing", 10) 
-    return "Utils/ImageSync"
+def sign_up(data) 
+  if signup_form(data) 
+    self.save_account('Mysheriff', {:email => data['new_email'], :password => data['new_password'], :status => "Account created, posting listing..."})
+    true
+  else 
+    reg_error = @browser.div('reg_error')
+    if reg_error.exist? && reg_error.lis.count == 1 && reg_error.text.include?('image Correctly') 
+      false 
+    else
+      raise "Error filling out form" 
+    end
   end 
-  return "Mysheriff/SignUp" if data['email'].to_s.empty? || data['password'].to_s.empty?
-  nil
 end 
 
-def update(data)
+def create_listing(data) 
+end 
+
+def update_listing(data)
   @browser = Watir::Browser.new :firefox
   @browser.goto 'www.mysheriff.net'
 
@@ -34,6 +45,45 @@ def update(data)
   self.save_account('Mysheriff', { "listing_url" => listing_url, "status" => "Listing updated."})
 end 
 
+def signup_form(data) 
+  @browser.goto "http://www.mysheriff.net/users/"
+
+  @browser.radio(:value => data['gender']).set
+
+  add_user_form = @browser.form(:id => 'AddUser') 
+
+  @browser.text_field(:name => 'firstname').set     data['first_name']
+  @browser.text_field(:name => 'lastname').set      data['last_name']
+  @browser.text_field(:name => 'email_address').set data['new_email']
+
+  @browser.select_list(:name=>'cmbmonth').select    data['birthday']['month']
+  @browser.select_list(:name=>'cmbday').select      data['birthday']['day']
+  @browser.select_list(:name=>'cmbyear').select     data['birthday']['year']
+
+  # city displays a drop down that you need to select from
+  @browser.text_field(:name => 'City').set          data['city']
+  @browser.div(:class => 'ac_results', :text => /#{data['city']}/).wait_until_present
+  @browser.div(:class => 'ac_results').li(:text => /#{data['state']}/).click
+
+  3.times do 
+    add_user_form.text_field(:id   => 'password').set      data['new_password']
+    @browser.text_field(:name => 'verif_box').set     solve_captcha( @browser.form(:id => 'AddUser').image )
+    @browser.button(:value => 'Sign Up').click
+
+    break if @browser.h1(:text => /Nice to see you/).exist?
+    break if @browser.li(:text => /email address has already been used/).exist?
+  end 
+  @browser.h1(:text => /Nice to see you/).exist? || @browser.li(:text => /email address has already been used/).exist?
+end 
+
+def solve_captcha(image_element)
+  image_file = "#{ENV['USERPROFILE']}\\citation\\mysheriff_captcha.png"
+  puts "CAPTCHA width: #{image_element.width}"
+  image_element.save image_file
+  sleep(3)
+
+  return CAPTCHA.solve image_file, :manual
+end
 
 def sign_in data
   if @browser.ul(:id => "nav").text.include? "Logout"
@@ -142,11 +192,32 @@ def upload_images( data )
   end
 end 
 
-pre = prerequisites(data)
-if pre 
-  self.start( pre ) 
+@heap = JSON.parse( data['heap'] ) 
+if !@heap['images']
+  self.start("Utils/ImageSync")
+  self.start("Mysheriff/UpdateListing", 30)
+  @heap['images'] = true
+  self.save_account("Mysheriff", {"heap" => @heap.to_json})
 else 
-  update(data)
-end
+  unless @heap['signed_up']
+    @heap['signed_up'] = sign_up(data) 
+    self.save_account("Mysheriff", {"heap" => @heap.to_json})
+  end 
 
+  if @heap['signed_up'] && !@heap['listing_created']
+    @heap['listing_created'] = create_listing(data) 
+    self.save_account("Mysheriff", {"heap" => @heap.to_json})
+  end 
+
+  if @heap['listing_created']
+    @heap['listing_updated']  = update_listing(data) 
+    self.save_account("Mysheriff", {"heap" => @heap.to_json})
+  end 
+
+  unless @heap['signed_up'] && @heap['listing_created'] && @heap['listing_updated'] 
+    self.start("Mysheriff/UpdateListing", 1440)
+  end 
+end 
 self.success
+
+

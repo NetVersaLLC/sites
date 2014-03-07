@@ -105,7 +105,7 @@ if @heap['listing_updated'] && !@heap['listing_verified']
   self.save_account("Ziplocal", {"heap" => @heap.to_json})
 end 
 
-unless heap['listing_updated'] && @heap['listing_verified']
+unless @heap['listing_updated'] && @heap['listing_verified']
   self.start("Ziplocal/UpdateListing", 1440)
 end 
 

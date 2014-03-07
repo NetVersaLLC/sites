@@ -96,7 +96,7 @@ def create_listing(data)
 
   @browser.text_field(:id => "q").set data['business']
   @browser.button(:value => "Get").click
-  sleep(15)
+  sleep(30)
   Watir::Wait.until { @browser.div(:id => 'results').exists? }
 
   if @browser.text.include? "We couldn't find any matches."
@@ -118,9 +118,8 @@ def update_listing(data)
   sign_in(data)
 
   @browser.link(:text => "Businesses" ).click
-  sleep(15)
-  @browser.h1(:text => "Managed Businesses").wait_until_present
-
+  sleep(30)
+  @browser.link(:text => 'Edit Information').wait_until_present
   @browser.link(:text => 'Edit Information').click
   sleep(30)
   fill_business data
@@ -130,7 +129,7 @@ end
 
 def get_listing_url(data)
   @browser.link(:text => "Businesses" ).click
-  sleep(15)
+  sleep(30)
   @browser.h1(:text => "Managed Businesses").wait_until_present
   @browser.link(:text => data['business']).href
 end 
@@ -146,7 +145,7 @@ def sign_in(data)
   @browser.text_field(:id => 'session_email').set data['email']
   @browser.text_field(:id => 'session_password').set data['password']
   @browser.button(:value => 'Log In').click
-  sleep(20) 
+  sleep(30) 
   Watir::Wait.until{ @browser.div(:id => "footer-links").text =~ /Log Out/ }
 end
 

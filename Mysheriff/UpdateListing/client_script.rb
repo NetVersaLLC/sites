@@ -8,7 +8,9 @@ at_exit {
 # Good idea for listing site: mydeputy.net
 
 def sign_up(data) 
-  if signup_form(data) 
+  return true unless data['email'].to_s.empty? || data['password'].to_s.empty? 
+
+  if sign_up_form(data) 
     self.save_account('Mysheriff', {:email => data['new_email'], :password => data['new_password'], :status => "Account created, posting listing..."})
     true
   else 
@@ -22,15 +24,55 @@ def sign_up(data)
 end 
 
 def create_listing(data) 
+  sign_in(data) 
+
+  return true if @browser.link(:title => /Edit Details/).exist? 
+  return true unless search_listing(data) 
+
+  @browser.link(:text => /Add your business now/).click
+  sleep(30)
+
+  form = @browser.form(:name => "formAdd") 
+
+  form.text_field(:id => "CompanyName").set data["business_name"] 
+  form.text_field(:id => "Address").set data["address1"] 
+  form.text_field(:id => "Address2").set data["address2"]
+  form.text_field(:id => "zip").set data["zip"] 
+  form.text_field(:id => "phone1").set data["phone"][0]
+  form.text_field(:id => "phone2").set data["phone"][1]
+  form.text_field(:id => "phone3").set data["phone"][2]
+  form.text_field(:id => "WebsiteAddress").set data["website"] 
+  form.text_field(:id => "EmailAddress").set data["email"]
+
+  form.text_field(:name,'City').set data["city"]
+  sleep(15)
+  @browser.div(:class => 'ac_results').li(:text => /#{data['state']}/).click
+
+  form.text_field(:name,'searchDescription').set data["category"]
+  sleep(10)
+  Watir::Wait.until { @browser.divs(:class => 'ac_results').length == 2 } 
+  categories = @browser.divs(:class => 'ac_results')[1]
+  categories.li(:text => /#{data['category']}/i).click
+
+  form.button.click
+  sleep(30)
+  if @browser.text.include? "View Listing"
+    self.save_account('Mysheriff', {
+        "listing_url" => @browser.link(:text,/View Listing/).href,
+        "status" => "Listing successfully created."
+      })
+    true
+  else
+    raise 'failed to create listing' 
+  end
 end 
 
 def update_listing(data)
-  @browser = Watir::Browser.new :firefox
-  @browser.goto 'www.mysheriff.net'
 
   sign_in(data) 
 
-  return self.start("Mysheriff/CreateListing") unless @browser.link(:title => /Edit Details/).exist?
+  @browser.goto("http://www.mysheriff.net/users/business/mybusiness/") 
+  sleep(30) 
 
   @browser.link(:title => /Edit Details/).click
   @business_nav = @browser.div(:id => "busnav")
@@ -43,9 +85,27 @@ def update_listing(data)
   
   listing_url = @browser.link(:text => /View Listing/).href,
   self.save_account('Mysheriff', { "listing_url" => listing_url, "status" => "Listing updated."})
+  true
 end 
 
-def signup_form(data) 
+def search_listing data
+  sleep(5)
+  @browser.link(:text,/add new business/).click
+  sleep(5)
+
+  form = @browser.form(:name => "formSearch")
+
+  form.text_field(:id => 'business').set data["business_name"]
+  form.text_field(:id => 'location').set data['zip']
+
+  form.button(:value => "Search").click
+  sleep(10)
+
+  @browser.span(:text => /No results found/).exist?
+end
+
+
+def sign_up_form(data) 
   @browser.goto "http://www.mysheriff.net/users/"
 
   @browser.radio(:value => data['gender']).set
@@ -86,6 +146,9 @@ def solve_captcha(image_element)
 end
 
 def sign_in data
+  @browser.goto 'www.mysheriff.net'
+  sleep(30)
+
   if @browser.ul(:id => "nav").text.include? "Logout"
     puts "Already logged in. Proceeding."
   else
@@ -94,11 +157,11 @@ def sign_in data
     login_form.text_field(:id => 'login').set data["email"] 
     login_form.text_field(:id => 'password').set data["password"]
     login_form.button.click
+    sleep(30)
 
     raise 'invalid login credentials' if @browser.span(:text =>  /Invalid Login/).exist?
   end
 end
-
 
 def update_details data
   @business_nav.link(:text => "Edit Details").click
@@ -219,5 +282,3 @@ else
   end 
 end 
 self.success
-
-

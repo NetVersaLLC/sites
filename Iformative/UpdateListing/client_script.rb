@@ -4,7 +4,7 @@ at_exit do
 end
 
 def sign_up data
-  return true unless data["username"].empty? || data["password"].empty? || data["email"].empty? 
+  return true unless data["username"].to_s.empty? || data["password"].to_s.empty? || data["email"].to_s.empty? 
 
   @browser.goto 'http://www.iformative.com/review/request/'
   sleep(30)

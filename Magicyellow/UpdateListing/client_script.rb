@@ -155,7 +155,9 @@ def verify_account(data)
   found = @browser.execute_script( click_email )
   if found 
     puts 'email found'
-    password = @browser.div(:text => /login and password/).text.match(/Password: (\S{6})/)[1]
+    sleep(30)
+    email_text = @browser.execute_script("return document.getElementsByTagName('pre')[0].textContent;")
+    password = email_text.match(/Password: (\S{6})/)[1]
 	  self.save_account("Magicyellow", {:email => data['email'], :password => password })
     data['password'] = password
     true

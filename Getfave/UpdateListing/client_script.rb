@@ -7,7 +7,7 @@ at_exit {
 
 
 def sign_up(data) 
-  return true unless data['email'].empty? && data['password'].empty? 
+  return true unless data['email'].to_s.empty? && data['password'].to_s.empty?
 
   @browser.goto 'https://www.getfave.com/login'
   sleep(30)
@@ -192,24 +192,13 @@ def fill_business(data)
   @browser.button(:value => 'Publish Changes').click
   #puts('Debug: Changes Published')
   sleep(30)
-  raise Exception, @browser.element(:class => 'error').text if @browser.element(:class => 'error').exist?
-rescue => e
-  unless @retries == 0
-    puts "Error caught in fill_business: #{e.inspect}"
-    puts "Retrying in two seconds. #{@retries} attempts remaining."
-    sleep 2
-    @retries -= 1
-    @browser.refresh
-    retry
-  else
-    raise "Error in fill_business could not be resolved. Error: #{e.inspect}"
-  end
+  raise @browser.element(:class => 'error').text if @browser.element(:class => 'error').exist?
 end
 
 @heap = JSON.parse( data['heap'] ) 
 
 unless @heap['signed_up'] 
-  @heap['signed_up'] = sign_up(data)        
+  @heap['signed_up'] = sign_up(data)
   self.save_account("Getfave", {"heap" => @heap.to_json})
 end 
 

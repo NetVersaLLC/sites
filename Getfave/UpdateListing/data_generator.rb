@@ -1,10 +1,13 @@
+
+gf = business.getfaves.first 
+
 data = {}
-data[ 'heap' ] = business.getfaves.first.heap 
+data[ 'heap' ] = (gf ? gf.heap : "{}")
 
 data['email' ] 		= business.bings.first.email
 data['new_password'] 		= Yahoo.make_password
 data['bing_password'] =  business.bings.first.password
-data['password'] = business.getfaves.first.password
+data['password'] = (gf ? gf.password : "")
 data['name' ] 			= business.contact_first_name + ' ' + business.contact_last_name
 
 data['phone'] = business.local_phone

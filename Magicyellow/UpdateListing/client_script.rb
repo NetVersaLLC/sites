@@ -211,6 +211,7 @@ def update_listing(data)
 
   listing_url = @browser.link(:href => /\/profile/).href
   self.save_account("Magicyellow", {:listing_url => listing_url, :status => "Listing updated."})
+  true
 end 
 
 @heap = JSON.parse( data['heap'] ) 

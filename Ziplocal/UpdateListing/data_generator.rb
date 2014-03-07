@@ -13,9 +13,11 @@ data[ 'zip' ] = business.zip
 data[ 'country' ] = 'United States'
 data[ 'countryAbrv' ] = 'US'
 data[ 'citystate' ] = data[ 'city' ] + ', ' + data[ 'stateabreviation' ]
-data[ 'password' ] = Yahoo.make_password
+data[ 'new_password' ] = Yahoo.make_password
 data[ 'website' ] = business.company_website
+data[ 'prefix' ] = business.contact_prefix
 catty = Ziplocal.where(:business_id => business.id).first
 data[ 'categoryKeyword' ] = ZiplocalCategory.find(catty.category_id).name
-data[ 'prefix' ] = business.contact_prefix
+data[ 'password'] = catty.password
+data[ 'heap' ] = catty.heap
 data

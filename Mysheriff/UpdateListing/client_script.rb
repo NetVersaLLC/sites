@@ -122,6 +122,7 @@ def sign_up_form(data)
 
   # city displays a drop down that you need to select from
   @browser.text_field(:name => 'City').set          data['city']
+  sleep(5)
   @browser.div(:class => 'ac_results', :text => /#{data['city']}/).wait_until_present
   @browser.div(:class => 'ac_results').li(:text => /#{data['state']}/).click
 

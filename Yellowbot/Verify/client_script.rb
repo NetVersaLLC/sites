@@ -39,7 +39,7 @@ if click_email_link(data)
 	end
 else 
 	if @chained
-	  self.start("Yellowbot/Verify", 15)
+	  self.start("Yellowbot/Verify", 1440)
 	end
 end
 self.success

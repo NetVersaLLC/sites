@@ -76,6 +76,10 @@ def update_listing(data)
 
   @browser.link(:title => /Edit Details/).click
   @business_nav = @browser.div(:id => "busnav")
+  sleep(20)
+
+  listing_url = @browser.link(:text => /View Listing/).href,
+  self.save_account('Mysheriff', { "listing_url" => listing_url, "status" => "Listing updated."})
 
   update_details(data) 
   update_about_us(data) 
@@ -83,8 +87,6 @@ def update_listing(data)
   update_pricing(data) 
   update_image_gallery(data) 
   
-  listing_url = @browser.link(:text => /View Listing/).href,
-  self.save_account('Mysheriff', { "listing_url" => listing_url, "status" => "Listing updated."})
   true
 end 
 
@@ -278,7 +280,7 @@ else
     self.save_account("Mysheriff", {"heap" => @heap.to_json})
   end 
 
-  unless @heap['signed_up'] && @heap['listing_created'] && @heap['listing_updated'] 
+  unless @heap['signed_up'] && @heap['listing_created'] && !@heap['listing_updated'] 
     self.start("Mysheriff/UpdateListing", 1440)
   end 
 end 

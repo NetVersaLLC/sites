@@ -100,9 +100,9 @@ def verify_listing(data)
 
   if @browser.execute_script( click_email )
     sleep(30)
-    @browser.h1(:text => /Folders/).wait_until_present
 
-    href = @browser.div(:id => "mpf0_MsgContainer").text.match(/(http:\/\/www.iformative.com\/confirm\/email\/\S*\/)/)[1]
+    email_text = @browser.execute_script("return document.getElementsByClassName('readMsgBody')[0].textContent;")
+    href = email_text.match(/(http:\/\/www.iformative.com\/confirm\/email\/\S*\/)/)[1]
     @browser.goto href
 
     sleep(30)

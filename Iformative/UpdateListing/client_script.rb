@@ -101,7 +101,8 @@ def verify_listing(data)
   if @browser.execute_script( click_email )
     sleep(30)
 
-    email_text = @browser.execute_script("return document.getElementsByClassName('readMsgBody')[0].textContent;")
+    #email_text = @browser.execute_script("return document.getElementsByClassName('readMsgBody')[0].textContent;")
+    email_text = @browser.execute_script("return document.getElementsByClassName('ReadMsgBody')[0].textContent;")
     href = email_text.match(/(http:\/\/www.iformative.com\/confirm\/email\/\S*\/)/)[1]
     @browser.goto href
 

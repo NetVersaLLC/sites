@@ -31,6 +31,7 @@ def captcha_text(image_element)
   puts "captcha solving..."
   captcha_file_name = "#{ENV['USERPROFILE']}\\citation\\magicyellow_captcha.png"
   image_element.save captcha_file_name
+  sleep(5)
   s = CAPTCHA.solve captcha_file_name, :manual
   puts "captcha solution #{s}" 
   s

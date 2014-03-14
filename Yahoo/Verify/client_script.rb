@@ -86,12 +86,11 @@ def get_verification_code(data)
 
   @browser.goto href
   sleep(30)
-  @browser.link(:text => "Verify").click
-  sleep(30)
   @browser.text_field(:id => "txtCaptcha").send_keys code 
   sleep(3)
   @browser.button(:value => "Verify Code").click
-  sleep(30)
+  sleep(70) # yahoo takes forever to create dashboard content or whatever it is doing. 
+  @browser.div(:text => /Marketing Dashboard/).exist?
 end
 
 def send_verify_email(data) 
@@ -124,10 +123,12 @@ end
 
 def verify_account(data) 
   sign_in(data)
-  send_verify_email(data)
-  code = get_verification_code(data)
-  set_verification_code(data, code)
-  true
+  if get_verification_code(data)
+    true
+  else
+    send_verify_email(data)
+    false 
+  end 
 end 
 
 @heap = JSON.parse( data['heap'] ) 
@@ -138,7 +139,7 @@ end
 
 
 if @heap['account_verified']
-  msg = "Account created.  Should receive a post card with verification code in one week."
+  msg = "Account created.  Waiting for listing to get approved."
   self.start("Yahoo/UpdateListing", 1440)
 else 
   self.start("Yahoo/Verify", 120)

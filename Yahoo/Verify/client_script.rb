@@ -1,78 +1,148 @@
-def verify_be_email()
-
-  puts 'Verify by email'
-
-  # Send confirmation email
-  @browser.radio( :id => 'opt-email' ).set data['email']
-  @browser.button( :id => 'btn-email' ).click
-  sleep 20 # for email to arrive
-
-  # Open mail box
-  @browser.goto( 'http://mail.yahoo.com/' )
-
-  # .. a) go to inbox and click verification link
-  @browser.a( :id => 'tabinbox' ).click
-  Watir::Wait::until do @browser.div( :class => 'list-view' ).exists? end
-  @browser.div( :text => 'Text - Yahoo! email verification code' ).click
-  # parse 'Your verification code is Vsp35sde.'
-  verification_code = 'Vsp35sde'
-  # parse link 'Please login to http://beta.listings.local.yahoo.com/verify/...'
-  
-  # .. b) serch mail by subject 'email verification code'
-  # text_field :id => yuhead-sform-searchfield, button :class => yucs-sprop-btn
-
-  # Complete verification by code
-  @browser.text_field( :id => 'txtCaptcha' ).set verification_code
-  @browser.button( :id => 'btnverifychannel' ).click
-end
-
-def verify_phone(data)
-
-  sign_in(data)
-  sleep 2
-  @browser.goto("http://smallbusiness.yahoo.com/dashboard/mybusinesses?brand=local")
-  sleep 2
-
-  @browser.link(:text => "Verify").when_present.click
-  sleep(2)
-  @browser.radio(:id => 'opt-phone').when_present.click
-  sleep(2)
-
-  
-
-retries = 3
-begin
-  @browser.button(:id => 'btn-phone').when_present.click
-    sleep(3)
-  code = PhoneVerify.retrieve_code("Yahoo")
-  @browser.text_field(:id => 'txtCaptcha').set code
-
-  @browser.button(:id => 'btnverifychannel').click
-  sleep 5
-
-  if @browser.text.include? "The verification code you submitted was incorrect. Please enter the new verification code."
-    throw "Invalid code."
-  end
-rescue
-  if retries > 0
-    puts("Invalid code. Trying again in 3 seconds...")
-    sleep 3
-    retries -= 1
-    retry
-  else
-    throw "Could not verify the account"
-  end
-end
-
-
+@browser = Watir::Browser.new :firefox
+at_exit {
+	unless @browser.nil?
+	  @browser.close
+	end
+}
+def sign_in(data)
+  signin_url=    'https://login.yahoo.com'
+  @browser.goto signin_url
+  sleep(30)
+  @browser.text_field(:id=> 'username').set data['email']
+  @browser.text_field(:id=> 'passwd').set data['password']
+  @browser.button(:id=> '.save').click
+  sleep(30)
   true
-
 end
 
-verify_phone(data)
-sleep 15 #Just waiting for the code to verify. It stick on "Please wait for your Market Place Manager to setup"
-# The account is actually verified almost immediately, but this setup takes forever.
-# Having it wait until the page loads often times out, so if the code was accepted we
-# can just return true and move on. 
+def get_verification_code(data) 
+
+  click_yahoo_email =   "var title = /Yahoo! email verification code/; 
+    var spans; 
+    spans = document.getElementsByClassName('Sb');
+    for (var i=0;i<spans.length;i++) { 
+      var s; 
+      s = spans[i];
+      if(title.exec(s.textContent)){ 
+        s.click(); 
+        return true; 
+      }
+    }
+    return false;"
+
+  click_junk_folder = "
+    var folder_name = /Junk/;
+    var spans; 
+    spans = document.getElementsByClassName('FolderLabel');
+    for (var i=0;i<spans.length;i++) { 
+      var s; 
+      s = spans[i];
+      if(folder_name.exec(s.textContent)){ 
+        s.click(); 
+        return true; 
+      }
+    }
+    return false;"
+
+  get_code = "
+    var divs; 
+    divs = document.querySelector('.ReadMsgContainer').getElementsByTagName('div');
+    for(var i=0;i<divs.length;i++) { 
+      console.log(divs[i].textContent);
+      if(divs[i].textContent.contains('verification code')){
+        return divs[i].textContent; 
+        }
+      }
+    return false;"
+
+  @browser.goto("https://mail.live.com/") 
+  sleep(30)
+  @browser.text_field(:name => "login").set data['bing_email']
+  @browser.text_field(:name => 'passwd').set data['bing_password']
+  @browser.form(:name => "f1").button.click
+  sleep(30)
+
+  if @browser.link(:text => 'continue to your inbox').exist? 
+    @browser.link(:text => 'continue to your inbox').click
+    sleep(30)
+  end 
+
+  if !@browser.execute_script(click_yahoo_email) 
+    sleep(5)
+    @browser.execute_script(click_junk_folder)
+    sleep(10)
+    return nil if !@browser.execute_script(click_yahoo_email) 
+  end 
+  sleep(30)
+
+  email_body = @browser.execute_script(get_code) 
+
+  code = /verification code is (\w+)./.match(email_body)[1]
+  href = /login to (http:\/\/\S+) and/.match(email_body)[1]
+  puts code
+  puts href
+
+  raise('could not find verification code in the email') unless code
+
+  @browser.goto href
+  sleep(30)
+  @browser.link(:text => "Verify").click
+  sleep(30)
+  @browser.text_field(:id => "txtCaptcha").send_keys code 
+  sleep(3)
+  @browser.button(:value => "Verify Code").click
+  sleep(30)
+end
+
+def send_verify_email(data) 
+  # When the browser goes through edit -> submit information, this, for some reason, 
+  # makes the email verification more reliable on the Yahoo side.
+  @browser.goto "http://smallbusiness.yahoo.com/dashboard" 
+  sleep(30)
+  @browser.link(:text => "Edit").click
+  sleep(30)
+  @browser.checkbox(:name => "tos").set 
+  sleep(5) 
+  @browser.button(:text => "Submit information").click 
+  sleep(30)
+  @browser.radio(:id => "opt-email").set
+  sleep(5) 
+  @browser.button(:id => "btn-email").click
+  sleep(30)
+end 
+
+def set_verification_code(data, code)
+  @browser.goto "http://smallbusiness.yahoo.com/dashboard" 
+  sleep(30)
+  @browser.link(:text => "Verify").click
+  sleep(30)
+  @browser.text_field(:id => "txtCaptcha").send_keys code 
+  sleep(3)
+  @browser.button(:value => "Verify Code").click
+  sleep(30)
+end 
+
+def verify_account(data) 
+  sign_in(data)
+  send_verify_email(data)
+  code = get_verification_code(data)
+  set_verification_code(data, code)
+  true
+end 
+
+@heap = JSON.parse( data['heap'] ) 
+msg = ""
+if !@heap['account_verified']
+  @heap['account_verified'] = verify_account(data)
+end 
+
+
+if @heap['account_verified']
+  msg = "Account created.  Should receive a post card with verification code in one week."
+  self.start("Yahoo/UpdateListing", 1440)
+else 
+  self.start("Yahoo/Verify", 120)
+end
+self.save_account("Yahoo", {"heap" => @heap.to_json, "status_message" => msg})
+
 true
-#main( data )

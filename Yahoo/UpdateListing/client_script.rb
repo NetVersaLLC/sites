@@ -135,3 +135,30 @@ runner= Runner.new
 runner.main(data)
 puts "the business listing has been updated successfully"
 true
+
+@heap = JSON.parse( data['heap'] ) 
+if @heap.length == 0 
+  @heap = JSON.parse( "{\"signed_up\": false, \"listing_created\": false, \"account_verified\":false, \"listing_updated\":false}" )
+  self.save_account("Yahoo", {"heap" => @heap.to_json})
+end 
+
+if !@heap['signed_up'] 
+  self.start("Yahoo/SignUp") 
+end 
+
+if @heap['signed_up'] && !@heap['listing_created']
+  self.start("Yahoo/CreateListing") 
+end 
+
+if @heap['listing_created'] && !@heap['account_verified']
+  self.start("Yahoo/Verify")
+end 
+
+if @heap['account_verified'] 
+  @heap['listing_updated'] = update_listing(data)
+  self.save_account("Yahoo", {"heap" => @heap.to_json})
+  if !@heap['listing_updated'] 
+    self.start("Yahoo/UpdateListing", 1440)
+  end 
+end 
+

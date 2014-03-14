@@ -2,7 +2,7 @@ data = {}
 
 yahoo            = business.yahoos.first
 data['category'] = YahooCategory.find(yahoo.category_id).name
-
+data['heap']     = yahoo.heap
 data['yahoo_username']  = yahoo.email
 data['yahoo_password']  = yahoo.password
 

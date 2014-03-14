@@ -5,6 +5,14 @@ at_exit {
 	end
 }
 
+heap = JSON.parse( data['heap'] )
+@heap = JSON.parse( data['heap'] ) 
+if @heap.length == 0 
+  @heap = JSON.parse( "{\"listing_created\": false, \"account_verified\":false}" )
+  self.save_account("Mycitybusiness", {"heap" => @heap.to_json})
+end 
+
+
 @browser.goto('http://mycitybusiness.net/addbusiness.php')
 
 @browser.text_field( :name => 'company').set data['business']
@@ -28,6 +36,9 @@ at_exit {
 @browser.button( :value => 'Submit').click
 sleep 2
 Watir::Wait.until { @browser.text.include? "Thank you for adding your business to mycityBusiness.net" }
+
+@heap['listing_created'] = true
+self.save_account("Mycitybusiness", {"heap" => @heap.to_json})
 
 if @chained
   self.start("Mycitybusiness/Verify")

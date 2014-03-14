@@ -1,4 +1,6 @@
+mycity = business.mycitybusinesses.first
 data = {}
+data[ 'heap' ]      = mycity ? mycity.heap : "{}"
 data[ 'state' ]			= business.state
 data[ 'city' ]			= business.city
 data[ 'business' ]		= business.business_name

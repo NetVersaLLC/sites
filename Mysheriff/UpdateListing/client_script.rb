@@ -75,10 +75,11 @@ def update_listing(data)
   sleep(30) 
 
   @browser.link(:title => /Edit Details/).click
+  sleep(30)
   @business_nav = @browser.div(:id => "busnav")
-  sleep(20)
 
-  listing_url = @browser.link(:text => /View Listing/).href,
+  listing_url = @browser.link(:text => /View Listing/).href 
+  puts listing_url
   self.save_account('Mysheriff', { "listing_url" => listing_url, "status" => "Listing updated."})
 
   update_details(data) 
@@ -91,7 +92,8 @@ def update_listing(data)
 end 
 
 def search_listing data
-  sleep(5)
+  @browser.link(:text => /My Business/).click 
+  sleep(30)
   @browser.link(:text,/add new business/).click
   sleep(5)
 

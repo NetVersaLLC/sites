@@ -18,7 +18,7 @@ def sign_up data
   form = @browser.div(:id,'register')
   form.text_field(:name => 'nick').set data['username'] 
   form.text_field(:name => 'email').set data['new_email'] 
-  form.text_field(:name => 'password').set data['new_password'] 
+  form.text_field(:name => 'pass').set data['new_password'] 
 
   @browser.button(:class,"btn-register").click
   sleep(30)
@@ -30,6 +30,7 @@ def sign_up data
       "email"     => data["new_email"],
       "password"  => data["new_password"]
     })
+    true
   elsif @browser.div(:text => /already exists/).exist? 
     true
   else 
@@ -40,6 +41,10 @@ end
 
 def create_listing(data) 
   return false unless login(data)
+  
+  # http://www.iformative.com/review/request/
+  @browser.link(:class => "request").click 
+  sleep(30)
 
   form = @browser.table(:class,"frame-c")
   form.text_field(:name => "product").set  data["business_name"]
@@ -120,6 +125,8 @@ end
 
 
 def login data
+  return true if @browser.link(:text => /Logout/).exist?
+
   @browser.goto 'http://www.iformative.com/review/request/'
   sleep(30)
   @browser.link(:text,"MY ACCOUNT").click

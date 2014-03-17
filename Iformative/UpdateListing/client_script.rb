@@ -166,7 +166,7 @@ if @heap['listing_verified']
 end 
 
 unless @heap['signed_up'] && @heap['listing_created'] && @heap['listing_verified'] && @heap['listing_updated']
-  self.start("Getfave/UpdateListing", 1440)
+  self.start("Iformative/UpdateListing", 1440)
 end 
 self.success
 

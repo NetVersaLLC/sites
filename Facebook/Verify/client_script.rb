@@ -45,9 +45,9 @@ end
 begin
   link = data['link']
   if link.nil? then
-  	if @chained
-  		self.start("Facebook/Verify", 1440)
-  	end
+    if @chained
+      self.start("Facebook/Verify", 1440)
+    end
   else
     @browser.goto(link)
     if @browser.text.include? "You must log in to continue."
@@ -55,8 +55,8 @@ begin
       @browser.button(:name, 'login').click
     end
     if @browser.text.include? "Enter"
-    	retry_verify_captcha(data)
-    	sleep(3)
+      retry_verify_captcha(data)
+      sleep(3)
     elsif @browser.text.include? "Please Verify Your Identity"
       if @browser.button(:value, 'Continue').exists?
         @browser.button(:value, 'Continue').click
@@ -64,24 +64,19 @@ begin
         if @browser.text.include? "Please Complete a Security Check"
           puts "Phone Verification Required"
           if @chained
-          self.start("Facebook/Notify")
-          end
-        end
-      elsif @browser.text.include? "Please Complete a Security Check"
-          puts "Phone Verification Required"
-          if @chained
             self.start("Facebook/Notify")
           end
-      else
-        puts "Phone Verification Required"
-    	 if @chained
-    		  self.start("Facebook/Notify")
-    	 end
+        else
+          puts "Verification success"
+          if @chained
+            self.start("Facebook/CreateListing")
+          end
+        end
       end
     elsif @browser.button(:value =>'Find Friends').exist?
       puts "Verification success"
       if @chained
-        self.start("Facebook/CreatePage")
+        self.start("Facebook/CreateListing")
       end
     else
       puts "Verification failure"

@@ -5,6 +5,14 @@ at_exit{
 	end
 }
 
+def login(data)
+  if not @browser.link(:text => 'Logout').exist?
+  @browser.text_field(:id => 'email').set data['email']
+  @browser.text_field(:id => 'pass').set data['password']
+  @browser.button(:value => 'Log In').click 
+  end
+end
+
 def solve_verify_captcha
   image = "#{ENV['USERPROFILE']}\\citation\\facebook_captcha.png"
   if @browser.image(:src, /facebook.com\/captcha\/tfbimage.php/).exists?
@@ -27,7 +35,13 @@ def retry_verify_captcha(data)
   until capSolved or count > 5 do
     captcha_text = solve_verify_captcha
     @browser.text_field(:name=> 'captcha_response').when_present.set captcha_text
-    @browser.button(:name =>'submit[Submit]').click
+    if @browser.button(:name =>'submit[Submit]').present?
+    	@browser.button(:name =>'submit[Submit]').click
+    elsif @browser.button(:name =>'submit[Continue]').present?
+    	@browser.button(:name =>'submit[Continue]').click
+    else
+    	puts "Facebook has a new submission button."
+    end
 
      sleep(5)
     if not @browser.text.include? "The text you entered didn't match the security check. Please try again."
@@ -43,9 +57,9 @@ def retry_verify_captcha(data)
 end
 
 def verify_phone(data)
-	@browser.button(:name, "submit[Continue]").click
-	sleep(2)
-	Watir::Wait.until { @browser.text.include? "Enter the text below" }
+	@browser.button(:name, "submit[Continue]").when_present.click
+	sleep(3)
+	Watir::Wait.until { @browser.text_field(:id, 'captcha_response').present? }
 	retry_verify_captcha(data)
 	sleep(1)
 	@browser.span(:text, "Enter a phone number").click
@@ -55,11 +69,11 @@ def verify_phone(data)
 		sleep(2)
 	end
 	puts("Mobile: " + data['mobile'])
-	@browser.text_field(:value, "Enter your number").set data['mobile']
+	@browser.text_field(:value, "Enter your number").send_keys data['mobile']
 	sleep(1)
 	@browser.button(:value, "1").click
 	sleep(2)
-	if @browser.text.include? "The phone number you're trying to verify was recently used to verify a different account. Please try a different number."
+	if @browser.text.include? "Please try a different number."
 		raise("The phone number you're trying to verify was recently used to verify a different account. Please try a different number.")
 	end
 	retries = 5
@@ -69,14 +83,21 @@ def verify_phone(data)
 		puts("Code: " + code)
 		@browser.text_field(:value, "Enter confirmation code").set code
 		@browser.button(:value, "1").click
-		sleep(10)
+		Watir::Wait.until(120) { @browser.text.include? "Thanks for confirming your phone number" }
+		@browser.button(:value, "1").click
+		sleep(5)
+		puts("Phone Verification Successful!")
+		if @chained
+			self.start("Facebook/CreateListing")
+			true
+		end
+	rescue
 		if retries > 0
 			if @browser.text.include? "Enter Your Confirmation Code"
 				puts("Code not entered! Retrying...")
 				retry
 				retries -= 1
-			end
-			if @browser.text.include? "Invalid confirmation code"
+			elsif @browser.text.include? "Invalid confirmation code"
 				puts("Invalid Code")
 				PhoneVerify.wrong_code('Facebook')
 				retry
@@ -84,17 +105,6 @@ def verify_phone(data)
 			end
 		else
 			raise("Phone Verification Failure - Could not enter code")
-		end
-		if @browser.text.include? "Thanks for confirming your phone number."
-			@browser.button(:value, "1").click
-			sleep(5)
-			puts("Phone Verification Successful!")
-			if @chained
-				self.start("Facebook/CreatePage")
-				true
-			end
-		else
-			raise("Phone not verified successfully")
 		end
 	end
 end

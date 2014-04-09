@@ -1,174 +1,176 @@
-@browser = Watir::Browser.new :firefox
-at_exit {
-	unless @browser.nil?
-		@browser.close
-	end
-}
+eval(data['payload_framework'])
+class AddListing < PayloadFramework
+  def run
+    sign_up
+    set_business_info
+  end
 
-# Start temp copy from shared.rb
+  def verify
+    sleep 3
+    browser.alert.close if browser.alert.exists?
+    verification = browser.text.include? "Congratulations!"
+    browser.close
+    verification
+  end
 
-def solve_captcha
-  image = "#{ENV['USERPROFILE']}\\citation\\showinusa_captcha.png"
-  obj = @browser.img( :xpath, '/html/body/form/div[3]/div[3]/div/div[3]/div/div/table/tbody/tr[2]/td[2]/div/img' )
-  puts "CAPTCHA source: #{obj.src}"
-  puts "CAPTCHA width: #{obj.width}"
-  obj.save image
+  def elements
+    @elements ||= {}
+    @elements[:main] ||= {
+      :wrapper => '#ctl00_MainContent_!!!',
+      :company_title => 'companyTitle',
+      :address => 'streetAddress',
+      :city => 'city',
+      :state => 'provinceDropDown',
+      :zip => 'postalCode',
+      :phone => 'localPhoneNum',
+      :fax => 'faxNumber',
+      :toll_free => 'tollFreeNumber',
+      :contact_name => 'contactPerson',
+      :email => 'contactEmail',
+      :website => 'website',
+      :description => 'description',
+      :submit => 'subButton',
+      :preview => 'skipHyperLink',
+      :anti_spam => '/.updateProgress'
+    }
 
-  CAPTCHA.solve image, :manual
+    @elements[:captcha] ||= {
+      :wrapper => '#recaptcha_!!!',
+      :captcha_image => 'challenge_image',
+      :captcha_field => 'response_field',
+      :captcha_reload => 'reload',
+      :verification => '/:contains("Describe your business.")',
+      :submit => '/#ctl00_MainContent_subButton'
+    }
+
+    @elements[:category_links] ||= {
+      :wrapper => "tr td a!!!",
+      :category1_link => ":contains('#{data[:categories][0]}')",
+      :category2_link => ":contains('#{data[:categories][1]}')"
+    }
+
+    @elements[:categories] ||= {
+      :parent => :main,
+      :wrapper => 'productDataList_ctl0!!!_productTextBox',
+      :category1 => '1',
+      :category2 => '2',
+      :category3 => '3',
+      :category4 => '4',
+      :category5 => '5'
+    }
+
+    @elements[:business_hours] ||= {
+      :parent => :main,
+      :wrapper => 'customBusinessHours_!!!',
+      :members => {
+        :mon => 'mon',
+        :tues => 'tues',
+        :wed => 'wed',
+        :thur => 'thur',
+        :fri => 'fri',
+        :sat => 'sat',
+        :sun => 'sun'
+        },
+      :is_open => '!!!CheckBox',
+      :start_hour => 'open!!!HourDropDownList',
+      :end_hour => 'close!!!HourDropDownList',
+      :start_minute => 'open!!!MinDropDownList',
+      :end_minute => 'close!!!MinDropDownList',
+      :open_pm => 'open!!!RadioButtonList_0',
+      :open_am => 'open!!!RadioButtonList_1',
+      :close_pm => 'close!!!RadioButtonList_0',
+      :close_am => 'close!!!RadioButtonList_1',
+    }
+
+    @elements[:payment_methods] ||= {
+      :parent => :main,
+      :wrapper => 'ctlPayment_paymentCheckBoxList_!!!',
+      :cash => '5',
+      :checks => '4',
+      :visa => '0',
+      :mastercard => '1',
+      :amex => '2',
+      :discover => '7',
+      :diners => '8'
+    }
+    @elements
+  end
+
+  def sign_up
+    browser.goto 'http://www.shopinusa.com/signup/'
+    enter :company_title
+    enter :address
+    enter :city
+    wait_until_present(:state)
+    select :state
+    enter :zip
+    enter :phone 
+    enter :fax
+    enter :toll_free
+    enter :contact_name
+    enter :email 
+    enter :website
+    context(:category_links) do
+      click :category1_link
+      context(:main) { wait_while_present(:anti_spam) }
+      wait_until_present(:category2_link)
+      click :category2_link
+    end
+    context(:captcha) do 
+      solve do
+        context(:main) { submit }
+        context(:main) { wait_while_present(:anti_spam) }
+        sleep 2
+        browser.text.include? 'Describe your business.'
+      end
+    end
+  end
+
+  def set_business_hours
+    context(:business_hours) do
+      data[:days_open].each do |day|
+        check :"#{day}:is_open"
+        context(:main) { wait_while_present(:anti_spam) }
+        context_member(day,day.to_s.capitalize)
+        context_member(day,"Thurs") if day.to_s == "thur"
+        select :"#{day}:start_hour"
+        select :"#{day}:start_minute"
+        select :"#{day}:end_hour"
+        select :"#{day}:end_minute"
+        context_member(day,"Thur") if day.to_s == "thur"
+        [:open_am, :open_pm, :close_am, :close_pm].each do |radio|
+          radio = [day,radio].join(":").to_sym
+          click radio if data[radio]
+        end
+      end
+      data[:days_closed].each do |day|
+        uncheck :"#{day}:is_open"
+        context(:main) {wait_while_present(:anti_spam)}
+      end
+    end
+  end
+
+  def set_business_info
+    context(:main) do
+      enter :description
+      set_business_hours
+      context(:categories) do
+        data[:categories].each_with_index do |category,n|
+          @data[:"category#{n+1}"] = category
+          enter :"category#{n+1}"
+        end
+      end
+      context(:payment_methods) do
+        data[:payment_methods].each do |payment_method|
+          check :"#{payment_method}"
+        end
+      end
+      wait_while_present(:anti_spam)
+      submit
+      wait_until_present(:preview)
+      click :preview
+    end
+  end
 end
 
-def enter_captcha( data )
-	capSolved = false
-	count = 1
-	until capSolved or count > 5 do
-		captcha_code = solve_captcha	
-		@browser.text_field( :id, 'recaptcha_response_field').set captcha_code
-		@browser.button( :id => 'ctl00_MainContent_submitButton').click
-	
-		sleep(2)
-		if not @browser.text.include? "Please enter the two words you see here into the box below it. It is not case sensitive"
-			capSolved = true
-		else
-			@browser.image(:id => 'recaptcha_reload').click
-		end		
-	count+=1
-	end
-	if capSolved == true
-		true
-	else
-		throw("Captcha was not solved")
-	end
-end
-
-
-# End temp copy from shared.rb
-
-@browser.goto( 'http://www.shopinusa.com/signup/' )
-
-@browser.text_field( :id => 'ctl00_MainContent_companyTitle').set data[ 'business' ]
-@browser.text_field( :id => 'ctl00_MainContent_streetAddress').set data[ 'addressComb' ]
-@browser.text_field( :id => 'ctl00_MainContent_city').set data[ 'city' ]
-@browser.select_list( :id => 'ctl00_MainContent_provinceDropDown').select data[ 'state_name' ]
-@browser.text_field( :id => 'ctl00_MainContent_postalCode').set data[ 'zip' ]
-@browser.text_field( :id => 'ctl00_MainContent_localPhoneNum').set data[ 'phone' ]
-@browser.text_field( :id => 'ctl00_MainContent_faxNumber').set data[ 'fax' ]
-@browser.text_field( :id => 'ctl00_MainContent_tollFreeNumber').set data[ 'tollfree' ]
-@browser.text_field( :id => 'ctl00_MainContent_contactPerson').set data[ 'fullname' ]
-
-@browser.text_field( :id => 'ctl00_MainContent_contactEmail').set data[ 'email' ]
-@browser.text_field( :id => 'ctl00_MainContent_website').set data[ 'website' ]
-
-
-@browser.link( :text => "#{data['category1']}").click
-sleep(3)
-@browser.link( :text => "#{data['category2']}").when_present.click
-
-enter_captcha( data )
-
-@browser.text_field( :id => 'ctl00_MainContent_description').set data[ 'description' ]
-
-@browser.text_field( :id => 'ctl00_MainContent_productDataList_ctl01_productTextBox').set data[ 'category1' ]
-@browser.text_field( :id => 'ctl00_MainContent_productDataList_ctl02_productTextBox').set data[ 'category2' ]
-@browser.text_field( :id => 'ctl00_MainContent_productDataList_ctl03_productTextBox').set data[ 'category3' ]
-@browser.text_field( :id => 'ctl00_MainContent_productDataList_ctl04_productTextBox').set data[ 'category4' ]
-@browser.text_field( :id => 'ctl00_MainContent_productDataList_ctl05_productTextBox').set data[ 'category5' ]
-
-hours = data[ 'hours' ]
-hours.each_with_index do |hour,day|
-	theday = hour[0]
-	theday = theday[0..2]
-	if hour[1][0] != "closed"
-		if theday == "tue"
-			theday = "tues"
-		end
-		if theday == "thu"
-			theday = "thur"
-		end
-		if not @browser.checkbox( :id => "ctl00_MainContent_customBusinessHours_#{theday}CheckBox").set?
-			@browser.checkbox( :id => "ctl00_MainContent_customBusinessHours_#{theday}CheckBox").click
-			sleep(3)
-		end
-		if theday == "thur"
-			theday = "thurs"
-		end
-
-		theday = theday.capitalize
-		# Is the day closed?	
-		open = hour[1][0]
-		openAMPM = open[-2, 2]
-		close = hour[1][1]
-		closeAMPM = close[-2, 2]
-		open = open.gsub( / [ap]m/i, '')
-		close = close.gsub( / [ap]m/i, '')		
-		openHour = open[0,2]
-		closeHour = close[0,2]
-		openMin = open[-2,2]
-		closeMin = close[-2,2]
-		if openAMPM == "am"
-			openAMPM = 0
-		else
-			openAMPM = 1
-		end
-		if closeAMPM == "am"
-			closeAMPM = 0
-		else
-			closeAMPM = 1
-		end
-		
-		if openHour[0,1] == "0"
-			openHour = openHour[1,1]
-		end
-		
-		if closeHour[0,1] == "0"
-			closeHour = closeHour[1,1]
-		end
-		
-
-		@browser.select_list( :id => "ctl00_MainContent_customBusinessHours_open#{theday}HourDropDownList").select openHour
-		@browser.select_list( :id => "ctl00_MainContent_customBusinessHours_open#{theday}MinDropDownList").select openMin
-		@browser.select_list( :id => "ctl00_MainContent_customBusinessHours_close#{theday}HourDropDownList").select closeHour
-		@browser.select_list( :id => "ctl00_MainContent_customBusinessHours_close#{theday}MinDropDownList").select closeMin
-		if theday == "Thurs"
-			theday = "Thur"
-		end
-
-		@browser.radio( :id => "ctl00_MainContent_customBusinessHours_open#{theday}RadioButtonList_#{openAMPM}").click
-		@browser.radio( :id => "ctl00_MainContent_customBusinessHours_close#{theday}RadioButtonList_#{closeAMPM}").click		
-	else
-		
-		if theday == "thu"
-			theday = "thur"
-		end
-		if theday == "tue"
-			theday = "tues"
-		end
-			@browser.checkbox( :id => "ctl00_MainContent_customBusinessHours_#{theday}CheckBox").click
-			puts("clicked the checkbox")
-			sleep(3)		
-	end
-
-end
-
-
-payments = data['payments']
-payments.each do |payment|
-	@browser.checkbox( :id => "ctl00_MainContent_ctlPayment_paymentCheckBoxList_#{payment}").click
-
-end
-
-@browser.button( :id => 'ctl00_MainContent_submitButton').click
-sleep 3
-# JavaScript Error: "e is null"
-# The site has an unhandled javascript exception that causes selenium to freak out.
-# The bgin/rescue allows the script to finish, as a work around for now.
-begin
-	@browser.goto('http://www.shopinusa.com/signup/Preview.aspx')
-rescue Exception => e
-	puts(e)
-end
-
-
-Watir::Wait.until { @browser.text.include? "Congratulations! Your free listing has been successfully submitted for review." }
-
-true
-
+AddListing.new(data).verify

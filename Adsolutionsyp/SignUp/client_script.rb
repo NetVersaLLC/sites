@@ -1,89 +1,216 @@
-@browser = Watir::Browser.new :firefox
-at_exit do
-	unless @browser.nil?
-		@browser.close
-	end
-end
+eval(data['payload_framework'])
+class SignUp < PayloadFramework
 
-# Temporary methods from Shared.rb
-
-def solve_captcha
-  image = ["#{ENV['USERPROFILE']}",'\citation\adyp_captcha.png'].join
-  obj = @browser.img(:alt => "CAPTCHA")
-  puts "CAPTCHA source: #{obj.src}"
-  puts "CAPTCHA width: #{obj.width}"
-  puts "CAPTCHAT stored at: #{image}"
-  obj.save image
-
-  CAPTCHA.solve image, :manual
-end
-
-
-def step_1_basic(data)
-  @browser.goto("https://adsolutions.yp.com/listings/basic")
-
-  @browser.text_field(:id => 'BusinessPhoneNumber').set data['phone']
-  @browser.text_field(:id => 'BusinessName').set data['business']
-  @browser.text_field(:id => 'BusinessOwnerFirstName').set data['fname']
-  @browser.text_field(:id => 'BusinessOwnerLastName').set data['lname']
-  @browser.text_field(:id => 'Email').set data['email']
-
-  @browser.text_field(:id => 'txtCategories').send_keys data['category'][0..3]
-  @browser.link(:text => data['category']).wait_until_present
-  @browser.link(:text => data['category']).click
-
-  @browser.text_field(:id => 'BusinessAddress_Address1').set data['address']
-  @browser.text_field(:id => 'BusinessAddress_City').set data['city']
-  @browser.select_list(:id => 'BusinessAddress_State').select data['state']
-  @browser.text_field(:id => 'BusinessAddress_Zipcode').set data['zip']
-  @browser.text_field(:id => 'BusinessYear').set data['founded']
-
-  @browser.image(:alt => 'continue').click
-
-  @browser.div(:id => "searchResultsDiv").wait_until_present
-end 
-
-
-def step_2_details(data)
-  @browser.link(:id => 'selectLink').click
-
-  data['payments'].each do |pay|
-    @browser.checkbox(:id => pay).clear
-    @browser.checkbox(:id => pay).click
+  def run
+    setup_basic
+    setup_business_details
+    setup_business_hours
+    setup_payment_methods
+    enter_captcha
+    register
+    sleep 1
+    already_registered = "This email address is already registered."
+    if browser.text.include? already_registered
+      raise "FATAL ERROR: This email address is already in use."
+    end
   end
 
-  3.times do
-    @browser.text_field(:id => "captcha").set solve_captcha
-    @browser.div(:class=>'buttonContainer30').button.click
-
-    break if @browser.div(:text => /Sign Up/).exist?
+  def verify
+    wait_until_present :footer_title
+    verified = browser.text.include? "Verify Listing"
+    context(:registration) do
+      save :email, :password, :security_answer if verified
+    end
+    chain "Notify"
+    verified
   end
-  raise "failed to solve captcha" unless @browser.div(:text => /Sign Up/).exist?
-end 
 
-def step_3_registration(data)
-  @browser.text_field(:id => 'RepeatEmail').when_present.set data['email']
-  @browser.text_field(:id => 'Password').set data['password']
-  @browser.text_field(:id => 'RepeatPassword').set data['password']
-  @browser.select_list(:id => 'SecurityQuestion').select "What is your mother's maiden name?"
-  @browser.text_field(:id => 'SecurityAnswer').set data['secret_answer']
+  def setup_basic
+    browser.goto "https://adsolutions.yp.com/listings/basic"
+    enter :phone
+    enter :company_name
+    enter :contact_first_name
+    enter :contact_last_name
+    enter :email
+    enter :category_list, data[:category][0..3]
+    wait_until_present :category
+    click :category
+    context(:address) do
+      enter :address
+      enter :city
+      select :state
+      enter :zip
+    end
+    enter :year
+    click :continue
+    sleep 3
+    search = "Please select the listing"
+    details = "Business Contact Information"
+    wait_until {
+      sleep 3
+      result = [search,details].map {|s| browser.text.include? s}
+      result.first or result.last
+    }
+    click :use_search_result if browser.text.include? search
+    wait_until_present :footer_title
+    if browser.text.include? "city you entered"
+      raise "FATAL ERROR: This customer's city does not match its zip!"
+    end
+  end
 
-  @browser.checkbox(:id => 'TermsOfUse').click
+  def setup_business_details
+    context(:business_details) do
+      wait_until_present :alternate_business_name
+      enter :alternate_business_name
+      enter :website
+      enter :website_description
+      select :phone_type, 'Mobile'
+      enter :mobile_phone
+      enter :alternate_email
+    end
+  rescue
+    if browser.text.include? "Listing Already Managed"
+      raise "FATAL ERROR: This listing has already been created!"
+      # remember to modify to handle more gracefully later
+    elsif browser.text.include? \
+      "Sorry, the city you provided is not valid for this zipcode."
+      raise "FATAL ERROR: Business city does not match business zip!"
+    end
+  end
 
-  @browser.button(:id => 'submitButton').click
+  def setup_business_hours
+    context(:business_hours) do
+      unless browser.text.include? "Use same hours for each weekday"
+        click :expand_weekdays
+      end
+      data[:days_open].each do |day|
+        start_merid = data[:"#{day}:start_merid"].upcase
+        end_merid = data[:"#{day}:end_merid"].upcase
+        start_time = [data[:"#{day}:start_time"],start_merid].join(" ")
+        end_time = [data[:"#{day}:end_time"],end_merid].join(" ")
+        select :"#{day}:start_time", start_time
+        select :"#{day}:end_time", end_time
+      end
+      data[:days_closed].each do |day|
+        check :"#{day}:is_closed" # #Monday_row .closeCheck
+      end
+    end
+  end
 
-  Watir::Wait.until(60) {@browser.text.include? "Your listing will not be displayed on YP.com until you have completed verification."}
-end 
+  def setup_payment_methods
+    context(:payment_methods) do
+      data[:payment_methods].each do |payment_method|
+        check payment_method
+      end
+    end
+  end
 
-step_1_basic(data) 
-step_2_details(data) 
-step_3_registration(data)
+  def enter_captcha
+    context(:captcha) do
+      solve {
+        submit
+        true if wait_until_present :verification rescue false
+      }
+    end
+  end
 
-self.save_account("Adsolutionsyp", { :email => data['email'], :password => data['password']})
+  def register
+    context(:registration) do 
+      wait_until_present :email
+      enter :email
+      enter :password
+      enter :password_confirmation, data[:password]
+      select :secret_question, "What is your favorite pet's name?"
+      enter :secret_answer
+      click :terms_of_service
+      submit
+    end
+  end
 
-if @chained
-	self.start("Adsolutionsyp/Notify")
+  def elements
+    @elements ||= {}
+
+    @elements[:main] ||= {
+      :wrapper => '#Business!!!',
+      :phone => 'PhoneNumber',
+      :company_name => 'Name',
+      :contact_first_name => 'OwnerFirstName',
+      :contact_last_name => 'OwnerLastName',
+      :email => '/#Email',
+      :category_list => '/#txtCategories',
+      :category => "/ul#ui-id-1 li a:contains('#{data[:category]}')",
+      :year => 'Year',
+      :continue => '/img[alt="continue"]',
+      :search_results => '/#searchResultsDiv',
+      :use_search_result => '/#selectLink',
+      :footer_title => '/.footer-title'
+    }
+
+    @elements[:address] ||= {
+      :parent => :main,
+      :wrapper => 'Address_!!!',
+      :address => 'Address1',
+      :city => 'City',
+      :state => 'State',
+      :zip => 'Zipcode'
+    }
+
+    @elements[:business_details] ||= {
+      :alternate_business_name => '.akaMark',
+      :website => '.businessWebsiteUrlMark',
+      :website_description => '.businessWebsiteDescriptionMark',
+      :phone_type => '.businessPhoneEditor select',
+      :mobile_phone => '.businessPhoneEditor .phoneNumberMark',
+      :alternate_email => '.emailAddressMark'
+    }
+
+    @elements[:business_hours] ||= {
+      :members => {
+        :mon => 'Monday',
+        :tues => 'Tuesday',
+        :wed => 'Wednesday',
+        :thur => 'Thursday',
+        :fri => 'Friday',
+        :sat => 'Saturday',
+        :sun => 'Sunday'
+        },
+      :expand_weekdays => '/#expandWeekdaysLink',
+      :start_time => '#!!!_row select',
+      :end_time => '#!!!_row select.endTimeSelect',
+      :is_closed => '#!!!_row .closeCheck'
+    }
+
+    @elements[:payment_methods] ||= {
+      :wrapper => '#Selected!!!',
+      :cash => 'PaymentOptions_12',
+      :checks => 'PaymentOptions_7',
+      :paypal => 'PaymentOptions_8',
+      :visa => 'CreditCards_2',
+      :mastercard => 'CreditCards_3',
+      :amex => 'CreditCards_4',
+      :discover => 'CreditCards_5',
+      :diners => 'CreditCards_11'
+    }
+
+    @elements[:captcha] ||= {
+      :captcha_field => '#captcha',
+      :captcha_image => 'img[alt="CAPTCHA"]',
+      :submit => 'input[alt="continue"]',
+      :verification => ':contains("Sign Up")'
+    }
+
+    @elements[:registration] ||= {
+      :email => '#RepeatEmail',
+      :password => '#Password',
+      :password_confirmation => '#RepeatPassword',
+      :secret_question => '#SecurityQuestion',
+      :secret_answer => '#SecurityAnswer',
+      :terms_of_service => '#TermsOfUse',
+      :submit => '#submitButton',
+      :verification => ':contains("Verify Listing")'
+    }
+    @elements
+  end
 end
 
-true
-
+SignUp.new("Adsolutionsyp",data,self).verify

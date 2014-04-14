@@ -1,7 +1,7 @@
 data = {}
-catty				= LocalpagesCategory.find business.localpages.first.category_id
-data['category1']   = catty.parent.name.gsub("\n", "")
-data['category2']   = catty.name.gsub("\n", "")
+catty				= Localpages.where(:business_id => business.id).first
+data['category1']   = LocalpagesCategory.find(catty.category_id).parent.name.chomp
+data['category2']   = LocalpagesCategory.find(catty.category_id).name.chomp
 data['username']		= business.localpages.first.username
 data['password']		= business.localpages.first.password
 data['business']		= business.business_name

@@ -29,7 +29,7 @@ def submit_listing(agent, data)
 		self.failure
 	end
 rescue => e
-	puts e
+	raise e
 end
 
 # Main Controller

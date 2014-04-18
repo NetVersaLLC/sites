@@ -1,5 +1,6 @@
 data = {}
-data[ 'category1' ]		= business.category1
+catty = UsbdnCategory.find(business.usbdns.first.category_id).name
+data[ 'category1' ]		= catty
 data[ 'business' ]		= business.business_name
 data[ 'fakeurl' ]		= business.bings.first.email.split("@")[0]
 data[ 'state' ]			= business.state_name

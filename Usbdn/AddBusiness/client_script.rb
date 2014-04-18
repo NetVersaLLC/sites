@@ -1,3 +1,6 @@
+at_exit { @browser.close unless @browser.nil? }
+
+@browser = Watir::Browser.new :firefox
 @browser.goto( 'http://usbdn.com/BizRegistrationStep1.asp?' )
 
 @browser.text_field( :id => 'SearchW').set data[ 'category1' ]

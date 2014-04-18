@@ -7,22 +7,17 @@ class SignUp < PayloadFramework
     setup_business_hours
     setup_payment_methods
     enter_captcha
-    register
-    sleep 1
-    already_registered = "This email address is already registered."
-    if browser.text.include? already_registered
-      raise "FATAL ERROR: This email address is already in use."
-    end
+    login unless register
   end
 
   def verify
     wait_until_present :footer_title
     verified = browser.text.include? "Verify Listing"
-    context(:registration) do
-      save :email, :password, :security_answer if verified
+    if verified
+      save :email, :password, :security_answer
+      chain "Notify"
     end
-    chain "Notify"
-    verified
+    return verified
   end
 
   def setup_basic
@@ -55,6 +50,13 @@ class SignUp < PayloadFramework
     wait_until_present :footer_title
     if browser.text.include? "city you entered"
       raise "FATAL ERROR: This customer's city does not match its zip!"
+    elsif browser.text.include? "Oops! There was an error submitting"
+      if (retries ||= 0) < 5
+        retries += 1
+        retry
+      else
+        raise "FATAL ERROR: Unknown error in #setup_basic" if retries >= 5
+      end
     end
   end
 
@@ -100,7 +102,7 @@ class SignUp < PayloadFramework
   def setup_payment_methods
     context(:payment_methods) do
       data[:payment_methods].each do |payment_method|
-        check payment_method
+        check payment_method.to_sym
       end
     end
   end
@@ -124,6 +126,19 @@ class SignUp < PayloadFramework
       enter :secret_answer
       click :terms_of_service
       submit
+    end
+    sleep 2
+    already_registered = "This email address is already registered."
+    not browser.text.include? already_registered
+  end
+
+  def login
+    url = "https://adsolutions.yp.com/SSO/Login?fDestination=%2Flistings%2Fverify"
+    browser.goto url
+    context(:login) do
+      enter :email # #Email
+      enter :password # #Password
+      submit # input[type=image]
     end
   end
 
@@ -208,6 +223,12 @@ class SignUp < PayloadFramework
       :terms_of_service => '#TermsOfUse',
       :submit => '#submitButton',
       :verification => ':contains("Verify Listing")'
+    }
+
+    @elements[:login] ||= {
+      :email => '#Email',
+      :password => '#Password',
+      :submit => 'input[type=image]'
     }
     @elements
   end

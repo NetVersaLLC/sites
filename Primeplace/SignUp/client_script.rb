@@ -44,9 +44,9 @@ end
 @browser.text_field( :id => 'newPassword').set data['password']
 @browser.text_field( :id => 'newPasswordVerify').set data['password']
 @browser.select_list( :id => 'country').select data['country']
-@browser.select_list( :id => 'dobMonth').select data['birth1'].sub(/^0/, "")
-@browser.select_list( :id => 'dobDay').select data['birth2'].sub(/^0/, "")
-@browser.select_list( :id => 'dobYear').select data['birth3'].sub(/^0/, "")
+@browser.select_list( :id => 'dobMonth').select data['birth2'].sub(/^0/, "")
+@browser.select_list( :id => 'dobDay').select data['birth3'].sub(/^0/, "")
+@browser.select_list( :id => 'dobYear').select data['birth1'].sub(/^0/, "")
 
 
 enter_captcha( data )

@@ -1,3 +1,13 @@
+
+@browser = Watir::Browser.new :firefox
+
+at_exit {
+  unless @browser.nil?
+    @browser.close
+  end
+}
+
+
 def add_business(data)
   @browser.goto("http://yellowwiz.com/add_business.php")
   @browser.text_field(:name => /visitor/).when_present.set data[ 'username' ]

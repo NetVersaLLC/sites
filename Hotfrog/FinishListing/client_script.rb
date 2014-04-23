@@ -1,4 +1,8 @@
 #Define some stuff, go places
+
+@browser = Watir::Browser.new :firefox
+puts "Browser created"
+
 retries = 5
 begin
 url = "http://www.hotfrog.com/Login.aspx"

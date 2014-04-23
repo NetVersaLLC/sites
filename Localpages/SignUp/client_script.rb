@@ -1,23 +1,25 @@
-@browser = Watir::Browser.new :firefox
-at_exit do
-	unless @browser.nil?
-		@browser.close
+# Agent
+agent = Mechanize.new
+agent.user_agent_alias = 'Windows Mozilla'
+
+# Methods
+
+def sign_up(agent, data)
+	page = agent.get('http://www.localpages.com/signup/')
+	form = page.form_with('signup1')
+	form.username = data['username']
+	form.email = data['email']
+	form.radiobutton_with(:value => /business/).check
+	page = form.click_button()
+	if page.body.include? 'You have successfully created your profile.'
+		self.save_account('Localpages', { :username => data['username'] })
+		if @chained
+			self.start("Localpages/Verify")
+		end
 	end
+rescue => e
+	raise e
 end
 
-@browser.goto('http://www.localpages.com/signup/')
-
-@browser.execute_script("
-			oFormObject = document.forms['signup1'];
-			oFormObject.elements['username'].value = '#{data['username']}';
-			oFormObject.elements['email'].value = '#{data['email']}';		
-			")
-@browser.radio( :xpath => '/html/body/div[2]/div/div[3]/div[2]/div/form/div/p[5]/input[2]').click
-@browser.link( :text => 'Register').click
-
-	RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['username'], 'model' => 'Localpages'
-	if @chained
-		self.start("Localpages/Verify")
-	end
-
-true
+# Main Controller
+sign_up(agent, data)

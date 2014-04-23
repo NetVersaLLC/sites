@@ -8,7 +8,7 @@ end
 @browser.goto( 'http://www.localcensus.com/add_business.php' )
 puts(data[ 'category' ])
 
-@browser.select_list( :name => 'business_category' ).select data[ 'category' ]
+@browser.select_list( :name => 'business_category' ).select data[ 'category' ].split("\n")[0]
 @browser.button( :value => 'Next').click
 
 @browser.select_list( :name => 'state' ).select data[ 'state' ].upcase

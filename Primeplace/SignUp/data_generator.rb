@@ -29,9 +29,9 @@ data[ 'suburb' ]		= "None"
 data[ 'tollfree' ]		= business.toll_free_phone
 data[ 'password' ]		= Yahoo.make_password
 data[ 'birthday' ]		= business.contact_birthday
-data[ 'birth1']			= business.contact_birthday.split("/")[0]
-data[ 'birth2']			= business.contact_birthday.split("/")[1]
-data[ 'birth3']			= business.contact_birthday.split("/")[2]
+data[ 'birth1']			= business.contact_birthday.split("-")[0]
+data[ 'birth2']			= business.contact_birthday.split("-")[1]
+data[ 'birth3']			= business.contact_birthday.split("-")[2]
 data
 
 

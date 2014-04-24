@@ -8,6 +8,7 @@ data[ 'last_name' ] = business.contact_last_name
 data[ 'full_name' ] = data[ 'first_name' ] + " " + data[ 'last_name' ]
 data[ 'country' ] = 'United States'
 data[ 'continent' ] = 'North America'
-data[ 'city' ] = business.city
-data[ 'category' ] = business.category1
+data[ 'city' ] = 'Hawaii'
+data[ 'password' ]	= Yahoo.make_password
+data[ 'category' ] = 'Entertainment'
 data

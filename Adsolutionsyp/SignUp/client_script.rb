@@ -14,7 +14,7 @@ class SignUp < PayloadFramework
     wait_until_present :footer_title
     verified = browser.text.include? "Verify Listing"
     if verified
-      save :email, :password, :security_answer
+      save :email, :password, :secret_answer
       chain "Notify"
     end
     return verified
@@ -142,7 +142,7 @@ class SignUp < PayloadFramework
     end
   end
 
-  def elements
+  def setup_elements
     @elements ||= {}
 
     @elements[:main] ||= {

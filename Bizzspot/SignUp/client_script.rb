@@ -7,28 +7,35 @@ end
 
 def add_business(data)
   @browser.goto("http://reviews.bizzspot.com/sign-up/")
-  sleep 10  
+  sleep 3 
   30.times{ break if @browser.status == "Done"; sleep 1}
-  @browser.frame(:id => "wufooForms7x3q7").text_field(:name => /Field15/).when_present.set data[ 'first_name' ]
-  @browser.frame(:id => "wufooForms7x3q7").text_field(:name => /Field16/).set data[ 'last_name' ]
-  phone = data['phone']
-  a1=phone.split("-")
-  @browser.frame(:id => "wufooForms7x3q7").text_field(:name => /Field6/).set a1[0]
-  @browser.frame(:id => "wufooForms7x3q7").text_field(:name => /Field6-1/).set a1[1]
-  @browser.frame(:id => "wufooForms7x3q7").text_field(:name => /Field6-2/).set a1[2]
-  @browser.frame(:id => "wufooForms7x3q7").text_field(:name => /Field143/).set data[ 'email' ]
-  @browser.frame(:id => "wufooForms7x3q7").text_field(:name => /Field20/).set data[ 'business' ]
-  @browser.frame(:id => "wufooForms7x3q7").text_field(:name => /Field27/).set a1[0]
-  @browser.frame(:id => "wufooForms7x3q7").text_field(:name => /Field27-1/).set a1[1]
-  @browser.frame(:id => "wufooForms7x3q7").text_field(:name => /Field27-2/).set a1[2]
-  @browser.frame(:id => "wufooForms7x3q7").text_field(:name => /Field33/).set data[ 'address' ]
-  @browser.frame(:id => "wufooForms7x3q7").text_field(:name => /Field35/).set data[ 'city' ]
-  @browser.frame(:id => "wufooForms7x3q7").select_list(:name => /Field38/).select data[ 'state' ]
-  @browser.frame(:id => "wufooForms7x3q7").text_field(:name => /Field39/).set data[ 'zip' ]
-  @browser.frame(:id => "wufooForms7x3q7").text_field(:name => /Field31/).set data[ 'category' ]
-  @browser.frame(:id => "wufooForms7x3q7").checkbox(:name => /Field42/).set
-  @browser.frame(:id => "wufooForms7x3q7").button(:name => /saveForm/).click
-  sleep 15
+  if data['phone'].include? '-'
+    phone = data['phone'].split('-')
+  else
+    phone = [
+    data['phone'][0..2],
+    data['phone'][3..5],
+    data['phone'][6..9]]
+  end
+  frame = @browser.frame(:id => "wufooForms7x3q7")
+  frame.text_field(:name => /Field15/).when_present.set data[ 'first_name' ]
+  frame.text_field(:name => /Field16/).set data[ 'last_name' ]
+  frame.text_field(:name => /Field6/).set phone[0]
+  frame.text_field(:name => /Field6-1/).set phone[1]
+  frame.text_field(:name => /Field6-2/).set phone[2]
+  frame.text_field(:name => /Field143/).set data[ 'email' ]
+  frame.text_field(:name => /Field20/).set data[ 'business' ]
+  frame.text_field(:name => /Field27/).set phone[0]
+  frame.text_field(:name => /Field27-1/).set phone[1]
+  frame.text_field(:name => /Field27-2/).set phone[2]
+  frame.text_field(:name => /Field33/).set data[ 'address' ]
+  frame.text_field(:name => /Field35/).set data[ 'city' ]
+  frame.select_list(:name => /Field38/).select data[ 'state' ]
+  frame.text_field(:name => /Field39/).set data[ 'zip' ]
+  frame.text_field(:name => /Field31/).set data[ 'category' ]
+  frame.checkbox(:name => /Field42/).set
+  frame.button(:name => /saveForm/).click
+  sleep 3
   30.times{ break if @browser.status == "Done"; sleep 1}
   
   if Watir::Wait::until { @browser.text.include? "Questions? Chat live" }
@@ -43,6 +50,6 @@ end
 #~ #Main Steps
 add_business(data)
 if @chained
-	self.start("Bizzspot/Verify")
+  self.start("Bizzspot/Verify")
 end
 true

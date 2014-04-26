@@ -1,32 +1,22 @@
-data = {}
- seed = rand( 1000 ).to_s()
-catty						= Mojopages.where(:business_id => business.id).first
-data[ 'phone_area' ] 		= business.local_phone.split("-")[0]
-data[ 'phone_prefix' ] 		= business.local_phone.split("-")[1]
-data[ 'phone_suffix' ] 		= business.local_phone.split("-")[2]
-data[ 'phone' ] 			= business.local_phone
-data[ 'business' ] 			= business.business_name
-#seed = rand( 1000 ).to_s()
-#data[ 'phone_area' ] = '45' + rand( 10 ).to_s()
-#data[ 'phone_prefix' ] = '54' + rand( 10 ).to_s()
-#data[ 'phone_suffix' ] = '654' + rand( 10 ).to_s()
-#data[ 'phone' ] = data[ 'phone_area' ]+data[ 'phone_prefix' ] +data[ 'phone_suffix' ]
-#data[ 'business' ] = 'Test'+seed
-data[ 'first_name' ] 		= business.contact_first_name
-data[ 'last_name' ] 		= business.contact_last_name
-data[ 'email' ] 			= business.bings.first.email #seed  + 
-data[ 'streetnumber' ] 		= business.address + ' ' + business.address2
-data[ 'city' ] 				= business.city
-data[ 'state' ] 			= business.state_name
-data[ 'stateabreviation' ] 	= business.state
-data[ 'zip' ] 				= business.zip
-data[ 'country' ] 			= 'United States'
-data[ 'citystate' ] 		= data[ 'city' ] + ', ' + data[ 'stateabreviation' ]
-data[ 'url' ] 				= business.company_website
-data[ 'tagline' ] 			= business.tag_line[0..110]
-data[ 'description' ] 		= business.business_description[0..799]
-data[ 'password' ] 			= Mojopages.make_password
-data[ 'category' ] 			= catty.mojopages_category.name.downcase
-data[ 'gender' ] 			= business.contact_gender
-data
-
+phone = business.local_phone
+category = MojopagesCategory.find(business.mojopages.first.category_id).name
+data = {
+  payload_framework: PayloadFramework._to_s,
+  company_name: business.business_name,
+  first_name: business.contact_first_name,
+  last_name: business.contact_last_name,
+  email: (business.mojopages.first.email or business.bings.first.email),
+  address: [business.address, business.address2].join(' '),
+  city: [business.city, business.state].join(', '),
+  zip: business.zip,
+  phone: phone,
+  phone_area_code: phone[0..2],
+  phone_prefix: phone[3..5],
+  phone_suffix: phone[6..9],
+  website: business.company_website,
+  password: (business.mojopages.first.password or Mojopages.make_password),
+  gender: business.contact_gender.downcase,
+  tagline: business.tag_line,
+  description: business.business_description,
+  category: category.downcase
+}

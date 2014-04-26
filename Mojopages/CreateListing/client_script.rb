@@ -1,130 +1,137 @@
-def add_business ( data )
+eval(data['payload_framework'])
+class CreateBusiness < PayloadFramework
+  def run
+    browser.goto 'mojopages.com'
+    register
+    sleep 1
+    if browser.text.include? "Another user with the same email address"
+      login
+    else
+      wait_until { browser.text.include? 'Welcome' rescue nil }
+      save :email, :password
+    end
+    create_business
+    select_category
+  end
 
-	@browser.goto('http://mojopages.com/biz/add')
-	# click the "Add your business to our directory" link
-#	@browser.link(:text, 'Add Business').click
-	sleep(2)
-	Watir::Wait::until do @browser.text.include? 'Add your business' end
-	
-	#fill out giant form
-	@browser.text_field( :id => 'name' ).set data[ 'business' ]
-	@browser.text_field( :id => 'owner.firstName' ).set data[ 'first_name' ]
-	@browser.text_field( :id => 'owner.lastName' ).set data[ 'last_name' ]
-	@browser.text_field( :id => 'owner.email' ).set data[ 'email' ]
-	@browser.text_field( :id => 'address.streetName' ).set data[ 'streetnumber' ]
-	@browser.text_field( :id => 'address.city' ).set data[ 'citystate' ]
-	@browser.text_field( :id => 'address.postalCode' ).set data[ 'zip' ]
-	@browser.text_field( :id => 'fullPhone' ).set data[ 'phone' ]
-	@browser.text_field( :id => 'url' ).set data[ 'url' ]
-	if data['tagline'].nil? then
-		@browser.text_field( :id => 'businessDescription' ).set " "*110
-	else
-		@browser.text_field( :id => 'businessDescription' ).set data[ 'tagline' ]
-	end
-	if @browser.span(:id, 'shortDescriptionCharacters').visible?
-		until not @browser.span(:id, 'shortDescriptionCharacters').visible?
-			@browser.text_field( :id => 'businessDescription' ).send_keys :space
-		end
-	end
-	@browser.text_field( :id => 'businessMetaDescription' ).set data[ 'description' ]
-	if @browser.span(:id, 'descriptionCharacters').visible?
-		until not @browser.span(:id, 'descriptionCharacters').visible?
-			@browser.text_field(:id, 'businessMetaDescription').send_keys :space
-		end
-	end
-	@browser.text_field( :id => 'owner.password' ).set data[ 'password' ]
-	@browser.text_field( :xpath => '/html/body/div/div[3]/div[2]/div/div[2]/div[2]/div/div[3]/form/div[4]/div[12]/input' ).set data[ 'password' ]
+  def verify
+    wait_until { browser.text.include? 'Please verify' rescue nil }
+    submit
+    true
+  end
 
-	#captcha_text = solve_captcha()
-	#@browser.text_field( :id => 'recaptcha_response_field').set captcha_text	
-	
-	
-	# submit the form
-	#@browser.button( :value => 'Continue' ).click
-	
-	enter_captcha( data )
-	sleep(2)
-	if @browser.text.include? "Another user with the same email address already exists."
-		raise("Another user with the same email address already exists.")
-	end
-	puts(data['email'])
-	puts(data['password'])
-	self.save_account("Mojopages", {:email => data['email'], :password => data['password']})
-	
+  def register
+    context(:registration) {
+      click :sign_up
+      wait_until_present :email
+      enter :first_name
+      enter :last_name
+      enter :email
+      enter :password
+      enter :password_confirmation, data[:password]
+      enter :zip
+      click :"#{data[:gender]}"
+      submit
+    }
+  end
 
-	#Wait until the Choose Category Screen loads
-	sleep(4)
-	Watir::Wait::until do @browser.text.include? 'Choose your business category' end
-	#Enter the business' category
-  puts(data['category'])
-	@browser.text_field( :name => 'category' ).set data[ 'category' ]
-	@browser.button( :value => 'Find Category' ).click
-	sleep(5)
-	
-	#Wait until category ajax loads
-	#Watir::Wait::until do @browser.radio( :name => 'category' ).exists? or  @browser.text.include? 'No results found. Try a different keyword' end
+  def login
+    context(:login) {
+      browser.goto 'mojopages.com/login'
+      enter :email
+      enter :password
+      submit
+      wait_until { browser.text.include? 'Welcome' rescue nil }
+    }
+  end
 
-	if @browser.radio(:value, data['category']).exists? then
-		@browser.radio(:value => data['category']).set
-	else
-		@browser.text_field( :name => 'category' ).set data['category'].split(" ").first
-		@browser.button( :value => 'Find Category' ).click
-		sleep(2)
-		if @browser.radio(:value, data['category']).exists? then
-			@browser.radio(:value => data['category']).set
-		else
-			@browser.text_field( :name => 'category' ).set data['category'].split(" ").last
-			@browser.button( :value => 'Find Category' ).click
-			sleep(2)
-			if @browser.radio(:value, data['category']).exists? then
-				@browser.radio(:value => data['category']).set
-			else
-				@browser.text_field( :name => 'category' ).set data['category'].split(" ").first
-				@browser.button( :value => 'Find Category' ).click
-				sleep(2)
-				if @browser.radio(:value, data['category'].split(" ").first).exists? then
-					@browser.radio(:value => data['category'].split(" ").first).set
-				else
-					@browser.text_field( :name => 'category' ).set data['category'].split(" ").last
-					@browser.button( :value => 'Find Category' ).click
-					sleep(2)
-					if @browser.radio(:value, data['category'].split(" ").last).exists? then
-						@browser.radio(:value => data['category'].split(" ").last).set
-					else
-						throw("Category could not be found")
-						#puts("Attempting to find category one letter at a time...")
-						#cycle = 1
-						#piece_by_piece = data['category'].chars.to_a
-						#kaz = piece_by_piece[0]
-						#until cycle > piece_by_piece.length
-						#	@browser.text_field( :name => 'category' ).set kaz
-						#	@browser.button( :value => 'Find Category' ).click
-						#	sleep(4)
-						#	if @browser.radio(:value, data['category']).exists? then
-						#		browser.radio(:value => data['category']).set
-						#		break
-						#	else
-						#		kaz << piece_by_piece[cycle]
-						#		if cycle > piece_by_piece.length
-						#			throw("Category could not be found")
-						#		end
-						#		cycle += 1
-						#	end
-						#end
-					end
-				end
-			end
-		end
-	end
+  def create_business
+    browser.goto 'mojopages.com/biz/add'
+    enter :company_name
+    enter :address
+    enter :city
+    enter :zip
+    enter :phone
+    enter :website
+    enter :tagline, data[:tagline].ljust(100)
+    enter :description, data[:description].ljust(500)
+    submit
+  end
 
+  def select_category
+    wait_until {
+      @has_category = browser.text.include? 'Confirm your category' rescue nil
+      @no_category = browser.text.include? 'Choose your business category' rescue nil
+      @has_category or @no_category
+    }
+    context(:category) {
+      click :continue if @has_category
+      if @no_category
+        until found_category ||= false
+          case (tries ||= 0)
+          when 0, 1
+            category = data[:category]
+          when 2, 3
+            category = data[:category].split(' ').first
+          when 4, 5
+            category = data[:category].split(' ').last
+          when 6
+            raise "Could not find category '#{data[:category]}'."
+          end
+          tries += 1
+          enter :category, category
+          click :find_category
+          if exists? :category_select
+            click :category_select
+            found_category = true
+          end
+        end
+      end
+    }
+  end
 
-	#wait for final step to load than confirm the signup process
-	sleep(2)
-	Watir::Wait::until do @browser.text.include? 'Almost done! Please verify your new business account information.' end
-	@browser.link( :class => 'bizCenterButton greenButton').click
+  def setup_elements
+    @elements[:main] = {
+      :company_name => '#name',
+      :first_name => '[name="owner.firstName"]',
+      :last_name => '[name="owner.lastName"]',
+      :email => '[name="owner.email"]',
+      :address => '[name="address.streetName"]',
+      :city => '[name="address.city"]',
+      :zip => '[name="address.postalCode"]',
+      :phone => '#fullPhone',
+      :website => '#url',
+      :tagline => '#businessDescription',
+      :description => '#businessMetaDescription',
+      :submit => '.bizCenterButton'
+    }
 
-puts("MojoPages business added successfully")
+    @elements[:registration] = {
+      :sign_up => 'a:contains("Sign Up")',
+      :first_name => '#firstName',
+      :last_name => '#lastName',
+      :email => '#email',
+      :password => '#password',
+      :password_confirmation => '#confirmPassword',
+      :zip => '#postalCode',
+      :male => '#Male',
+      :female => '#Female',
+      :submit => '#proceed'
+    }
 
+    @elements[:login] = {
+      :email => '[name=username]',
+      :password => '[name=password]',
+      :submit => '[value=Login]'
+    }
+
+    @elements[:category] = {
+      :continue => 'a.button.positive',
+      :category => '[name=category]',
+      :find_category => '[value="Find Category"]',
+      :category_select => "[type=radio][value='#{data[:category]}']"
+    }
+  end
 end
-add_business( data )
-true
+
+CreateBusiness.new('Mojopages',data,self).verify

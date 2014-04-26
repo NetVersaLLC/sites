@@ -1,12 +1,22 @@
-data = {}
-data['email']				= business.mojopages.first.email
-data['password']			= business.mojopages.first.password
-data['name']				= business.business_name
-data['description']			= business.business_description
-data['phone']				= business.local_phone
-data['address']				= business.address
-data['citystate']			= business.city + ", " + business.state
-data['zip']					= business.zip
-data['url']					= business.company_website
-data['keywords']			= business.category1 + ", " + business.category2 + ", " + business.category3 + ", " + business.category4 + ", " + business.category5
-data
+phone = business.local_phone
+category = MojopagesCategory.find(business.mojopages.first.category_id).name
+data = {
+  payload_framework: PayloadFramework._to_s,
+  company_name: business.business_name,
+  first_name: business.contact_first_name,
+  last_name: business.contact_last_name,
+  email: (business.mojopages.first.email or business.bings.first.email),
+  address: [business.address, business.address2].join(' '),
+  city: [business.city, business.state].join(', '),
+  zip: business.zip,
+  phone: phone,
+  phone_area_code: phone[0..2],
+  phone_prefix: phone[3..5],
+  phone_suffix: phone[6..9],
+  website: business.company_website,
+  password: (business.mojopages.first.password or Mojopages.make_password),
+  gender: business.contact_gender.downcase,
+  tagline: business.tag_line,
+  description: business.business_description,
+  category: category.downcase
+}

@@ -1,190 +1,140 @@
-def claim_business( business )
+eval(data['payload_framework'])
+class ClaimBusiness < PayloadFramework
+  def run
+    area = data[:phone_area_code]
+    prefix = data[:phone_prefix]
+    suffix = data[:phone_suffix]
+    @url = "http://mojopages.com/biz/find?areaCode=#{area}&exchange=#{prefix}&phoneNumber=#{suffix}"
+    browser.goto(@url)
+    register
+    sleep 1
+    if browser.text.include? "Another user with the same email address"
+      login
+    else
+      wait_until { browser.text.include? 'Welcome' }
+      save :email, :password
+    end
+    claim_business
+    select_category
+  end
+
+  def verify
+    wait_until { browser.text.include? 'Please verify' rescue nil }
+    submit
+    true
+  end
+
+  def register
+    context(:registration) {
+      click :sign_up
+      wait_until_present :email
+      enter :first_name
+      enter :last_name
+      enter :email
+      enter :password
+      enter :password_confirmation, data[:password]
+      enter :zip
+      click :"#{data[:gender]}"
+      submit
+    }
+  end
+
+  def login
+    context(:login) {
+      browser.goto 'mojopages.com/login'
+      enter :email
+      enter :password
+      submit
+      wait_until { browser.text.include? 'Welcome' rescue nil }
+    }
+  end
+
+  def claim_business
+    browser.goto @url
+    wait_until { browser.text.include? 'Is this your business?' }
+    sleep 2
+    click :claim_business
+    # wait_until { browser.text.include? "By checking here, I agree" }
+    # browser.execute_script "$j('[type=checkbox]').attr('checked',true);"
+    # browser.execute_script "return confirm(this)"
+    wait_until_present :terms_of_service
+    check :terms_of_service
+    click :continue
+    # listing_id = browser.url.split('/').last
+    # browser.goto "mojopages.com/business/confirm/#{listing_id}"
+    # form_id = browser.form(:action, '/business/claim').id
+    # browser.execute_script "document.getElementById('#{form_id}').submit();"
+    already_claimed = 'This business has already been claimed.'
+    raise already_claimed if browser.text.include? already_claimed
+  end
 
 
-#stuffandthings = @browser.execute_script "return document.title"
-	
-#puts(stuffandthings)
-#puts('I just did something above this line')
+  def select_category
+    wait_until {
+      @has_category = browser.text.include? 'Confirm your category'
+      @no_category = browser.text.include? 'Choose your business category'
+      @has_category or @no_category
+    }
+    context(:category) {
+      click :continue if @has_category
+      if @no_category
+        until found_category ||= false
+          case (tries ||= 0)
+          when 0, 1
+            category = data[:category]
+          when 2, 3
+            category = data[:category].split(' ').first
+          when 4, 5
+            category = data[:category].split(' ').last
+          when 6
+            raise "Could not find category '#{data[:category]}'."
+          end
+          tries += 1
+          enter :category, category
+          click :find_category
+          if exists? :category_select
+            click :category_select
+            found_category = true
+          end
+        end
+      end
+    }
+  end
 
-	area = business[ 'phone_area' ]
-	prefix = business[ 'phone_prefix' ]
-	suffix = business[ 'phone_suffix' ]
-url = "http://mojopages.com/biz/find?areaCode=#{area}&exchange=#{prefix}&phoneNumber=#{suffix}"
-	@browser.goto(url)
-	#confirm your business
-#	@browser.link( :class => 'button positive').click
-	
-	#Confirm box has popped up
+  def setup_elements
+    @elements[:main] = {
+      :claim_business => 'a.button.positive',
+      :terms_of_service => '#lightwindow_contents > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > input:nth-child(1)',
+      :continue => '#lightwindow_contents > div:nth-child(1) > div:nth-child(1) > div:nth-child(3) > input:nth-child(1)',
+      :submit => '.bizCenterButton'
+    }
 
-#	sleep(4)
+    @elements[:registration] = {
+      :sign_up => 'a:contains("Sign Up")',
+      :first_name => '#firstName',
+      :last_name => '#lastName',
+      :email => '#email',
+      :password => '#password',
+      :password_confirmation => '#confirmPassword',
+      :zip => '#postalCode',
+      :male => '#Male',
+      :female => '#Female',
+      :submit => '#proceed'
+    }
 
+    @elements[:login] = {
+      :email => '[name=username]',
+      :password => '[name=password]',
+      :submit => '[value=Login]'
+    }
 
-	#click sign up
-#	@browser.link( :text => 'Sign Up').focus
-	@browser.link( :text => 'Sign Up').click
-#sleep(4)
-	#wait till form loads
-	sleep(2)
-	Watir::Wait::until do @browser.text_field( :id => 'email').exists? end
-	
-	#fill signup form
-	@browser.text_field( :id => 'firstName' ).set business[ 'first_name' ]
-	@browser.text_field( :id => 'lastName' ).set business[ 'last_name' ]	
-	@browser.text_field( :id => 'email' ).set business[ 'email' ]
-	@browser.text_field( :id => 'password' ).set business[ 'password' ]
-	@browser.text_field( :id => 'confirmPassword' ).set business[ 'password' ]
-	@browser.text_field( :id => 'postalCode' ).set business[ 'zip' ]
-
-	#gender selection
-	if business[ 'gender' ] == 'male' or business[ 'gender' ] == "Unknown"
-		@browser.radio( :id => 'Male').set
-	else
-		@browser.radio( :id => 'Female').set
-	end
-	
-	#click submit
-	@browser.button( :id => 'proceed').click
-	sleep(2)
-	if @browser.text.include? "Another user with the same email address already exists."
-		@browser.goto("http://mojopages.com/login")
-		@browser.text_field(:name => 'username').set business['f_email']
-		@browser.text_field(:name => 'password').set business['f_password']
-		@browser.button(:value => 'Login').click
-		sleep(2)
-		Watir::Wait::until do @browser.text.include? 'Welcome' end
-		@browser.goto("http://www.mojopages.com/biz/signup")
-	else
-
-
-	#loads user page
-	sleep(2)
-	Watir::Wait::until do @browser.text.include? 'Welcome' end
-	self.save_account("Mojopages", {:email => business['email'], :password => business['password']})
-	#now that we are signed up we need to go back and actually claim the business, since it skips that step when we go to sign up.
-	@browser.goto("http://www.mojopages.com/biz/signup")
-	end
-	
-	#wait until page loads
-	sleep(2)
-	Watir::Wait::until do @browser.text.include? 'Enter your business phone # to find your business' end
-	
-	#enter phone number
-	@browser.text_field( :id => 'areaCode' ).set business[ 'phone_area' ]
-	@browser.text_field( :name => 'exchange' ).set business['phone_prefix' ]
-	@browser.text_field( :name => 'phoneNumber' ).set business[ 'phone_suffix' ]
-	@browser.button( :value => 'Find My Business' ).click
-	puts(business[ 'phone_area' ] + business['phone_prefix' ] + business[ 'phone_suffix' ])
-	
-	#wait until 'This your business? loads
-	sleep(2)
-	Watir::Wait::until do @browser.text.include? 'Is this your business?' end
-	#say yes
-	@browser.link( :class => 'button positive').click
-
-
-	sleep(2)
-	Watir::Wait::until do @browser.checkbox( :name => 'confirmBox').exists? end
-	sleep(5)
-	#check box to confirm terms and conditions
-	@browser.checkbox( :name => 'confirmBox').click
-	@browser.button(:value, 'Continue').click
-	sleep(5)
-
-theform = @browser.form(:action, '/business/claim').id
-
-
-@browser.execute_script "document.getElementById('#{theform}').submit();"
-#@browser.execute_script "return confirm( this );" 
-
-#	@browser.checkbox( :name => 'confirmBox').set
-#	@browser.button( :value => 'Continue').click
-
-	if @browser.text.include? 'This business has already been claimed.'
-		raise StandardError.new( 'This business has already been claimed. Please contact support@mojopages.com if you believe this is an error' )
-	end
-
-
-	
-	#wait until the page loads to select a category, or confirm category
-	@category_already_set = @browser.text.include? 'Confirm your category'
-	@set_category_needed = @browser.text.include? 'Choose your business category'
-	sleep(2)
-	Watir::Wait::until do @category_already_set or @set_category_needed end
-	
-
-	#check if category has already been set or if it needs to be selected
-	if @category_already_set
-		#category already set
-		@browser.link( :class => 'button positive').click
-	elsif @set_category_needed
-		#category needs to be set
-		@browser.text_field( :name => 'category' ).set business[ 'category' ]
-		@browser.button( :value => 'Find Category' ).click
-	
-	#Wait until category ajax loads
-	sleep(2)
-	Watir::Wait::until do @browser.radio( :name => 'category' ).exists? or  @browser.text.include? 'No results found. Try a different keyword' end
-
-	if @browser.radio(:value, business['category']).exists? then
-		@browser.radio(:value => business['category']).set
-	else
-		@browser.text_field( :name => 'category' ).set business['category'].split(" ").first
-		@browser.button( :value => 'Find Category' ).click
-		sleep(2)
-		if @browser.radio(:value, business['category']).exists? then
-			@browser.radio(:value => business['category']).set
-		else
-			@browser.text_field( :name => 'category' ).set business['category'].split(" ").last
-			@browser.button( :value => 'Find Category' ).click
-			sleep(2)
-			if @browser.radio(:value, business['category']).exists? then
-				@browser.radio(:value => business['category']).set
-			else
-				@browser.text_field( :name => 'category' ).set business['category'].split(" ").first
-				@browser.button( :value => 'Find Category' ).click
-				sleep(2)
-				if @browser.radio(:value, business['category'].split(" ").first).exists? then
-					@browser.radio(:value => business['category'].split(" ").first).set
-				else
-					@browser.text_field( :name => 'category' ).set business['category'].split(" ").last
-					@browser.button( :value => 'Find Category' ).click
-					sleep(2)
-					if @browser.radio(:value, business['category'].split(" ").last).exists? then
-						@browser.radio(:value => business['category'].split(" ").last).set
-					else
-						throw("Category could not be found")
-						#puts("Attempting to find category one letter at a time...")
-						#cycle = 1
-						#piece_by_piece = business['category'].chars.to_a
-						#kaz = piece_by_piece[0]
-						#until cycle > piece_by_piece.length
-						#	@browser.text_field( :name => 'category' ).set kaz
-						#	@browser.button( :value => 'Find Category' ).click
-						#	sleep(4)
-						#	if @browser.radio(:value, business['category']).exists? then
-						#		browser.radio(:value => business['category']).set
-						#		break
-						#	else
-						#		kaz << piece_by_piece[cycle]
-						#		if cycle > piece_by_piece.length
-						#			throw("Category could not be found")
-						#		end
-						#		cycle += 1
-						#	end
-						#end
-					end
-				end
-			end
-		end
-	end
-end
-	
-	#final confirmation step
-	sleep(2)
-	Watir::Wait::until do @browser.text.include? 'Almost done! Please verify your new business account information.' end
-	@browser.link( :class => 'bizCenterButton greenButton').click
-
-
+    @elements[:category] = {
+      :continue => 'a.button.positive',
+      :category => '[name=category]',
+      :find_category => '[value="Find Category"]',
+      :category_select => "option[value='#{data[:category]}']"
+    }
+  end
 end
 
-claim_business( data )
+ClaimBusiness.new('Mojopages',data,self).verify

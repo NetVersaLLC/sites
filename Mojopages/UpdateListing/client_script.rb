@@ -1,32 +1,69 @@
-sign_in(data)
-sleep 3  #wait for login to process
-@browser.goto("http://mojopages.com/business/")
-sleep 2 
-Watir::Wait.until {@browser.div(:id => 'freeAdvertisingPopup-modal-panel').exists? or @browser.div(:id => 'dashboard_business_info').exists?}
+eval(data['payload_framework'])
+class UpdateListing < PayloadFramework
+  def run
+    login
+    click :my_account
+    wait_until { exists? :close_ad or exists? :dashboard }
+    click :close_ad if exists? :close_ad
+    click :edit_listing
+    wait_until_present :edit_button
+    click :edit_button
+    update_listing
+  end
 
-if @browser.checkbox(:name => 'dontShowAgain').exists?
-	@browser.checkbox(:name => 'dontShowAgain').click
+  def verify
+    true
+  end
+
+  def update_listing
+    enter :company_name
+    enter :address
+    enter :city
+    enter :zip
+    enter :phone
+    enter :website
+    enter :tagline, data[:tagline].ljust(110)
+    enter :description, data[:description].ljust(510)
+    submit
+  end
+
+  def login
+    context(:login) {
+      browser.goto 'mojopages.com/login'
+      enter :email
+      enter :password
+      submit
+      wait_until { browser.text.include? 'Welcome' rescue nil }
+    }
+  end
+
+  def setup_elements
+    @elements[:main] = {
+      :company_name => '#name',
+      :first_name => '[name="owner.firstName"]',
+      :last_name => '[name="owner.lastName"]',
+      :email => '[name="owner.email"]',
+      :address => '[name="address.streetName"]',
+      :city => '[name="address.city"]',
+      :zip => '[name="address.postalCode"]',
+      :phone => '#fullPhone',
+      :website => '#url',
+      :tagline => '#description',
+      :description => '#businessMetaDescription',
+      :edit_button => 'a:contains("Edit")',
+      :edit_listing => 'a:contains("Edit Business Profile")',
+      :close_ad => '[name=dontShowAgain]',
+      :dashboard => '#dashboard_business_info',
+      :my_account => 'span.my_account_span',
+      :submit => 'button:contains("Submit")'
+    }
+
+    @elements[:login] = {
+      :email => '[name=username]',
+      :password => '[name=password]',
+      :submit => '[value=Login]'
+    }
+  end
 end
 
-@browser.link(:text => 'Edit Business Profile').click
-
-sleep 1
-Watir::Wait.until {@browser.h3(:id => 'biz_details_title').exists? }
-
-@browser.link(:text => 'Edit').click
-
-sleep 1
-Watir::Wait.until {@browser.text_field(:name => 'name').exists? }
-
-@browser.text_field(:name => 'name').set data['name']
-@browser.text_field(:name => 'description').set data['keywords']
-@browser.text_field(:name => 'fullPhone').set data['phone']
-@browser.text_field(:name => 'address.streetName').set data['address']
-@browser.text_field(:name => 'address.city').set data['citystate']
-@browser.text_field(:name => 'address.postalCode').set data['zip']
-@browser.text_field(:name => 'url').set data['url']
-@browser.text_field(:name => 'businessMetaDescription').set data['description']
-@browser.button(:text => 'Submit').click
-
-sleep 10
-true
+UpdateListing.new('Mojopages',data,self).verify

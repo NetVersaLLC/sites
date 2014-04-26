@@ -1,20 +1,22 @@
-data = {}
-data['phone'] =       business.local_phone
-data[ 'keywords'] = 				business.keywords
-data[ 'username' ] = 				business.bings.first.email.split("@")[0] + 9.to_s
-data[ 'email' ] = 					business.bings.first.email 
-data[ 'business' ] = 				business.business_name
-data[ 'address' ] = 				business.address + ' ' + business.address2
-data[ 'city' ] = 					business.city
-data[ 'state' ] = 					business.state 
-data[ 'zip' ] = 					business.zip
-data[ 'business_description'] = 	business.business_description
-data[ 'website'] = 					business.company_website
-data[ 'role' ] = 					'owner'
-data[ 'name_title' ] = 				business.contact_prefix
-data[ 'first_name' ] = 				business.contact_first_name
-data[ 'last_name' ] = 				business.contact_last_name
-data[ 'password' ] = 				business.bings.first.password
-data[ 'reason_for_info_update'] = 	''
-data['category'] = 					business.category1
-data
+phone = business.local_phone
+fax = business.fax_number
+data = {
+  payload_framework: PayloadFramework._to_s,
+  first_name: business.contact_first_name,
+  last_name: business.contact_last_name,
+  phone_area_code: phone[0..2],
+  phone_prefix: phone[3..5],
+  phone_suffix: phone[6..9],
+  email: business.bings.first.email,
+  company_name: business.business_name,
+  address: business.address,
+  address2: business.address2,
+  city: business.city,
+  state: business.state,
+  category: business.category1,
+  zip: business.zip,
+  fax_area_code: fax[0..2],
+  fax_prefix: fax[3..5],
+  fax_suffix: fax[6..9],
+  website: business.company_website
+}

@@ -20,8 +20,9 @@ end
 def solve_captcha2
   begin
   image = "#{ENV['USERPROFILE']}\\citation\\bing1_captcha.png"
-  obj = @browser.div(:id => 'WLX_HIP_CTL_AMFE').img()
+  obj = @browser.div(:id => 'hipLoading').img()
   #obj = @browser.img( :xpath, '//div/table/tbody/tr/td/img[1]' )
+  #obj = @browser.img( :src, /https:\/\/DC\d\.client\.hip\.live\.com/)
   puts "CAPTCHA width: #{obj.width}"
   obj.save image
   sleep(3)
@@ -34,8 +35,7 @@ end
 
 def enter_captcha
   5.times do
-    captcha_code = solve_captcha2 
-    obj = @browser.div(:id => 'WLX_HIP_CTL_AMFE').text_field().set captcha_code
+    obj = @browser.text_field(:id => /wlspispSolutionElement/).set solve_captcha2 
     @browser.button(:value => /Create account/).click
 
     sleep(20)
@@ -86,6 +86,7 @@ begin
     emailretries = 3
     email_name = firstname + data['last_name'].downcase
     @browser.text_field( :id, /imembernamelive/ ).set email_name
+    sleep 1
     @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
     sleep 1
     @browser.img(:src, /progressindicator\.gif/).wait_while_present
@@ -94,6 +95,7 @@ begin
         @var = rand(99)
         email_name = firstname + data['name'].downcase.delete( ' ' ).strip + @var.to_s
         @browser.text_field( :id, /imembernamelive/ ).set email_name
+        sleep 1
         @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
         sleep 1
         @browser.img(:src, /progressindicator\.gif/).wait_while_present
@@ -102,6 +104,7 @@ begin
         @var = rand(99)
         email_name = lastname + data['first_name'].downcase + @var.to_s
         @browser.text_field( :id, /imembernamelive/ ).set email_name
+        sleep 1
         @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
         sleep 1
         @browser.img(:src, /progressindicator\.gif/).wait_while_present
@@ -110,6 +113,7 @@ begin
         @var = rand(99)
         email_name = firstname + data['last_name'].downcase + @var.to_s
         @browser.text_field( :id, /imembernamelive/ ).set email_name
+        sleep 1
         @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
         sleep 1
         @browser.img(:src, /progressindicator\.gif/).wait_while_present
@@ -120,6 +124,7 @@ begin
         @var = rand(9999)
         email_name = data[ 'name_longer' ].downcase.delete( ' ' ).strip + @var.to_s
         @browser.text_field( :id, /imembernamelive/ ).set email_name
+        sleep 1
         @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
         sleep 1
         @browser.img(:src, /progressindicator\.gif/).wait_while_present

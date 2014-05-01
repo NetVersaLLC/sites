@@ -5,6 +5,15 @@ at_exit{
   end
 }
 
+def solve_captcha()
+  image = "#{ENV['USERPROFILE']}\\citation\\google_captcha.png"
+  obj = @browser.img( :src, /Captcha/ )
+  puts "CAPTCHA source: #{obj.src}"
+  puts "CAPTCHA width: #{obj.width}"
+  obj.save image
+  CAPTCHA.solve image, :manual
+end
+
 def login ( data )
   site = 'https://www.google.com/local/business'
   @browser.goto site
@@ -25,13 +34,31 @@ def login ( data )
     @browser.text_field(:id, "Passwd").set data['pass']
     @browser.button(:value, "Sign in").click
     sleep(5)
+    until not @browser.text.include? "Letters are not case-sensitive"
+      puts "Captcha detected"
+      unless @retries == 0
+        @retries -= 1
+        #@browser.text_field(:id, "Email").set data['email']
+        @browser.text_field(:name, "Passwd").set data['pass']
+        @browser.text_field(:id, 'logincaptcha').set solve_captcha
+        @browser.button(:value, "Sign in").click 
+      else
+        raise "Could not solve Captcha"
+      end
+    end
     # If user name or password is not correct
       if @browser.span(:id => 'errormsg_0_Passwd').exist?
         if @browser.span(:id => 'errormsg_0_Passwd').visible?
+          raise "Incorrect password"
         end
       end
   else
     raise StandardError.new("You must provide both a username AND password for gplus_login!")
+  end
+rescue
+  unless @retries == 0
+    @retries -= 1
+    retry
   end
 end
 
@@ -119,61 +146,61 @@ def update_hours( data )
     elsif not time.nil? || time == ""
       puts "Current Day: #{day}"
       if day == "Sunday"
-        @browser.element(:css => 'div.zn:nth-child(1) > div:nth-child(1) > div:nth-child(1)').click
-        @list = @browser.element(:css => 'div.zn:nth-child(1) > div:nth-child(1) > div:nth-child(5)')
+        @browser.element(:css => 'div.zn:nth-child(2) > div:nth-child(1) > div:nth-child(1)').click
+        @list = @browser.element(:css => 'div.zn:nth-child(2) > div:nth-child(1) > div:nth-child(2)')
         sleep 0.5
         #@browser.div(:text => 'Sunday').click
         @list.divs(:class, 'c-X c-Ne').first.click
-        @browser.element(:css => 'div.zn:nth-child(1) > div:nth-child(1) > input:nth-child(2)').send_keys time.first
-        @browser.element(:css => 'div.zn:nth-child(1) > div:nth-child(1) > input:nth-child(4)').send_keys time.last
+        @browser.element(:css => 'div.zn:nth-child(2) > div:nth-child(1) > input:nth-child(3)').send_keys time.first
+        @browser.element(:css => 'div.zn:nth-child(2) > div:nth-child(1) > input:nth-child(5)').send_keys time.last
       elsif day == "Monday"
-        @browser.element(:css => 'div.zn:nth-child(2) > div:nth-child(1) > div:nth-child(1)').click
-        @list = @browser.element(:css => 'div.zn:nth-child(2) > div:nth-child(1) > div:nth-child(5)')
+        @browser.element(:css => 'div.zn:nth-child(3) > div:nth-child(1) > div:nth-child(1)').click
+        @list = @browser.element(:css => 'div.zn:nth-child(3) > div:nth-child(1) > div:nth-child(2)')
         sleep 0.5
         #@browser.div(:text => 'Monday').click
         @list.divs(:class, 'c-X c-Ne')[1].click
-        @browser.element(:css => 'div.zn:nth-child(2) > div:nth-child(1) > input:nth-child(2)').send_keys time.first
-        @browser.element(:css => 'div.zn:nth-child(2) > div:nth-child(1) > input:nth-child(4)').send_keys time.last
+        @browser.element(:css => 'div.zn:nth-child(3) > div:nth-child(1) > input:nth-child(3)').send_keys time.first
+        @browser.element(:css => 'div.zn:nth-child(3) > div:nth-child(1) > input:nth-child(5)').send_keys time.last
       elsif day == "Tuesday"
-        @browser.element(:css => 'div.zn:nth-child(3) > div:nth-child(1) > div:nth-child(1)').click
-        @list = @browser.element(:css => 'div.zn:nth-child(3) > div:nth-child(1) > div:nth-child(5)')
+        @browser.element(:css => 'div.zn:nth-child(4) > div:nth-child(1) > div:nth-child(1)').click
+        @list = @browser.element(:css => 'div.zn:nth-child(4) > div:nth-child(1) > div:nth-child(2)')
         sleep 0.5
         #@browser.div(:text => 'Tuesday').click
         @list.divs(:class, 'c-X c-Ne')[2].click
-        @browser.element(:css => 'div.zn:nth-child(3) > div:nth-child(1) > input:nth-child(2)').send_keys time.first
-        @browser.element(:css => 'div.zn:nth-child(3) > div:nth-child(1) > input:nth-child(4)').send_keys time.last
+        @browser.element(:css => 'div.zn:nth-child(4) > div:nth-child(1) > input:nth-child(3)').send_keys time.first
+        @browser.element(:css => 'div.zn:nth-child(4) > div:nth-child(1) > input:nth-child(5)').send_keys time.last
       elsif day == "Wednesday"
-        @browser.element(:css => 'div.zn:nth-child(4) > div:nth-child(1) > div:nth-child(1)').click
-        @list = @browser.element(:css => 'div.zn:nth-child(4) > div:nth-child(1) > div:nth-child(5)')
+        @browser.element(:css => 'div.zn:nth-child(5) > div:nth-child(1) > div:nth-child(1)').click
+        @list = @browser.element(:css => 'div.zn:nth-child(5) > div:nth-child(1) > div:nth-child(2)')
         sleep 0.5
         #@browser.div(:text => 'Wednesday').click
         @list.divs(:class, 'c-X c-Ne')[3].click
-        @browser.element(:css => 'div.zn:nth-child(4) > div:nth-child(1) > input:nth-child(2)').send_keys time.first
-        @browser.element(:css => 'div.zn:nth-child(4) > div:nth-child(1) > input:nth-child(4)').send_keys time.last
+        @browser.element(:css => 'div.zn:nth-child(5) > div:nth-child(1) > input:nth-child(3)').send_keys time.first
+        @browser.element(:css => 'div.zn:nth-child(5) > div:nth-child(1) > input:nth-child(5)').send_keys time.last
       elsif day == "Thursday"
-        @browser.element(:css => 'div.zn:nth-child(5) > div:nth-child(1) > div:nth-child(1)').click
-        @list = @browser.element(:css => 'div.zn:nth-child(5) > div:nth-child(1) > div:nth-child(5)')
+        @browser.element(:css => 'div.zn:nth-child(6) > div:nth-child(1) > div:nth-child(1)').click
+        @list = @browser.element(:css => 'div.zn:nth-child(6) > div:nth-child(1) > div:nth-child(2)')
         sleep 0.5
         #@browser.div(:text => 'Thursday').click
         @list.divs(:class, 'c-X c-Ne')[4].click
-        @browser.element(:css => 'div.zn:nth-child(5) > div:nth-child(1) > input:nth-child(2)').send_keys time.first
-        @browser.element(:css => 'div.zn:nth-child(5) > div:nth-child(1) > input:nth-child(4)').send_keys time.last
+        @browser.element(:css => 'div.zn:nth-child(6) > div:nth-child(1) > input:nth-child(3)').send_keys time.first
+        @browser.element(:css => 'div.zn:nth-child(6) > div:nth-child(1) > input:nth-child(5)').send_keys time.last
       elsif day == "Friday"
-        @browser.element(:css => 'div.zn:nth-child(6) > div:nth-child(1) > div:nth-child(1)').click
-        @list = @browser.element(:css => 'div.zn:nth-child(6) > div:nth-child(1) > div:nth-child(5)')
+        @browser.element(:css => 'div.zn:nth-child(7) > div:nth-child(1) > div:nth-child(1)').click
+        @list = @browser.element(:css => 'div.zn:nth-child(7) > div:nth-child(1) > div:nth-child(2)')
         sleep 0.5
         #@browser.div(:text => 'Friday').click
         @list.divs(:class, 'c-X c-Ne')[5].click
-        @browser.element(:css => 'div.zn:nth-child(6) > div:nth-child(1) > input:nth-child(2)').send_keys time.first
-        @browser.element(:css => 'div.zn:nth-child(6) > div:nth-child(1) > input:nth-child(4)').send_keys time.last
+        @browser.element(:css => 'div.zn:nth-child(7) > div:nth-child(1) > input:nth-child(3)').send_keys time.first
+        @browser.element(:css => 'div.zn:nth-child(7) > div:nth-child(1) > input:nth-child(5)').send_keys time.last
       elsif day == "Saturday"
-        @browser.element(:css => 'div.zn:nth-child(7) > div:nth-child(1) > div:nth-child(1)').click
-        @list = @browser.element(:css => 'div.zn:nth-child(7) > div:nth-child(1) > div:nth-child(5)')
+        @browser.element(:css => 'div.zn:nth-child(8) > div:nth-child(1) > div:nth-child(1)').click
+        @list = @browser.element(:css => 'div.zn:nth-child(8) > div:nth-child(1) > div:nth-child(2)')
         sleep 0.5
         #@browser.div(:text => 'Saturday').click
         @list.divs(:class, 'c-X c-Ne').last.click
-        @browser.element(:css => 'div.zn:nth-child(7) > div:nth-child(1) > input:nth-child(2)').send_keys time.first
-        @browser.element(:css => 'div.zn:nth-child(7) > div:nth-child(1) > input:nth-child(4)').send_keys time.last
+        @browser.element(:css => 'div.zn:nth-child(8) > div:nth-child(1) > input:nth-child(3)').send_keys time.first
+        @browser.element(:css => 'div.zn:nth-child(8) > div:nth-child(1) > input:nth-child(5)').send_keys time.last
       end
     end
   end

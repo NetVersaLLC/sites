@@ -5,255 +5,269 @@ at_exit {
   end
 }
 
-def sign_in_business( business )
+#require 'gp_requires'
+def sign_in( business )
 
-retries = 3
-begin
-    @browser.goto( 'https://www.bingplaces.com/' )
+  @browser.goto( 'https://login.live.com/' )
 
-    @browser.button(:id => 'loginButton').click
+  email_parts = {}
+  email_parts = business[ 'hotmail' ].split( '.' )
 
-    sleep 2
-    @browser.link(:text => 'Login').when_present.click
-
-    email_parts = {}
-    email_parts = business[ 'hotmail' ].split( '.' )
-    sleep 2
-    Watir::Wait.until { @browser.input( :name, 'login' ).exists? }
-
-    @browser.input( :name, 'login' ).send_keys email_parts[ 0 ]
-    @browser.input( :name, 'login' ).send_keys :decimal
-    @browser.input( :name, 'login' ).send_keys email_parts[ 1 ]
-    # TODO: check that email entered correctly since other characters may play a trick
-    @browser.text_field( :name, 'passwd' ).set business[ 'password' ]
-    # @browser.checkbox( :name, 'KMSI' ).set
-    @browser.button( :name, 'SI' ).click
-
-    sleep 2
-    Watir::Wait.until {@browser.button(:id => 'loginButton').exists?}
-
-    if @browser.button(:id => 'loginButton').text =~ /Sign in/i
-      throw "Sign-in failed"
-    end
-
-
-  rescue Exception => e
-    if retries > 0
-      puts e.inspect
-      retries -= 1
-      retry
-    else
-      throw "Sign in was not able to complete. "
-    end
-  end
-
-
+  @browser.input( :name, 'login' ).send_keys email_parts[ 0 ]
+  @browser.input( :name, 'login' ).send_keys :decimal
+  @browser.input( :name, 'login' ).send_keys email_parts[ 1 ]
+  # TODO: check that email entered correctly since other characters may play a trick
+  @browser.text_field( :name, 'passwd' ).set business[ 'password' ]
+  # @browser.checkbox( :name, 'KMSI' ).set
+  @browser.button( :name, 'SI' ).click
 
 end
 
-def update_business_portal_details( business )
+def search_for_business( data )
+  @browser.goto( 'http://www.bing.com/businessportal/' ) 
+  sleep 2
+  @browser.button( :value , 'Get Started' ).when_present.click
+  sleep 2
+  #@browser.link(:title => 'Add Your Business').when_present.click
 
-   puts("Debug: Waiting for page to load")
-   sleep(5)
-  
+  @browser.span(:id, 'loginText').click
+  sleep 1
+  unless @browser.link(:text, 'Sign Out').present?
+    @browser.link(:text, 'Login').click
+  end
+end
+
+def update_listing( data )
+  @browser.link(:id, 'managePage').when_present.click
+  @browser.link(:text, 'Edit').when_present.click
+  puts 'Updating listing'
+  sleep 2
+  @browser.execute_script("hidePopUp()")
+  sleep 2
+  Watir::Wait.until { @browser.text_field(:name => 'BasicBusinessInfo.BusinessName').exists? }
+  @browser.text_field(:name => 'BasicBusinessInfo.BusinessName').clear
+  sleep 1
+  @browser.text_field(:name => 'BasicBusinessInfo.BusinessName').set data['business']
+  sleep 1
+  @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.AddressLine1').set data['address']
+  sleep 1
+  @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.AddressLine2').set data['address2']
+  sleep 1
+  @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.City.CityName').set data['city']
+  sleep 1
+  @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.City.CityName').send_keys :tab
+  sleep 1
+  @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.State.StateName').set data['state_name']
+  sleep 1
+  @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.ZipCode').set data['zip']
+  sleep 1
+  @browser.text_field(:name => 'BasicBusinessInfo.MainPhoneNumber.PhoneNumberField').set data['local_phone']
+  sleep 1
+  @browser.text_field(:name => 'BasicBusinessInfo.BusinessEmailAddress').set data['hotmail']
+  sleep 1
+  @browser.text_field(:name => 'BasicBusinessInfo.WebSite').set data['website']
+  sleep 1
+
   if @browser.element(:css , "a[onclick='removeBusinessCategory(this)']").exists?
-  	@browser.execute_script("hidePopUp()")
-  	sleep(2)
     @browser.elements(:css , "a[onclick='removeBusinessCategory(this)']").each do |close|
       close.to_subtype.click
     end
-    puts("Debug: Categories Removed")
   end
-
-
-
-  @browser.checkboxes.each do |at|
-    at.clear
-  end
-  puts("Debug: All checkboxes cleared")
-
-  @browser.execute_script("hidePopUp()")
-  sleep(2)
-  if @browser.text.include? "Browse Categories" then
-  	@browser.button(:value, 'Cancel').click
-  	sleep(2)
-  end
-  @browser.text_field(:name => 'BasicBusinessInfo.BusinessName').set business[ 'businessname' ]
-  @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.AddressLine1').set business[ 'address_uno' ]
-  @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.AddressLine2').set business[ 'address_dos' ]
-  @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.City.CityName').set business[ 'city' ]
-  @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.State.StateName').set business[ 'state_full' ]
-  @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.ZipCode').set business[ 'zip' ]
-  @browser.text_field(:name => 'BasicBusinessInfo.MainPhoneNumber.PhoneNumberField').set business[ 'phone' ]
-  @browser.text_field(:name => 'BasicBusinessInfo.BusinessEmailAddress').set business[ 'hotmail' ]
-  @browser.text_field(:name => 'BasicBusinessInfo.WebSite').set business[ 'website' ]
-  puts("Debug: Basic Data Updated Successfully")
-
-  @browser.text_field(:id => 'categoryInputTextBox').set business[ 'category' ]
-  sleep(2)
-  @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
-  sleep(1)
-  @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
-  sleep(2)
-  @browser.text_field(:id => 'categoryInputTextBox').send_keys :enter
-  #@browser.button( :id, 'categoryAddButton').click
-  puts("Debug: Category Updated Successfully")
-	if @browser.text.include? "Please enter at least one category." then
-		@browser.text_field(:id => 'categoryInputTextBox').set business[ 'category' ]
-  		sleep(2)
-  		@browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
-  		sleep(2)
-  		@browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
-  		sleep(2)
-  		@browser.text_field(:id => 'categoryInputTextBox').send_keys :enter
-  		#@browser.button( :id, 'categoryAddButton').click
-	end
-end
-
-def update_business_portal_additional_details( business )
-	if business[ '24hours' ] == true then
-		@browser.radio( :name => 'AdditionalBusinessInfo.OpHourDetail.OpHourType', :value => 'Open24Hours').set
-	else
-  	@browser.radio( :name => 'AdditionalBusinessInfo.OpHourDetail.OpHourType').set
-  	@browser.text_field( :name, 'AdditionalBusinessInfo.OpHourDetail.AdditionalInformation').set business[ 'hours' ]
-  	end
-  	puts("Debug: Hours Set")
-  	@browser.text_field( :name, 'AdditionalBusinessInfo.Description').set business[ 'description' ]
-  	@browser.text_field( :name, 'AdditionalBusinessInfo.YearEstablished').set business[ 'year_established' ]
-  	@browser.text_field( :name, 'AdditionalBusinessInfo.OpHourDetail.AdditionalInformation').set business[ 'brands ']
-  puts("Debug: Additional Data Updated Successfully")
-end
-
-def update_business_portal_online_presence( business )
-  if @browser.text_field(:name, 'AdditionalBusinessInfo.FacebookWebsite').visible?
-    @browser.text_field(:name, 'AdditionalBusinessInfo.FacebookWebsite').set business[ 'facebook' ]
-    @browser.text_field(:name,'AdditionalBusinessInfo.TwitterWebsite').set business[ 'twitter' ]
-  end
-  puts("Debug: Online Presence Updated Successfully")
-end
-
-def update_business_portal_images_and_videos ( business )
-   #@browser.file_field(:id, 'imageFiles1').set self.logo
-   puts("Debug: Logo Path Set")
-   #@browser.button(:id, 'uploadPhoto1').click
-puts("1")
-  @browser.links(:text => 'X').each do |alink|      
-      puts("2")
-        alink.click if alink.visible?
-        sleep 1
-
-  end
-
-puts("3")
-
-#  logo = self.logo
-#puts "logo: " +logo.to_s
-puts("4")
-#   @browser.file_field(:id => 'imageFiles1').set logo
-   sleep 5
-   puts("5")
- #  @browser.button(:id => 'uploadPhoto1').click
-
-  sleep 5
-puts("6")
-=begin
-if not self.images.exists? or self.images.nil? then
-  images = self.images
-  puts images.to_s
-  puts("7")
-  while @browser.img(:xpath => '//*[@id="imageContainer1"]/span/div/img').attribute_value("src") == "https://www.bingplaces.com/Images/loading.gif" do sleep 1 end 
-puts("8")
-   pbm = 0
-   if images.length > 0
-      puts(images[pbm]['file_name'])
-        while pbm < images.length
-          @browser.file_field(:id, 'imageFiles2').set images[pbm]['file_name']
-          sleep 4
-          #@browser.button(:id => 'uploadPhoto2').click
-puts("9")
-          sleep 2
-          otherpbm = pbm + 1
-          @browser.execute_script("startImageUpload(2)")
-          puts("Before wait")
-          while @browser.img(:xpath => "//*[@id='imageContainer2']/span/div[#{otherpbm}]/img").attribute_value("src") == "https://www.bingplaces.com/Images/loading.gif" do sleep 1 end 
-            puts("Right after wait")
-            sleep 5
-          pbm += 1
+  @browser.text_field(:id => 'categoryInputTextBox').clear
+  category = Array.new
+  data['category'].chomp.split("").each{ |letter|
+    next if not letter =~ /[\w\d\s\!\@\#\$\%\^\&\*\(\)]/
+    puts "Letter: " + letter
+    category.push(letter)
+  }
+  sleep 3
+  category.each{ |letter|
+    sleep 0.1
+    if letter =~ /\&/
+      @browser.text_field(:id => 'categoryInputTextBox').send_keys [:shift, 7]
+    else
+      @browser.text_field(:id => 'categoryInputTextBox').send_keys letter
+    end
+  }
+  sleep 3
+  @browser.text_field(:id => 'categoryInputTextBox').send_keys :tab
+  sleep 3
+  ####
+  unless @browser.img(:src, /CloseMark/).exists?
+    puts "Trying something else.."
+    @browser.text_field(:id => 'categoryInputTextBox').clear
+    sleep 3
+    category.each{ |letter|
+    sleep 0.1
+    if letter =~ /\&/
+      @browser.text_field(:id => 'categoryInputTextBox').send_keys [:shift, 7]
+    else
+      @browser.text_field(:id => 'categoryInputTextBox').send_keys letter
+    end
+  }
+    sleep 3
+    puts "Hitting Enter..."
+    @browser.send_keys :enter
+    puts "Enter hit."
+    sleep 3
+    unless @browser.img(:src, /CloseMark/).exists?
+      puts "Trying YET ANOTHER something..."
+      @browser.text_field(:id => 'categoryInputTextBox').clear
+      sleep 3
+      category.each{ |letter|
+        sleep 0.1
+        if letter =~ /\&/
+            @browser.text_field(:id => 'categoryInputTextBox').send_keys [:shift, 7]
+        else
+            @browser.text_field(:id => 'categoryInputTextBox').send_keys letter
         end
+      }
+      sleep 3
+      @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
+      sleep 1
+      @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
+      sleep 1
+      @browser.text_field(:id => 'categoryInputTextBox').send_keys :enter
+      sleep 3
+      unless @browser.img(:src, /CloseMark/).exists?
+        puts "Come on, now..."
+        @browser.text_field(:id => 'categoryInputTextBox').clear
+        category.each{ |letter|
+            sleep 0.1
+            if letter =~ /\&/
+                @browser.text_field(:id => 'categoryInputTextBox').send_keys [:shift, 7]
+            else
+                @browser.text_field(:id => 'categoryInputTextBox').send_keys letter
+            end
+        }
+        puts "Category entered"
+        sleep(3)
+        @browser.text_field(:id => 'categoryInputTextBox').send_keys :arrow_down
+        puts "Arrow down"
+        sleep (2)
+        @browser.text_field(:id => 'categoryInputTextBox').send_keys :enter
+        puts "Enter pressed"
+        sleep(1)
+        unless @browser.img(:src, /CloseMark/).exists?
+          puts "RAAGGGHH!! *The payload rips off it's shirt and turns green*"
+          @browser.text_field(:id => 'categoryInputTextBox').clear
+          @browser.text_field(:id => 'categoryInputTextBox').set category.join.to_s
+          sleep 3
+          @browser.text_field(:id => 'categoryInputTextBox').send_keys :tab
+          sleep 3
+        end
+      end
+    end
   end
-end  
-=end
-end
-
-def update_business_portal_other_contact_information( business )
-  @browser.text_field(:name, 'AdditionalBusinessInfo.MobilePhoneNumber').set business[ 'mobile' ]
-  @browser.text_field(:name, 'AdditionalBusinessInfo.TollFreeNumber').set business[ 'toll_free_number' ]
-  @browser.text_field(:name, 'AdditionalBusinessInfo.FaxNumber').set business[ 'fax_number' ]
-  puts("Debug: Other Contact Information Updated Successfully")
-end
-
-def update_business_portal_general_information( business )
-  business[ 'payments' ].each do |pay|
-  @browser.checkbox(:id, pay).set
+rescue Exception => e
+  puts(e.inspect)
+  if retries > 0
+    puts("Something went wrong, trying again in 2 seconds..")
+    sleep 2
+    retries -= 1
+    retry
+  else
+    throw e.inspect
   end
-  @browser.text_field(:name, 'AdditionalBusinessInfo.LanguageSpoken').set business[ 'languages' ]
 end
 
-#def enter_business_portal_mobile()
-  #Watir::Wait::until do
-  #  @browser.div( :text, 'MOBILE SITE' ).exists?
-  #end
-#sleep(5)
-  #@browser.div( :class, 'LiveUI_Area_FreeMobileSite' ).div( :class, 'LiveUI_Field_Flag' ).click
-  #@browser.div( :class, 'LiveUI_Area_CreateQRCode' ).div( :class, 'LiveUI_Field_Flag' ).click
-#
- # @browser.div( :text, 'Next' ).click
-#end
+def additional_details( data )
+  puts "Updating additional details"
+  retries = 3
+  begin
+    @browser.h5(:text => 'Services, hours, photos & other details').click
+    sleep 1 #Animation length
+    #@browser.text_field(:name => 'AdditionalBusinessInfo.OpHourDetail.AdditionalInformation').set data['hours']
+    @browser.text_field(:name => 'AdditionalBusinessInfo.Description').when_present.set data['description']
+    @browser.text_field(:name => 'AdditionalBusinessInfo.YearEstablished').set data['founded']
+  rescue Selenium::WebDriver::Error::ElementNotVisibleError
+    if retries > 0
+      retries -= 1
+      retry
+    else
+      puts("Cound not add business hours, description, and year founded.")
+    end
+  end
 
-def editmode()
-  @browser.div( :id, 'businessList1').a( :text, 'Edit').click
+  sleep 2
+  retries = 3
+  begin
+    #@browser.h5(:text => 'Images and Videos').click
+    unless self.logo.nil?
+      @browser.file_field(:id, 'imageFiles1').set self.logo
+      @browser.button(:id, 'uploadPhoto1').click
+      sleep 2
+      @browser.img(:src, /loading.gif/).wait_while_present
+      @browser.img(:src, /https:\/\/bpprodstorage\.blob\.core\.windows\.net/).wait_until_present
+    end
+
+    unless self.images.length < 1
+      for image in self.images
+        @browser.file_field(:id, 'imageFiles2').set "#{ENV['USERPROFILE']}\\citation\\#{@bid}\\images\\#{image}"
+        @browser.button(:id, 'uploadPhoto2').click
+        sleep 2
+        Watir::Wait.until { @browser.button(:id, 'uploadPhoto2').enabled? }
+      end
+    end
+  rescue => e
+    if retries > 0
+      retries -= 1
+      retry
+    else
+      puts(e)
+    end
+  end
+
+  retries = 3
+  begin
+    @browser.h5(:text => "Additional contact information").click
+    sleep 2
+    if data['mobile_appears']
+      @browser.text_field(:name => 'AdditionalBusinessInfo.MobilePhoneNumber').set data['mobile']
+    end
+    @browser.text_field(:name => 'AdditionalBusinessInfo.TollFreeNumber').set data['tollfree']
+    @browser.text_field(:name => 'AdditionalBusinessInfo.FaxNumber').set data['fax']
+  rescue Selenium::WebDriver::Error::ElementNotVisibleError
+    if retries > 0
+      retries -= 1
+      retry
+    else
+      puts("Could not add additional phone numbers")
+    end
+  end
+
+  retries = 3
+  begin
+    #@browser.h5(:text => "General Information").click
+    sleep 1
+
+    data['payments'].each do |pay|
+          puts "Payment: " + pay
+      @browser.checkbox(:id => pay).clear
+      @browser.checkbox(:id => pay).click
+    end
+  rescue Selenium::WebDriver::Error::ElementNotVisibleError
+    if retries > 0
+      retries -= 1
+      retry
+    else
+      puts("Cound not add payment methods.")
+    end
+  end
+
+  @browser.button(:id => 'submitBusiness').click
+
+  Watir::Wait.until { @browser.text.include? "Validate your address" }
+  puts "Validating..."
+  @browser.element(:css, 'div.popUpAction:nth-child(4) > input:nth-child(1)').click
+
+  sleep 2
+  Watir::Wait.until { @browser.text.include? "All Businesses" }
 end
 
-
-def update( business )
-  sign_in_business( business )
-  puts("Debug: Signed in")
-  editmode()
-  puts("Debug: Edit Mode Activated")
-   sleep 2
-   Watir::Wait.until { @browser.h5( :text, 'Additional Business Details').exists? }
-
-  @browser.h5( :text, 'Additional Business Details').click
-  sleep(1)
-  #@browser.h5( :text, 'Online Presence').click
-  #sleep(1)
-  @browser.h5( :text, 'Images and Videos').click
-  sleep(1)
-  @browser.h5( :text, 'Other Contact Information').click
-  sleep(1)
-  @browser.h5( :text, 'General Information').click
-  puts("Debug: All Dropdown pages opened")
-  sleep(1)
-
-
-  update_business_portal_details( business )
-  puts("Debug: Details update method complete")
-  update_business_portal_additional_details( business )
-  puts("Debug: Additional details update method complete")
-  #update_business_portal_online_presence( business )
-  #puts("Debug: Online presence details update method complete")
-  update_business_portal_images_and_videos ( business )
-  puts("Debug: Images and videos update method complete")
-  update_business_portal_other_contact_information( business )
-  puts("Debug: Other contact information update method complete")
-  update_business_portal_general_information( business )
-  puts("Debug: General information update method complete")
-  @browser.button(:id, 'submitBusiness').click
-  puts("Debug: Overall Update Successful!")
-end
-
-update( data )
-
-puts("Debug: Mission Accomplished")
+sign_in( data )
+search_for_business( data )
+update_listing( data )
+additional_details( data )
 self.save_account("Bing", {:status => "Listing updated successfully!"})
 true

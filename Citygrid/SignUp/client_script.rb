@@ -10,24 +10,34 @@ def claim_business(data)
   # Claim the business
   @browser.link(:text => data[ 'business_name' ]).click
   @browser.a( :text => 'Own This Business' ).click
-  @browser.text_field( :id => 'user_first_name' ).set data[ 'first_name' ]
-  @browser.text_field( :id => 'user_last_name' ).set data[ 'last_name' ]
-  @browser.text_field( :id => 'user_phone' ).set data[ 'phone']
-  @browser.text_field( :id => 'user_email' ).set data[ 'email' ]
-  @browser.button( :id => 'create_account_button' ).click
+  @browser.text_field( :id => 'dispute_first_name' ).set data[ 'first_name' ]
+  @browser.text_field( :id => 'dispute_last_name' ).set data[ 'last_name' ]
+  @browser.text_field( :id => 'phone-textfield-1' ).set data[ 'area-code']
+  @browser.text_field( :id => 'phone-textfield-2' ).set data[ 'prefix']
+  @browser.text_field( :id => 'phone-textfield-3' ).set data[ 'number']
+  @browser.text_field( :id => 'dispute_email' ).set data[ 'email' ]
+  # @browser.text_area(:id=>'dispute_details').set data['description']
+  @browser.button( :class => 'btn' ).click
   @browser.wait()
-  @browser.text_field( :id => 'user_password' ).when_present.set data[ 'password' ]
-  @browser.button( :id => 'create_account_button' ).click
-  @browser.wait()
-  @browser.text.include? 'Verify'
-  number = @browser.button( :id, "call_button").when_present.value
-  phone_number = number.slice! "Call me now at "
-  puts "Calling the phone number #{number}"
-#  @browser.button( :id, "call_button").when_present.click
-  code = PhoneVerify.ask_for_code
-  @browser.text_field( :id, "code_field").set code
-  @browser.checkbox( :id => 'check-agree' ).set
-  @browser.button( :id => 'check_button' ).click
+  if @browser.text.include? "Thank you for your inquiry!"
+  	puts "Succesfully Claimed."
+  	true
+  else
+    puts "You need to claim the business."	
+    false
+  end 
+#   @browser.text_field( :id => 'user_password' ).when_present.set data[ 'password' ]
+#   @browser.button( :id => 'create_account_button' ).click
+#   @browser.wait()
+#   @browser.text.include? 'Verify'
+#   number = @browser.button( :id, "call_button").when_present.value
+#   phone_number = number.slice! "Call me now at "
+#   puts "Calling the phone number #{number}"
+# #  @browser.button( :id, "call_button").when_present.click
+#   code = PhoneVerify.ask_for_code
+#   @browser.text_field( :id, "code_field").set code
+#   @browser.checkbox( :id => 'check-agree' ).set
+#   @browser.button( :id => 'check_button' ).click
 end
 
 def search_business(data)

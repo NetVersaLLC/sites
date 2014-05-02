@@ -126,6 +126,10 @@ begin
   @browser.button(:id => 'submitBusiness').click
   puts "Submitted"
   sleep(4 - retries)
+  Watir::Wait.until { @browser.text.include? "Validate your address" }
+  puts "Validating..."
+  @browser.element(:css, 'div.popUpAction:nth-child(4) > input:nth-child(1)').click
+  #@browser.button(:value => 'Submit').when_present.click
   puts "Waiting for Verify Later"
   @browser.button(:value => 'Verify Later').when_present.click
 
@@ -267,6 +271,15 @@ def search_for_business( data )
   @browser.button( :value , 'Get Started' ).when_present.click
   sleep 2
   #@browser.link(:title => 'Add Your Business').when_present.click
+
+  @browser.span(:id, 'loginText').click
+  sleep 1
+  unless @browser.link(:text, 'Sign Out').present?
+    @browser.link(:text, 'Login').click
+  end
+
+  @browser.div(:class, 'countryDropDown').when_present.click
+  @browser.link(:text, /United States/).when_present.click
 
   @businessfound = false
 
@@ -430,7 +443,7 @@ end
 
 
 
-sign_in_business( data )
+sign_in( data )
 search_for_business( data )
 
 if not @businessfound == true

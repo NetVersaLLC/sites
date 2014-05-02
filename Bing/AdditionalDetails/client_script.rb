@@ -52,18 +52,48 @@ begin
 
 end
 
-sign_in_business( data )
-sleep 2
-Watir::Wait.until { @browser.text.include? "All Businesses" }
+def sign_in( data )
 
-@browser.link(:text => 'Edit').click
+  @browser.goto( 'https://login.live.com/' )
+
+  email_parts = {}
+  email_parts = data[ 'hotmail' ].split( '.' )
+
+  @browser.input( :name, 'login' ).send_keys email_parts[ 0 ]
+  @browser.input( :name, 'login' ).send_keys :decimal
+  @browser.input( :name, 'login' ).send_keys email_parts[ 1 ]
+  # TODO: check that email entered correctly since other characters may play a trick
+  @browser.text_field( :name, 'passwd' ).set data[ 'password' ]
+  # @browser.checkbox( :name, 'KMSI' ).set
+  @browser.button( :name, 'SI' ).click
+
+end
+
+sign_in( data )
+
+@browser.goto( 'http://www.bing.com/businessportal/' ) 
+sleep 2
+@browser.button( :value , 'Get Started' ).when_present.click
+sleep 2
+#@browser.link(:title => 'Add Your Business').when_present.click
+
+@browser.span(:id, 'loginText').click
+sleep 1
+unless @browser.link(:text, 'Sign Out').present?
+  @browser.link(:text, 'Login').click
+end
+
+sleep 2
+Watir::Wait.until { @browser.text.include? "Complete your listing" }
+
+@browser.button(:value => 'Complete listing').when_present.click
 
 sleep 2
 retries = 3
 begin
-	@browser.h5(:text => 'Additional Business Details').when_present.click
+	#@browser.h5(:text => 'Services, hours, photos & other details').when_present.click
 	sleep 1 #Animation length
-	@browser.text_field(:name => 'AdditionalBusinessInfo.OpHourDetail.AdditionalInformation').set data['hours']
+	#@browser.text_field(:name => 'AdditionalBusinessInfo.OpHourDetail.AdditionalInformation').set data['hours']
 	@browser.text_field(:name => 'AdditionalBusinessInfo.Description').set data['description']
 	@browser.text_field(:name => 'AdditionalBusinessInfo.YearEstablished').set data['founded']
 rescue Selenium::WebDriver::Error::ElementNotVisibleError
@@ -78,7 +108,7 @@ end
 sleep 2
 retries = 3
 begin
-  @browser.h5(:text => 'Images and Videos').click
+  #@browser.h5(:text => 'Images and Videos').click
   unless self.logo.nil?
     @browser.file_field(:id, 'imageFiles1').set self.logo
     @browser.button(:id, 'uploadPhoto1').click
@@ -106,7 +136,7 @@ end
 
 retries = 3
 begin
-	@browser.h5(:text => "Other Contact Information").click
+	@browser.h5(:text => "Additional contact information").click
 	sleep 2
 	if data['mobile_appears']
 		@browser.text_field(:name => 'AdditionalBusinessInfo.MobilePhoneNumber').set data['mobile']
@@ -124,7 +154,7 @@ end
 
 retries = 3
 begin
-	@browser.h5(:text => "General Information").click
+	#@browser.h5(:text => "General Information").click
 	sleep 1
 
 	data['payments'].each do |pay|

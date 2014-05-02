@@ -88,6 +88,7 @@ begin
     @browser.text_field( :id, /imembernamelive/ ).set email_name
     sleep 1
     @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
+    @browser.text_field(  :id, 'iLastName' ).click
     sleep 1
     @browser.img(:src, /progressindicator\.gif/).wait_while_present
     until @browser.text.include? "@outlook.com is available"
@@ -97,6 +98,7 @@ begin
         @browser.text_field( :id, /imembernamelive/ ).set email_name
         sleep 1
         @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
+        @browser.text_field(  :id, 'iLastName' ).click
         sleep 1
         @browser.img(:src, /progressindicator\.gif/).wait_while_present
         emailretries -= 1
@@ -106,6 +108,7 @@ begin
         @browser.text_field( :id, /imembernamelive/ ).set email_name
         sleep 1
         @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
+        @browser.text_field(  :id, 'iLastName' ).click
         sleep 1
         @browser.img(:src, /progressindicator\.gif/).wait_while_present
         emailretries -= 1
@@ -115,6 +118,7 @@ begin
         @browser.text_field( :id, /imembernamelive/ ).set email_name
         sleep 1
         @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
+        @browser.text_field(  :id, 'iLastName' ).click
         sleep 1
         @browser.img(:src, /progressindicator\.gif/).wait_while_present
         emailretries -= 1
@@ -126,6 +130,7 @@ begin
         @browser.text_field( :id, /imembernamelive/ ).set email_name
         sleep 1
         @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
+        @browser.text_field(  :id, 'iLastName' ).click
         sleep 1
         @browser.img(:src, /progressindicator\.gif/).wait_while_present
         emailretries -= 1

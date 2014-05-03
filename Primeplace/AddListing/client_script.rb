@@ -1,7 +1,7 @@
 @browser = Watir::Browser.new :firefox
 at_exit {
 	unless @browser.nil?
-		# @browser.close
+         @browser.close
 	end
 }
 
@@ -46,13 +46,40 @@ if @browser.link( :class => 'button', :class => 'big').exists?
 	@browser.link( :class => 'button', :class => 'big').click
 end
 
+if @browser.div(:class=>'center').exists?
+   puts "You are successfully listed."
+  true
+ else
+  @browser.radio(:id=>'IhaveParking').set
+  sleep(5)
+  @browser.select_list(:id=>'country').select data['country']
+  @browser.text_field(:id=>'company').set data['company_name']
+  @browser.text_field(:id=>'website').set data['website']
+  @browser.text_field(:id=>'email').set data['email']
+  @browser.text_field(:id=>'name').set data['fullname']
+  @browser.text_field(:id=>'phone').set data['phone']
+  @browser.textarea(:name=>'address').set data['address']
+  @browser.button(:id=>'create_account').click
+  @browser.wait()
+  if @browser.div(:class=>'center').exists?
+   puts "You are successfully listed."
+  true
+  else
+  	puts "Please try again"
+   false
+  end 
+   puts "Please try again"
+   false
+end 
+
+
 #Wait for Verification Page
-Watir::Wait.until { @browser.text.include? "Choose a verification method" }
+#Watir::Wait.until { @browser.text.include? "Choose a verification method" }
 
 #Begin Postcard Verify
-@browser.span(:id => 'methodPostcardTab').click
-sleep(2)
-@browser.text_field( :id => 'postcardFirstName').set data['fname']
-@browser.text_field( :id => 'postcardLastName').set data['lname']
-@browser.button( :id => 'verifyPostcard').click
-true
+#@browser.span(:id => 'methodPostcardTab').click
+#sleep(2)
+#@browser.text_field( :id => 'postcardFirstName').set data['fname']
+#@browser.text_field( :id => 'postcardLastName').set data['lname']
+#@browser.button( :id => 'verifyPostcard').click
+#true

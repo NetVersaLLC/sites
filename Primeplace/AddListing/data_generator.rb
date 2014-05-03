@@ -22,6 +22,7 @@ data[ 'exchange' ]		= business.local_phone.split("-")[1]
 data[ 'last4' ]			= business.local_phone.split("-")[2]
 data[ 'fax' ]			= business.fax_number
 data[ 'email' ]			= business.bings.first.email
+data['company_name']    = business.corporate_name
 data[ 'website' ]		= business.company_website
 data[ 'description' ]	= business.business_description
 data[ 'tagline' ]		= business.category1 + " " + business.category2 + " " + business.category3

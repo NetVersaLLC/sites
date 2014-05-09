@@ -25,7 +25,7 @@ at_exit {
 @browser.text_field( :id => /create_new_listing_name/).set data['business_name']
 @browser.text_field( :id => /create_new_listing_address_1/).set data['address']
 @browser.text_field( :id => /create_new_listing_city/).set data['city']
-@browser.select_list(:id => 'create_new_listing_state').select 'IN'
+@browser.select_list(:id => 'create_new_listing_state').select data['state']
 @browser.text_field( :id => /create_new_listing_zip/).set data['zip']
 @browser.text_field( :id => /create_new_listing_phone/).set data['phone']
 

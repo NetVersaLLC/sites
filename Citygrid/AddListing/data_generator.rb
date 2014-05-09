@@ -7,6 +7,7 @@ data[ 'email' ]		= business.bings.first.email
 data[ 'business_name' ] = business.business_name
 data[ 'zip' ] 		= business.zip
 data['address']  = business.address
+data['state'] = business.state
 data['city'] = business.city
 data['website'] = business.company_website
 data['category'] = business.category3

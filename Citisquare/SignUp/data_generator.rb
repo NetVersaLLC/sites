@@ -1,6 +1,7 @@
 data = {}
 catty = Citisquare.where(:business_id => business.id).first
 data['email'] = business.bings.first.email
+data['bing_password'] = business.bings.first.password
 data['username'] = business.bings.first.email.split("@")[0]
 data['password'] = business.citisquares.first.password.nil? ? Yahoo.make_password : business.citisquares.first.password
 data['phone_area'] = business.local_phone.split("-")[0]

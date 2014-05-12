@@ -16,7 +16,7 @@ data[ 'state' ] 	    = business.state_name
 data[ 'zip' ] 	 	    = business.zip
 data[ 'country' ]  	    = 'United States'
 data[ 'image' ]  	    = business.logo_file_name
-data[ 'password' ] 	    = Yahoo.make_password
+data[ 'password' ] 	    = business.bings.first.password
 data
 
  

@@ -10,9 +10,9 @@ data[ 'title' ] 		= business.category1 + ' ' + business.category2
 data[ 'address' ] 		= business.address 
 data[ 'address2' ]     = business.address2
 data[ 'city' ] 		    = business.city
-data[ 'state' ] 	    = business.state_name
+data[ 'state' ] 	    = business.state#_name
 data[ 'zip' ] 	 	   	= business.zip
 data[ 'country' ]  	    = 'United States'
 data[ 'image' ]  	    = business.logo_file_name
-data[ 'password' ]	    = business.thumbtacks.first.password
+data[ 'password' ]	    = business.bings.first.password
 data

@@ -1,25 +1,37 @@
-# Start Sign Up process
-url = 'https://register.kudzu.com/packageSelect.do'
-@browser.goto(url)
-30.times{ break if @browser.status == "Done"; sleep 1}
-@browser.button( :name, 'basicButton' ).click
+eval(data['payload_framework'])
+class SignUp < PayloadFramework
+  def run
+    browser.goto 'https://register.kudzu.com/packageSelect.do'
+    wait_until_present :start_button
+    click :start_button
+    enter :username
+    enter :email
+    enter :password
+    enter :password_confirmation, data[:password]
+    select :secret_question
+    enter :secret_answer
+    submit
+  end
+  
+  def verify
+    wait_until { browser.text.include? "Add Your Contact Name" }
+    save :username, :email, :password, :secret_answer
+    chain 'CreateListing'
+    true
+  end
 
-# Fill Create Your Login page
-  # Watir::Wait::until @browser.text.include "Create Your Login" or assert that
-  # Watir::Wait::until do @browser.text.include? "agree to the terms below" end
-@browser.text_field( :id => 'userName' ).set data[ 'userName' ]
-@browser.text_field( :id => 'email' ).set data[ 'email' ]
-@browser.text_field( :id => 'pass1' ).set data[ 'pass' ]
-@browser.text_field( :id => 'pass2' ).set data[ 'pass' ]
-@browser.select_list( :id, 'securityQuestion' ).select data[ 'securityQuestion' ]
-@browser.text_field( :id => 'answer' ).set data[ 'answer' ]
-@browser.button( :name, 'nextButton' ).click
-
-30.times{ break if @browser.status == "Done"; sleep 1}
-
-RestClient.post "#{@host}/accounts.json?auth_token=#{@key}&business_id=#{@bid}", 'account[username]' => data['userName'], 'account[password]' => data['pass'], 'account[secret_answer]' => data['answer'], 'model' => 'Kudzu'
-if @chained
-	self.start("Kudzu/CreateListing")
+  def setup_elements
+    @elements[:main] = {
+      :start_button => '[name=basicButton]',
+      :username => '#userName',
+      :email => '#email',
+      :password => '#pass1',
+      :password_confirmation => '#pass2',
+      :secret_question => '#securityQuestion',
+      :secret_answer => '#answer',
+      :submit => '[name=nextButton]'
+    }
+  end
 end
-true
-#Basic SignUp ends
+
+SignUp.new('Kudzu',data,self).verify

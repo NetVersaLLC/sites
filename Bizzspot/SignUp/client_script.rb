@@ -18,13 +18,13 @@ class SignUp < PayloadFramework
     select :state
     enter :category
     enter :zip
-    enter :business_phone_area_code 
-    enter :business_phone_prefix 
-    enter :business_phone_suffix
+    enter :business_phone_area_code, data[:phone_area_code]
+    enter :business_phone_prefix, data[:phone_prefix]
+    enter :business_phone_suffix, data[:phone_suffix]
     enter :fax_area_code
     enter :fax_prefix
     enter :fax_suffix
-    enter :business_email
+    enter :business_email, data[:email]
     enter :website
     check :terms_of_service
     submit
@@ -32,7 +32,7 @@ class SignUp < PayloadFramework
 
   def verify
     wait_until { browser.url.split('/').last == 'thanks.php' }
-    save :email, :password
+    save :email
     true
   end
 

@@ -1,5 +1,5 @@
-phone = business.local_phone
-fax = business.fax_number
+phone = business.local_phone.gsub('-','')
+fax = business.fax_number.gsub('-','')
 data = {
   payload_framework: PayloadFramework._to_s,
   first_name: business.contact_first_name,

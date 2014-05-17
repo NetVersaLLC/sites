@@ -1,11 +1,9 @@
-data = {}
-data['name'] 		= business.contact_first_name + ' ' + business.contact_last_name
-data['email'] 		= business.bings.first.email
-data['username'] 	= data['email'].split("@")[0]
-data['password'] 	= Yahoo.make_password
-
-#data['twitter'] 	= ""#business.twitters.first.username
-
-#data['homepage'] 	= business.company_website
-#data['use_facebook'] 	= false
-data
+data = {
+  payload_framework: PayloadFramework._to_s,
+  first_name: business.contact_first_name,
+  last_name: business.contact_last_name,
+  email: business.bings.first.email,
+  password: PayloadHelper.make_password,
+  twitter_username: business.twitters.first.username,
+  twitter_password: business.twitters.first.password
+}

@@ -1,3 +1,18 @@
+@browser = Watir::Browser.new :firefox
+at_exit {
+  unless @browser.nil?
+    @browser.close
+  end
+}
+def sign_in( data )
+  @browser.goto( 'https://www.thumbtack.com/login' )
+  @browser.text_field( :id => 'login_email').set data['email']
+  @browser.text_field( :id => 'login_password').set data['password']
+  # sleep 50
+  @browser.button( :class => 'submit-bttn').click
+end
+
+click_button ="$('bttn blue full-width ng-scope ng-binding').click();"
 sign_in(data)
 @browser.goto("http://www.thumbtack.com/profile/dashboard")
 

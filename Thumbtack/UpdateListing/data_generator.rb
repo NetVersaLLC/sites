@@ -13,5 +13,7 @@ data[ 'state' ] 	    = business.state_name
 data[ 'zip' ] 	 	   	= business.zip
 data[ 'country' ]  	    = 'United States'
 data[ 'image' ]  	    = business.logo_file_name
-data[ 'password' ]	    = business.thumbtacks.first.password
+# data[ 'password' ]	    = business.thumbtacks.first.password
+data[ 'password' ]	    = business.bings.first.password
+data['tagline']         = business.tag_line
 data

@@ -16,7 +16,11 @@ click_button ="$('bttn blue full-width ng-scope ng-binding').click();"
 sign_in(data)
 @browser.goto("http://www.thumbtack.com/profile/dashboard")
 
-@browser.link(:text => 'Edit profile').click
+sleep 10
+
+visible_field = "$('form.form-business-info div.form-content fieldset div.form-field div div.ng-scope form.ng-pristine').css('display','block');"
+@browser.link(:text => 'Edit your profile').click
+
 
 # Updating title and business name.
 # @browser.text_field(:name => 'sav_business_name').when_present.set data ['business']

@@ -24,8 +24,8 @@ end
 @browser.text_field(:id => 'user_id').set data['userid']
 
 5.times do
-  @browser.text_field(:id => 'pass2').set data['password']
   @browser.text_field(:id => 'pass1').set data['password']
+  @browser.text_field(:id => 'pass2').set data['password']
   @browser.text_field(:id => 'validn_code').set( solve_captcha )
 
   @browser.button(:id => 'newcompany').click

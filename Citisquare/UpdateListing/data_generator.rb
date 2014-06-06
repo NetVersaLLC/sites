@@ -28,6 +28,9 @@ data['apt_number'] = business.address2[/\d+/]
 data['box_number'] = ''
 
 data['city'] = business.city
+data['my_category'] = CitisquareCategory.find(catty.category_id).parent.name
+data['sub_category'] = CitisquareCategory.find(catty.category_id).name
+data['category'] = data['my_category']+' > '+data['sub_category']
 # data['category'] = catty.citisquare_category.parent.name.gsub("\n", "")
 # data['sub_category'] = catty.citisquare_category.name.gsub("\n", "")
 data['specials'] = business.category1 + ' ' + business.category2 + ' ' + business.category3 + ' ' + business.category4 + ' ' + business.category5

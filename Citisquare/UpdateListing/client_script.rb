@@ -7,9 +7,13 @@ at_exit do
   end
 end
 def login(data)
-  @browser.text_field(:name=>'user[email]').set data['email']
-  @browser.text_field(:name=>'user[password]').set data['password']
+  if !data['email'].empty? and !data['password'].empty?
+    @browser.text_field(:name=>'user[email]').set data['email']
+    @browser.text_field(:name=>'user[password]').set data['password']
     @browser.button(:name=>'commit').click
+  else
+    raise StandardError.new("You must provide both a username AND password for login!")
+  end 
 end
 
 def verify_updation(url)

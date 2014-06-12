@@ -130,7 +130,6 @@ unless @heap['listing_created']
     @heap['listing_created'] = create_listing(data) 
     self.save_account("Magicyellow", {"heap" => @heap.to_json})
   end 
-create_listing(data)
 
 self.start("Magicyellow/UpdateListing")
 self.success

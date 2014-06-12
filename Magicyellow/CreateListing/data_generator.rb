@@ -1,5 +1,5 @@
 data = {}
-
+data[ 'heap'] = YAML.load(business.magicyellows.first.heap)
 data[ 'business_category' ] = MagicyellowCategory.find(business.magicyellows.first.category_id).name
 data[ 'phone' ] = business.local_phone
 data[ 'email' ] = business.bings.first.email

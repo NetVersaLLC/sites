@@ -1,6 +1,6 @@
 data = {}
 data[ 'username' ]		= business.freebusinessdirectories.first.username
-data[ 'password' ]		= business.bings.first.password
+data[ 'password' ]		= business.freebusinessdirectories.first.password
 data[ 'description' ]		= business.business_description
 data[ 'website' ]		= business.company_website
 data[ 'salutation' ]		= business.contact_prefix

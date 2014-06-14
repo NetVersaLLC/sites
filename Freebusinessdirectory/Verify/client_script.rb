@@ -45,8 +45,13 @@ def click_verification_link(data)
 
   email_body = @browser.execute_script(get_href)
   href = ((email_body.split('field:'))[1]).split('Please')[0]
-  #  href = '(http:\/\/\S+) If/'.match(email_body)[1] 
-  puts href
+  password = ((email_body.split('Password:'))[1]).split('Should')[0]
+ 
+  self.save_account("Freebusinessdirectory", {:username => data['userid'], 
+    :email => data['email'], :password => password })
+   data['password'] = password
+   puts href
+ 
   raise('could not find verification link in the email') unless href
 
   @browser.goto href

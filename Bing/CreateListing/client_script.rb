@@ -23,6 +23,7 @@ begin
   @browser.text_field(:name => 'BasicBusinessInfo.BusinessName').clear
   @browser.text_field(:name => 'BasicBusinessInfo.BusinessName').set data['business']
   @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.AddressLine1').set data['address']
+  @browser.link(:id => 'addAddressLine2').click
   @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.AddressLine2').set data['address2']
   @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.City.CityName').set data['city']
   @browser.text_field(:name => 'BasicBusinessInfo.BusinessAddress.City.CityName').send_keys :enter

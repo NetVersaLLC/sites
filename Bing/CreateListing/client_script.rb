@@ -279,7 +279,7 @@ def search_for_business( data )
     @browser.link(:text, 'Login').click
   end
 
-  @browser.div(:class, 'countryDropDown').when_present.click
+  @browser.element(:css => '.countryDropDown').when_present.click
   @browser.link(:text, /United States/).when_present.click
 
   @businessfound = false

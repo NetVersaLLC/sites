@@ -83,57 +83,62 @@ begin
     else
       lastname = data['last_name'].downcase
     end
-    emailretries = 3
+    emailretries = 4
     email_name = firstname + data['last_name'].downcase
     @browser.text_field( :id, /imembernamelive/ ).set email_name
-    sleep 1
+    sleep 2
     @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
+    sleep 2
     @browser.text_field(  :id, 'iLastName' ).click
-    sleep 1
+    sleep 2
     @browser.img(:src, /progressindicator\.gif/).wait_while_present
     until @browser.text.include? "@outlook.com is available"
       if emailretries == 1
-        @var = rand(99)
-        email_name = firstname + data['name'].downcase.delete( ' ' ).strip + @var.to_s
+        @var = 8.times.map{ rand(9) }.join
+        email_name = data[ 'name_longer' ].downcase.delete( ' ' ).strip + @var.to_s
         @browser.text_field( :id, /imembernamelive/ ).set email_name
-        sleep 1
+        sleep 2
         @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
+        sleep 2
         @browser.text_field(  :id, 'iLastName' ).click
-        sleep 1
+        sleep 2
         @browser.img(:src, /progressindicator\.gif/).wait_while_present
         emailretries -= 1
       elsif emailretries == 2
-        @var = rand(99)
-        email_name = lastname + data['first_name'].downcase + @var.to_s
+        @var = 4.times.map{ rand(9) }.join
+        email_name = firstname + data['name'].downcase.delete( ' ' ).strip + @var.to_s
         @browser.text_field( :id, /imembernamelive/ ).set email_name
-        sleep 1
+        sleep 2
         @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
+        sleep 2
         @browser.text_field(  :id, 'iLastName' ).click
-        sleep 1
+        sleep 2
         @browser.img(:src, /progressindicator\.gif/).wait_while_present
         emailretries -= 1
       elsif emailretries == 3
-        @var = rand(99)
+        @var = 3.times.map{ rand(9) }.join
+        email_name = lastname + data['first_name'].downcase + @var.to_s
+        @browser.text_field( :id, /imembernamelive/ ).set email_name
+        sleep 2
+        @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
+        sleep 2
+        @browser.text_field(  :id, 'iLastName' ).click
+        sleep 2
+        @browser.img(:src, /progressindicator\.gif/).wait_while_present
+        emailretries -= 1
+      elsif emailretries == 4
+        @var = 2.times.map{ rand(9) }.join
         email_name = firstname + data['last_name'].downcase + @var.to_s
         @browser.text_field( :id, /imembernamelive/ ).set email_name
-        sleep 1
+        sleep 2
         @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
+        sleep 2
         @browser.text_field(  :id, 'iLastName' ).click
-        sleep 1
+        sleep 2
         @browser.img(:src, /progressindicator\.gif/).wait_while_present
         emailretries -= 1
-      elsif emailretries == 0
-        throw "Email could not be set uniquely."
       else
-        @var = rand(9999)
-        email_name = data[ 'name_longer' ].downcase.delete( ' ' ).strip + @var.to_s
-        @browser.text_field( :id, /imembernamelive/ ).set email_name
-        sleep 1
-        @browser.text_field( :id, /iFirstName/).click # Causes the email check to occur
-        @browser.text_field(  :id, 'iLastName' ).click
-        sleep 1
-        @browser.img(:src, /progressindicator\.gif/).wait_while_present
-        emailretries -= 1
+        throw "Email could not be set uniquely."
       end
     end
     data[ 'hotmail' ] = email_name + '@outlook.com'

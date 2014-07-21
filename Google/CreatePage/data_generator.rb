@@ -12,7 +12,7 @@ data[ 'phone' ]           = business.local_phone
 data[ 'state' ]           = business.state_name
 data[ 'address' ]         = business.address
 data[ 'hours'   ]         = Google.get_hours(business)
-data[ 'city' ]		= @business.city
+data[ 'city' ]		= business.city
 data[ 'website'] 	= business.company_website
 data[ 'description'] = business.business_description
 #catty = Facebook.where(:business_id => business.id).first

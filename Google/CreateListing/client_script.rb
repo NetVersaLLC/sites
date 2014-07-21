@@ -1,7 +1,7 @@
 #require 'rautomation'
 
 #!/usr/bin/env ruby
-
+=begin
 require 'rubygems'
 require 'ffi'
 
@@ -126,6 +126,7 @@ module Win
     Win.post_message(open_button, 245, 0, 0)
   end
 end
+=end
 
 # Used for proper exception handling
 
@@ -158,10 +159,6 @@ def login ( data )
   end
   
   page = Nokogiri::HTML(@browser.html)
-
-  #if not page.at_css('div.signin-box') # Check for <div class="signin-box">
-  #  @browser.link(:text => 'Sign in').click
-  #end
 
   if !data['email'].empty? and !data['pass'].empty?
     @browser.text_field(:id, "Email").set data['email']
@@ -196,136 +193,26 @@ rescue
   end
 end
 
-# No longer used, left for reference
-# Upload photo on google profile
-def photo_upload_pop(data)
-  require 'rautomation'
-  #update logo
-  @browser.div(:class => 'G8iV4').when_present.click
-  @browser.div(:class => /o7Daxc g-s-Sa-Cr/).when_present.click
-  @browser.div(:text => 'Select a photo from your computer').when_present.click
-  data['logo'] = self.logo
-  if data['logo'] > 0
-    photo_upload_pop = RAutomation::Window.new :title => /File Upload/
-    photo_upload_pop.text_field(:class => "Edit").set(data['logo'])
-    photo_upload_pop.button(:value => "&Open").click
-    @browser.wait_until {@browser.div(:text => 'Set as profile photo').visible? }
-    @browser.div(:text => 'Set as profile photo').click
-    @browser.button(:value => 'Cancel').when_present.click
-  end
-
-  #update other images
-  pic = self.images
-  data[ 'images' ] = pic
-  @browser.div(:text => 'Change cover').when_present.click
-  @browser.div(:text => 'Upload').when_present.click
-  @browser.div(:text => 'Select a photo from your computer').when_present.click
-  if pic.length > 0
-    image_index = ""
-    for image_index in (0..pic.length-1)
-      photo_upload_pop = RAutomation::Window.new :title => /File Upload/
-      photo_upload_pop.text_field(:class => "Edit").set(pic[image_index])
-      photo_upload_pop.button(:value => "&Open").click
-      @browser.wait_until {@browser.div(:text => 'Select cover photo').visible? }
-      @browser.div(:text => 'Select cover photo').click
-    end
-  end
-end
-
-
-# Used to handle different elements later down the road
-def check_scenarios( data )
+def check_results( data )
   businessFound = false
-  business_name = []
-  address = []
-  data['business'].split(" ").each{ |word|
-    business_name.push(word)
-  }
-  weight = 0
-  puts "Checking result scenarios..."
-  # Check for different scenarios
-  if @browser.text.include? "Is this your business?"
-    # Scenario 1
-    @scenario = 1
-    puts "Single Business Scenario"
-    business_name.each{ |word|
-      if @browser.text.include? word
-        weight += 1
-      end
-    }
-    if weight >= (business_name.length / 2) then
-      if @browser.text.include? data['address'] then
-        puts "Match Found!"
-        businessFound = true
-      else
-        weight = 0
-        data['address'].split(" ").each{ |word|
-          address.push(word)
-        }
-        address.each{ |word|
-          if @browser.text.include? word
-            weight += 1
-          end
-        }
-        if weight >= (address.length / 2)
-          puts "Match Found!"
-          businessFound = true
-        end
-      end
-    end
-  elsif @browser.text.include? "Is one of these your business?"
-    # Scenario 2
-    @scenario = 2
-    puts "Multiple Businesses Scenario"
-    business_name.each{ |word|
-      if @browser.text.include? word
-        weight += 1
-      end
-    }
-    if weight >= (business_name.length / 2) then
-      if @browser.text.include? data['address'] then
-        puts "Match Found!"
-        businessFound = true
-      else
-        weight = 0
-        data['address'].split(" ").each{ |word|
-          address.push(word)
-        }
-        address.each{ |word|
-          if @browser.text.include? word
-            weight += 1
-          end
-        }
-        if weight >= (address.length / 2)
-          puts "Match Found!"
-          businessFound = true
-        end
-      end
-    end
-  elsif @browser.text.include? "We could not find"
-    # Scenario 3
-    @scenario = 3
-    puts "No Results Scenario"
+  if @browser.text.include? data['business'] then
+    businessFound = true
   end
-  return businessFound
+  businessFound
 end
 
 def search_business( data )
   
   login (data)
 
-  unless @browser.url =~ /https:\/\/www\.google\.com\/local\/business\/add/
-    @browser.goto "https://www.google.com/local/business/add"
-  end
+  @browser.goto "https://www.google.com/local/business/add"
   
   if @browser.div(:class => "W0 pBa").exist? && @browser.div(:class => "W0 pBa").visible?
     @browser.div(:class => "W0 pBa").click
   end
 
-  #@browser.div(:text, 'Local Business or Place').when_present.click
-
   if @browser.text_field(:id => 'Passwd').exist?
-    @browser.text_field(:id => 'Passwd').set data['pass'] if @browser.text_field(:id => 'Passwd').exist?
+    @browser.text_field(:id => 'Passwd').set data['pass']
     @browser.button(:value, "Sign in").click
     sleep(3)
   end
@@ -337,7 +224,7 @@ def search_business( data )
   end
   
   puts "Searching for business..."
-  @browser.element(:css => '.b-Ca').when_present.send_keys data['phone']#data['business'] + ", " + data['state'] + ' ' + data['city']
+  @browser.element(:css => '.b-Ca').when_present.send_keys data['phone']
   @browser.img(:src, /search-white/).click
   @browser.element(:css => '.I0vWDf').wait_until_present(60)
   sleep 3 # Just in case some elements haven't loaded yet
@@ -353,20 +240,8 @@ rescue => e
   end
 end
 
-def handle_scenarios()
-  # Handle Result Scenario
-  puts "Handling Results Scenario..."
-  if @scenario == 1 then
-    @browser.h4(:text, "No, this is not my business").click
-  elsif @scenario == 2 then
-    @browser.h4(:text, "No, these are not my businesses").click
-  elsif @scenario == 3 then
-    @browser.h4(:text, "I've correctly entered the business and address").click
-  else
-    raise "Invalid Result Scenario"
-  end
-
-  puts "Scenario #{@scenario.to_s} handled."
+def handle_results()
+  @browser.goto "https://www.google.com/local/business/add/info"
 end
 
 def initial_signup_form( data )
@@ -377,14 +252,14 @@ def initial_signup_form( data )
   end
   puts 'Creating business listing'
   # Basic Information, xpath used for reliability
-  @browser.element(:css => '.Fd-fb > div:nth-child(2) > label:nth-child(1) > div:nth-child(2) > input:nth-child(1)').when_present.send_keys data['business']
+  @browser.element(:css => '.j7GMYc-fb > div:nth-child(2) > label:nth-child(1) > div:nth-child(2) > input:nth-child(1)').when_present.send_keys data['business']
   puts "Business set"
   #Skip Country/Region
   @browser.element(:css => 'div.Xq:nth-child(2) > input:nth-child(2)').send_keys data['address']
   @browser.element(:css => '.OO').send_keys data['city']
   # Set State      
   puts "Selecting State..."
-  @browser.element(:css, '.aP > div:nth-child(1)').click
+  @browser.element(:css, '.aP > div:nth-child(2)').click
   sleep 1
   @browser.divs(:class, 'c-X').each do |state|
     if state.text == data['state']
@@ -401,7 +276,7 @@ def initial_signup_form( data )
   sleep 2
   @browser.element(:css => '.cP').send_keys data['zip'].to_s
   puts "Zip set"
-  @browser.element(:css => 'input.Cj:nth-child(1)').send_keys data['phone']
+  @browser.element(:css => '.x1bKod-g5zyGb').send_keys data['phone']
   puts "Phone Set"
   data['category'].gsub!(/\d\s?/, "") # Remove numbers
   @browser.element(:css => '.mg').send_keys data['category']
@@ -416,7 +291,7 @@ def initial_signup_form( data )
       category.click
     end
   end
-  @browser.div(:text, 'Submit').click
+  @browser.div(:text, 'Continue').click
   Watir::Wait.until(10) { @browser.url != "https://www.google.com/local/business/add/info" }
 rescue => e
   unless @retries == 0
@@ -430,18 +305,34 @@ rescue => e
   end
 end
 
-def postcard_verify( data )
-  @browser.element(:css => 'div.Id:nth-child(1)').when_present.click
-  @browser.element(:css => '.sf8V7e > div:nth-child(3) > input:nth-child(1)').when_present.send_keys data['name']
-  @browser.element(:css => '.sf8V7e > div:nth-child(3) > div:nth-child(2) > div:nth-child(1)').click
-  
-  @browser.element(:css => '.EHnaC').when_present.click #Continue
-  sleep 3
-  if @browser.element(:css => '.b-P-Tb').present?
-    @browser.element(:css => '.b-P-Tb').click
-    @browser.element(:css => '.d-Cb-Ba').click
+def google_plus_handler()
+  if @browser.element(:css => '.Ti').exists?
+    @browser.element(:css => '.Ti').click # I am authorized to handle this business, checkbox
+    sleep 4 # Probably could be less, better safe than sorry
+    @browser.element(:css, '.s69Rsd').click
   end
+end
+
+def phone_verify_handler()
+  sleep 10 # Gotta be a better way. 
+  if @browser.text.include? "Verify your account"
+    puts "Phone verification encountered!"
+    if @chained
+      self.start("Google/CreateNotify")
+    end
+    self.save_account("Google", {:status => "Creating listing... Phone verification required."})
+    self.success("Phone verification required.")
+    exit
+  end
+end
+
+def postcard_verify( data )
+  @browser.div(:text => /Continue and verify later/).when_present.click
+  sleep 8
   puts "Page Successfully Created"
+  self.save_account("Google", {:status => "Business page created succesfully."})
+  self.success("Page created succesfully.")
+  exit
 rescue
   unless @retries < 3
     @retries = 3
@@ -452,7 +343,7 @@ rescue
   end
 end
 
-def add_business_contact( data)
+def add_business_contact( data )
   unless @retries < 3
     @retries = 3
   end
@@ -629,7 +520,6 @@ rescue => e
     sleep 3
   end
 end
-end
 
 def add_business_description( data )
   unless @retries < 3
@@ -658,13 +548,12 @@ rescue => e
 end
 
 def finish_business( data )
-  @browser.element(:css => '.rB').when_present.click
+  @browser.element(:css => '.b-c-Wa').when_present.click
 
   add_business_contact( data )
 
   add_hours( data )
 
-  # Needs RAutomation support
   #add_photos( data )
 
   add_business_description( data )
@@ -686,20 +575,21 @@ end
 #Main Steps
 @retries = 3
 begin
-  #login( data ) 
-  search_business( data ) # Also logs in, so the rescue can handle it
-  if check_scenarios( data ) == true
+  search_business( data )
+  if check_results( data ) == true
     self.save_account("Google", {:status => "Pre-existing listing found! Claiming..."})
     if @chained
       self.start("Google/ClaimListing")
     end
   else
-    handle_scenarios()
+    handle_results()
     initial_signup_form( data )
+    google_plus_handler()
+    phone_verify_handler()
     postcard_verify( data )
     begin
       sleep 5
-      if @browser.element(:css => '.rB').present?
+      if @browser.element(:css => '.b-c-Wa').present?
         finish_business( data )
       else
         raise InvalidDashboard
@@ -720,14 +610,10 @@ begin
     self.save_account("Google", {:status => "Listing created, verify postcard will arrive in 1-2 weeks."})
   end
 
-rescue Timeout::Error
-  puts("Caught a TIMEOUT ERROR!")
-
 rescue Selenium::WebDriver::Error::ElementNotVisibleError => e
   puts e.inspect
   puts "Error encountered. Trying to ride it out..."
-  #sleep  
-
+  sleep
 end
 
 puts "Payload Completed"

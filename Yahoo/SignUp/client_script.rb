@@ -17,6 +17,7 @@ class Runner
         phone_verify
         code = PhoneVerify.retrieve_code("Yahoo")
         input_verification_sms(code)
+        Watir::Wait.until{ @brow.text.include? "Your account has been successfully created!" }
       end
     end
   ensure
@@ -26,7 +27,7 @@ class Runner
   def input_verification_sms(code)
     wait_for_page_load
     txt_set({:id => 'verification-code'}, code.to_s)
-    @brow.button(:type => 'submit').click
+    @brow.element(:css => '.button').click
   end
   
   def sign_up
@@ -119,8 +120,8 @@ class Runner
 
 
   def wait_for_page_load
-    sleep(30)
-    #Watir::Wait.until{ @brow.execute_script("return document.readyState == 'complete';")}
+    #sleep(30)
+    Watir::Wait.until{ @brow.execute_script("return document.readyState == 'complete';")}
   end
 
   def try_do func, n, *args

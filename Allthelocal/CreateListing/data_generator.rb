@@ -1,4 +1,5 @@
 data = {}
+data['heap'] = business.allthelocals.first ? business.allthelocals.first.heap : "{}"
 data['contact_name'] = business.contact_first_name + ' ' + business.contact_last_name
 data['email'] = business.bings.first.email
 data['local_phone'] = business.local_phone
